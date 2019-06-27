@@ -1,0 +1,173 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JavaScript与ActiveX控件 | Kensan</title>
+<link rel="shortcut icon" href="https://fuzi1996.github.io//favicon.ico?v=1561647823841">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://fuzi1996.github.io//styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fuzi1996.github.io/">
+  <img class="avatar" src="https://fuzi1996.github.io//images/avatar.png?v=1561647823841" alt="">
+  </a>
+  <h1 class="site-title">
+    Kensan
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              JavaScript与ActiveX控件
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2019-06-27 ·
+              </time>
+              
+                <a href="https://fuzi1996.github.io//tag/javascript" class="post-tags">
+                  # JavaScript
+                </a>
+              
+                <a href="https://fuzi1996.github.io//tag/activex" class="post-tags">
+                  # ActiveX
+                </a>
+              
+            </div>
+            
+            <div class="post-content">
+              <h1 id="如何注入activex控件对象">如何注入ActiveX控件对象?</h1>
+<ul>
+<li><code>&lt;object id=&quot;xxx&quot; classid=&quot;xx-xx...&quot;&gt;</code></li>
+<li>如果不使用object标签，也可以直接通过js的ActiveXObject来创建指定ActiveX的实例从而达到调用插件接口的目的
+<code>var objCard = new ActiveXObject(&quot;xxx&quot;);</code></li>
+</ul>
+<h5 id="xxx为xxxl格式是第二位第二位">xxx为'xxx.l'格式,是第二位第二位</h5>
+<p>例如:
+<img src="https://github.com/fuzi1996/pictbed/blob/master/regist.png" alt="注册表图片">
+即IMPLEMENT_OLECREATE_EX的第二参数就表示当前插件的ProgId
+<code>var objCard = new ActiveXObject(&quot;Uprain.CardAccessorCtrl.1&quot;);</code></p>
+<h1 id="如何判断activex是否已经安装呢">如何判断ActiveX是否已经安装呢？</h1>
+<p>实际上如果ActiveX未安装，通过new ActiveXObject的方式来创建插件对象是会抛出“Automation 服务器不能创建对象”异常的。</p>
+<pre><code class="language-javascript">try {
+	&amp;emsp;&amp;emsp;objCard = new ActiveXObject(&quot;Uprain.CardAccessorCtrl.1&quot;);
+}
+catch (e) {
+	&amp;emsp;&amp;emsp;alert(&quot;调用ActiveX失败！&quot;);
+}
+</code></pre>
+<h1 id="如何捕获activex控件事件">如何捕获ActiveX控件事件?</h1>
+<ul>
+<li>方式1:</li>
+</ul>
+<pre><code class="language-html">&lt;script language=&quot;javascript&quot; for=&quot;objectId&quot; event=&quot;eventName&quot;&gt;
+		&amp;emsp;&amp;emsp;//todo
+&lt;/script&gt;
+</code></pre>
+<ul>
+<li>方式2:</li>
+</ul>
+<pre><code class="language-html">&lt;script lanuage=&quot;javascript&quot;&gt;
+	function L::TestEvent(){
+			&amp;emsp;&amp;emsp;//todo
+	}
+&lt;/script&gt;
+</code></pre>
+<ul>
+<li>方式3:</li>
+</ul>
+<pre><code class="language-html">&lt;script type = 'text/javascript'&gt; 
+function onXXXevent(){ 
+	&amp;emsp;&amp;emsp;//js内容 
+} 
+activexID.attachEvent(&quot;onXXXevent&quot;, onXXXevent); 
+//或者addEventListener
+&lt;/script&gt;
+</code></pre>
+<h5 id="来自-httpswwwjb51netarticle22996htm">来自 <a href="https://www.jb51.net/article/22996.htm">https://www.jb51.net/article/22996.htm</a></h5>
+<h1 id="怎样在不支持script-for标签的页面中使用script-for">怎样在不支持script for标签的页面中使用script for?</h1>
+<p><img src="https://github.com/fuzi1996/pictbed/blob/master/create_script_element_for.png" alt="动态创建script"></p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fuzi1996.github.io//post/about">
+              <h3 class="post-title">
+                关于
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://fuzi1996.github.io/</id>
+    <title>Kensan</title>
+    <updated>2019-06-27T15:03:50.898Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://fuzi1996.github.io/"/>
+    <link rel="self" href="https://fuzi1996.github.io//atom.xml"/>
+    <subtitle>温故而知新</subtitle>
+    <logo>https://fuzi1996.github.io//images/avatar.png</logo>
+    <icon>https://fuzi1996.github.io//favicon.ico</icon>
+    <rights>All rights reserved 2019, Kensan</rights>
+    <entry>
+        <title type="html"><![CDATA[JavaScript与ActiveX控件]]></title>
+        <id>https://fuzi1996.github.io//post/javascript-yu-activex-kong-jian</id>
+        <link href="https://fuzi1996.github.io//post/javascript-yu-activex-kong-jian">
+        </link>
+        <updated>2019-06-27T13:11:36.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="如何注入activex控件对象">如何注入ActiveX控件对象?</h1>
+<ul>
+<li><code>&lt;object id=&quot;xxx&quot; classid=&quot;xx-xx...&quot;&gt;</code></li>
+<li>如果不使用object标签，也可以直接通过js的ActiveXObject来创建指定ActiveX的实例从而达到调用插件接口的目的
+<code>var objCard = new ActiveXObject(&quot;xxx&quot;);</code></li>
+</ul>
+<h5 id="xxx为xxxl格式是第二位第二位">xxx为'xxx.l'格式,是第二位第二位</h5>
+<p>例如:
+<img src="https://github.com/fuzi1996/pictbed/blob/master/regist.png" alt="注册表图片">
+即IMPLEMENT_OLECREATE_EX的第二参数就表示当前插件的ProgId
+<code>var objCard = new ActiveXObject(&quot;Uprain.CardAccessorCtrl.1&quot;);</code></p>
+<h1 id="如何判断activex是否已经安装呢">如何判断ActiveX是否已经安装呢？</h1>
+<p>实际上如果ActiveX未安装，通过new ActiveXObject的方式来创建插件对象是会抛出“Automation 服务器不能创建对象”异常的。</p>
+<pre><code class="language-javascript">try {
+	&amp;emsp;&amp;emsp;objCard = new ActiveXObject(&quot;Uprain.CardAccessorCtrl.1&quot;);
+}
+catch (e) {
+	&amp;emsp;&amp;emsp;alert(&quot;调用ActiveX失败！&quot;);
+}
+</code></pre>
+<h1 id="如何捕获activex控件事件">如何捕获ActiveX控件事件?</h1>
+<ul>
+<li>方式1:</li>
+</ul>
+<pre><code class="language-html">&lt;script language=&quot;javascript&quot; for=&quot;objectId&quot; event=&quot;eventName&quot;&gt;
+		&amp;emsp;&amp;emsp;//todo
+&lt;/script&gt;
+</code></pre>
+<ul>
+<li>方式2:</li>
+</ul>
+<pre><code class="language-html">&lt;script lanuage=&quot;javascript&quot;&gt;
+	function L::TestEvent(){
+			&amp;emsp;&amp;emsp;//todo
+	}
+&lt;/script&gt;
+</code></pre>
+<ul>
+<li>方式3:</li>
+</ul>
+<pre><code class="language-html">&lt;script type = 'text/javascript'&gt; 
+function onXXXevent(){ 
+	&amp;emsp;&amp;emsp;//js内容 
+} 
+activexID.attachEvent(&quot;onXXXevent&quot;, onXXXevent); 
+//或者addEventListener
+&lt;/script&gt;
+</code></pre>
+<h5 id="来自-httpswwwjb51netarticle22996htm">来自 <a href="https://www.jb51.net/article/22996.htm">https://www.jb51.net/article/22996.htm</a></h5>
+<h1 id="怎样在不支持script-for标签的页面中使用script-for">怎样在不支持script for标签的页面中使用script for?</h1>
+<p><img src="https://github.com/fuzi1996/pictbed/blob/master/create_script_element_for.png" alt="动态创建script"></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[关于]]></title>
+        <id>https://fuzi1996.github.io//post/about</id>
+        <link href="https://fuzi1996.github.io//post/about">
+        </link>
+        <updated>2019-01-25T11:09:48.000Z</updated>
+        <content type="html"><![CDATA[<p>这是由Gridea生成的个人博客，Gridea可以将你的github仓库编程一个个人博客。非常好用，这是它的地址<a href="https://gridea.dev/">gridea</a></p>
+]]></content>
+    </entry>
+</feed>
