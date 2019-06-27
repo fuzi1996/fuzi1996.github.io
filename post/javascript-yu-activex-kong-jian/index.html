@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript与ActiveX控件 | Kensan</title>
-<link rel="shortcut icon" href="https://fuzi1996.github.io//favicon.ico?v=1561648945647">
+<link rel="shortcut icon" href="https://fuzi1996.github.io//favicon.ico?v=1561648996453">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://fuzi1996.github.io//styles/main.css">
 
@@ -18,7 +18,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://fuzi1996.github.io/">
-  <img class="avatar" src="https://fuzi1996.github.io//images/avatar.png?v=1561648945647" alt="">
+  <img class="avatar" src="https://fuzi1996.github.io//images/avatar.png?v=1561648996453" alt="">
   </a>
   <h1 class="site-title">
     Kensan
@@ -94,13 +94,12 @@
 <ul>
 <li><code>&lt;object id=&quot;xxx&quot; classid=&quot;xx-xx...&quot;&gt;</code></li>
 <li>如果不使用object标签，也可以直接通过js的ActiveXObject来创建指定ActiveX的实例从而达到调用插件接口的目的
-<code>var objCard = new ActiveXObject(&quot;xxx&quot;);</code></li>
-</ul>
-<h5 id="xxx为xxxl格式是第二位第二位">xxx为'xxx.l'格式,是第二位第二位</h5>
-<p>例如:
+<code>var objCard = new ActiveXObject(&quot;xxx&quot;);</code>
+例如:
 <img src="https://github.com/fuzi1996/pictbed/blob/master/regist.png" alt="注册表图片url:https://github.com/fuzi1996/pictbed/blob/master/regist.png">
 即IMPLEMENT_OLECREATE_EX的第二参数就表示当前插件的ProgId
-<code>var objCard = new ActiveXObject(&quot;Uprain.CardAccessorCtrl.1&quot;);</code></p>
+<code>var objCard = new ActiveXObject(&quot;Uprain.CardAccessorCtrl.1&quot;);</code></li>
+</ul>
 <h1 id="如何判断activex是否已经安装呢">如何判断ActiveX是否已经安装呢？</h1>
 <p>实际上如果ActiveX未安装，通过new ActiveXObject的方式来创建插件对象是会抛出“Automation 服务器不能创建对象”异常的。</p>
 <pre><code class="language-javascript">try {
