@@ -1,0 +1,199 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JEECG学习(一)验证码是怎么来的？ | Kensan</title>
+<link rel="shortcut icon" href="https://fuzi1996.github.io//favicon.ico?v=1587399702299">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://fuzi1996.github.io//styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fuzi1996.github.io/">
+  <img class="avatar" src="https://fuzi1996.github.io//images/avatar.png?v=1587399702299" alt="">
+  </a>
+  <h1 class="site-title">
+    Kensan
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://fuzi1996.github.io//post/about/" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              JEECG学习(一)验证码是怎么来的？
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2020-04-20 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <h1 id="验证码是怎么来的">验证码是怎么来的？</h1>
+<figure data-type="image" tabindex="1"><img src="http://kensan.gitee.io/picted/jeecg_study/index_html_checkcode.png" alt="首页验证码" loading="lazy"></figure>
+<h2 id="前台请求">前台请求</h2>
+<ul>
+<li>
+<p>前台请求地址：http://127.0.0.1:3000/jeecg-boot/sys/randomImage/1585981360936?_t=1585981360</p>
+</li>
+<li>
+<p>携带参数：_t: 1585981360</p>
+</li>
+<li>
+<p>返回参数：</p>
+</li>
+</ul>
+<pre><code class="language-json">{
+	&quot;success&quot;: true,
+	&quot;message&quot;: &quot;操作成功！&quot;,
+	&quot;code&quot;: 0,
+	&quot;result&quot;: &quot;data:image/jpg;base64,xxxx..&quot;,
+	&quot;timestamp&quot;: 1585981360953
+}
+</code></pre>
+<h2 id="获取验证码前端">获取验证码前端</h2>
+<figure data-type="image" tabindex="2"><img src="http://kensan.gitee.io/picted/jeecg_study/login_vue.png" alt="获取验证码前端vue文件" loading="lazy"></figure>
+<p>我们得知，/sys/randomImages后面跟的是当前时间戳，且前台会把当前时间戳记录下来；至于_t，我猜是为了防止请求缓存，携带的随机数</p>
+<p>由下面图片得到验证</p>
+<figure data-type="image" tabindex="3"><img src="http://kensan.gitee.io/picted/jeecg_study/request_js.png" alt="请求js" loading="lazy"></figure>
+<h2 id="验证码后台">验证码后台</h2>
+<figure data-type="image" tabindex="4"><img src="http://kensan.gitee.io/picted/jeecg_study/LoginController_java_randomImage.png" alt="获取验证码后台代码" loading="lazy"></figure>
+<pre><code class="language-java">String code = RandomUtil.randomString(BASE_CHECK_CODES,4);
+String lowerCaseCode = code.toLowerCase();
+String realKey = MD5Util.MD5Encode(lowerCaseCode+key,&quot;utf-8&quot;);
+//存redis
+redisUtil.set(realKey,lowerCaseCode,60);
+//获取验证码照片
+String base64 = RandImageUtil.generate(code);
+res.setSuccess(true);
+res.setResult(base64);
+</code></pre>
+<h3 id="验证码照片生成randimageutilgenerate">验证码照片生成RandImageUtil.generate</h3>
+<pre><code class="language-java">//RandImageUtil主要市这句产生随机验证码图片
+BufferedImage image = getImageBuffer(resultCode);
+</code></pre>
+<pre><code class="language-java">private static BufferedImage getImageBuffer(String resultCode){
+        // 在内存中创建图象
+        final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        // 获取图形上下文
+        final Graphics2D graphics = (Graphics2D) image.getGraphics();
+        // 设定背景颜色
+        graphics.setColor(Color.WHITE); // ---1
+        // 填充矩形
+        graphics.fillRect(0, 0, width, height);
+        // 设定边框颜色
+//		graphics.setColor(getRandColor(100, 200)); // ---2
+        graphics.drawRect(0, 0, width - 1, height - 1);
+
+        final Random random = new Random();
+        // 随机产生干扰线，使图象中的认证码不易被其它程序探测到
+        for (int i = 0; i &lt; count; i++) {
+            graphics.setColor(getRandColor(150, 200)); // ---3
+
+            final int x = random.nextInt(width - lineWidth - 1) + 1; // 保证画在边框之内
+            final int y = random.nextInt(height - lineWidth - 1) + 1;
+            final int xl = random.nextInt(lineWidth);
+            final int yl = random.nextInt(lineWidth);
+            graphics.drawLine(x, y, x + xl, y + yl);
+        }
+        // 取随机产生的认证码
+        for (int i = 0; i &lt; resultCode.length(); i++) {
+            // 将认证码显示到图象中,调用函数出来的颜色相同，可能是因为种子太接近，所以只能直接生成
+            // graphics.setColor(new Color(20 + random.nextInt(130), 20 + random
+            // .nextInt(130), 20 + random.nextInt(130)));
+            // 设置字体颜色
+            graphics.setColor(Color.BLACK);
+            // 设置字体样式
+//			graphics.setFont(new Font(&quot;Arial Black&quot;, Font.ITALIC, 18));
+            graphics.setFont(new Font(&quot;Times New Roman&quot;, Font.BOLD, 24));
+            // 设置字符，字符间距，上边距
+            graphics.drawString(String.valueOf(resultCode.charAt(i)), (23 * i) + 8, 26);
+        }
+        // 图象生效
+        graphics.dispose();
+        return image;
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fuzi1996.github.io/post/aboutfrp/">
+              <h3 class="post-title">
+                frp配置
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

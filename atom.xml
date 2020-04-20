@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fuzi1996.github.io/</id>
     <title>Kensan</title>
-    <updated>2020-04-20T16:20:38.440Z</updated>
+    <updated>2020-04-20T16:21:47.854Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fuzi1996.github.io/"/>
     <link rel="self" href="https://fuzi1996.github.io/atom.xml"/>
@@ -12,8 +12,8 @@
     <rights>All rights reserved 2020, Kensan</rights>
     <entry>
         <title type="html"><![CDATA[JEECG学习(一)验证码是怎么来的？]]></title>
-        <id>https://fuzi1996.github.io/post/jeecg-xue-xi-yi-yan-zheng-ma-shi-zen-me-lai-de/</id>
-        <link href="https://fuzi1996.github.io/post/jeecg-xue-xi-yi-yan-zheng-ma-shi-zen-me-lai-de/">
+        <id>https://fuzi1996.github.io/post/jeecg-how-to-get-checkcode/</id>
+        <link href="https://fuzi1996.github.io/post/jeecg-how-to-get-checkcode/">
         </link>
         <updated>2020-04-20T15:52:26.000Z</updated>
         <content type="html"><![CDATA[<h1 id="验证码是怎么来的">验证码是怎么来的？</h1>
