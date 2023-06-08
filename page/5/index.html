@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>技术琐话</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="技术琐话">
+<meta property="og:url" content="https://fuzi1996.github.io/page/5/index.html">
+<meta property="og:site_name" content="技术琐话">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="fuzi">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="技术琐话" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">技术琐话</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://fuzi1996.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-jeecg/how-generate-jeecg-checkcode" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/05/jeecg/how-generate-jeecg-checkcode/" class="article-date">
+  <time class="dt-published" datetime="2021-09-05T11:33:00.000Z" itemprop="datePublished">2021-09-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jeecg/">jeecg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/09/05/jeecg/how-generate-jeecg-checkcode/">jeecg 2.4.6 如何生成验证码</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="验证码是怎么来的？"><a href="#验证码是怎么来的？" class="headerlink" title="验证码是怎么来的？"></a>验证码是怎么来的？</h2><p>前端地址:</p>
+<p><code>src\views\user\LoginAccount.vue</code></p>
+<h2 id="前台请求"><a href="#前台请求" class="headerlink" title="前台请求"></a>前台请求</h2><ul>
+<li><p>前台请求地址：<a target="_blank" rel="noopener" href="http://127.0.0.1:3000/jeecg-boot/sys/randomImage/1585981360936?_t=1585981360">http://127.0.0.1:3000/jeecg-boot/sys/randomImage/1585981360936?_t=1585981360</a></p>
+</li>
+<li><p>携带参数：_t: 1585981360</p>
+</li>
+<li><p>返回参数：</p>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;success&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="string">&quot;message&quot;</span>: <span class="string">&quot;操作成功！&quot;</span>,</span><br><span class="line">  <span class="string">&quot;code&quot;</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">&quot;result&quot;</span>: <span class="string">&quot;data:image/jpg;base64,xxxx..&quot;</span>,</span><br><span class="line">  <span class="string">&quot;timestamp&quot;</span>: <span class="number">1585981360953</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="获取验证码前端"><a href="#获取验证码前端" class="headerlink" title="获取验证码前端"></a>获取验证码前端</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">handleChangeCheckCode</span>(<span class="params"></span>)&#123;</span><br><span class="line">  <span class="comment">// 缓存当前时间戳</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">currdatetime</span> = <span class="keyword">new</span> <span class="title class_">Date</span>().<span class="title function_">getTime</span>();</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">model</span>.<span class="property">inputCode</span> = <span class="string">&#x27;&#x27;</span></span><br><span class="line">  <span class="title function_">getAction</span>(<span class="string">`/sys/randomImage/<span class="subst">$&#123;<span class="variable language_">this</span>.currdatetime&#125;</span>`</span>).<span class="title function_">then</span>(<span class="function"><span class="params">res</span>=&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(res.<span class="property">success</span>)&#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">randCodeImage</span> = res.<span class="property">result</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">requestCodeSuccess</span>=<span class="literal">true</span></span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">$message</span>.<span class="title function_">error</span>(res.<span class="property">message</span>)</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">requestCodeSuccess</span>=<span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;).<span class="title function_">catch</span>(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">requestCodeSuccess</span>=<span class="literal">false</span></span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们得知，&#x2F;sys&#x2F;randomImages后面跟的是当前时间戳，且前台会把当前时间戳记录下来；至于_t，我猜是为了防止请求缓存，携带的随机数</p>
+<p>由下面图片得到验证(<code>地址:src\utils\request.js</code>)</p>
+<p><img src="/assets/images/jeecg/request_js.png" alt="request_js"></p>
+<h2 id="验证码后台"><a href="#验证码后台" class="headerlink" title="验证码后台"></a>验证码后台</h2><p><img src="/assets/images/jeecg/LoginController_java_randomImage.png" alt="LoginController_java_randomImage"></p>
+<p>文件地址:</p>
+<p>org.jeecg.modules.system.controller.LoginController#randomImage</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">code</span> <span class="operator">=</span> RandomUtil.randomString(BASE_CHECK_CODES,<span class="number">4</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">lowerCaseCode</span> <span class="operator">=</span> code.toLowerCase();</span><br><span class="line"><span class="type">String</span> <span class="variable">realKey</span> <span class="operator">=</span> MD5Util.MD5Encode(lowerCaseCode+key,<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line"><span class="comment">//存redis</span></span><br><span class="line">redisUtil.set(realKey,lowerCaseCode,<span class="number">60</span>);</span><br><span class="line"><span class="comment">//获取验证码照片</span></span><br><span class="line"><span class="type">String</span> <span class="variable">base64</span> <span class="operator">=</span> RandImageUtil.generate(code);</span><br><span class="line">res.setSuccess(<span class="literal">true</span>);</span><br><span class="line">res.setResult(base64);</span><br></pre></td></tr></table></figure>
+
+<h3 id="验证码照片生成RandImageUtil-generate"><a href="#验证码照片生成RandImageUtil-generate" class="headerlink" title="验证码照片生成RandImageUtil.generate"></a>验证码照片生成RandImageUtil.generate</h3><p>org.jeecg.modules.system.util.RandImageUtil#generate(java.lang.String)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//RandImageUtil主要是这句产生随机验证码图片</span></span><br><span class="line"><span class="type">BufferedImage</span> <span class="variable">image</span> <span class="operator">=</span> getImageBuffer(resultCode);</span><br></pre></td></tr></table></figure>
+
+<p><code>getImageBuffer</code>方法如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> BufferedImage <span class="title function_">getImageBuffer</span><span class="params">(String resultCode)</span>&#123;</span><br><span class="line">        <span class="comment">// 在内存中创建图象</span></span><br><span class="line">        <span class="keyword">final</span> <span class="type">BufferedImage</span> <span class="variable">image</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BufferedImage</span>(width, height, BufferedImage.TYPE_INT_RGB);</span><br><span class="line">        <span class="comment">// 获取图形上下文</span></span><br><span class="line">        <span class="keyword">final</span> <span class="type">Graphics2D</span> <span class="variable">graphics</span> <span class="operator">=</span> (Graphics2D) image.getGraphics();</span><br><span class="line">        <span class="comment">// 设定背景颜色</span></span><br><span class="line">        graphics.setColor(Color.WHITE); <span class="comment">// ---1</span></span><br><span class="line">        <span class="comment">// 填充矩形</span></span><br><span class="line">        graphics.fillRect(<span class="number">0</span>, <span class="number">0</span>, width, height);</span><br><span class="line">        <span class="comment">// 设定边框颜色</span></span><br><span class="line">        <span class="comment">// graphics.setColor(getRandColor(100, 200)); // ---2</span></span><br><span class="line">        graphics.drawRect(<span class="number">0</span>, <span class="number">0</span>, width - <span class="number">1</span>, height - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="type">Random</span> <span class="variable">random</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>();</span><br><span class="line">        <span class="comment">// 随机产生干扰线，使图象中的认证码不易被其它程序探测到</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">            graphics.setColor(getRandColor(<span class="number">150</span>, <span class="number">200</span>)); <span class="comment">// ---3</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">final</span> <span class="type">int</span> <span class="variable">x</span> <span class="operator">=</span> random.nextInt(width - lineWidth - <span class="number">1</span>) + <span class="number">1</span>; <span class="comment">// 保证画在边框之内</span></span><br><span class="line">            <span class="keyword">final</span> <span class="type">int</span> <span class="variable">y</span> <span class="operator">=</span> random.nextInt(height - lineWidth - <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">final</span> <span class="type">int</span> <span class="variable">xl</span> <span class="operator">=</span> random.nextInt(lineWidth);</span><br><span class="line">            <span class="keyword">final</span> <span class="type">int</span> <span class="variable">yl</span> <span class="operator">=</span> random.nextInt(lineWidth);</span><br><span class="line">            graphics.drawLine(x, y, x + xl, y + yl);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 取随机产生的认证码</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; resultCode.length(); i++) &#123;</span><br><span class="line">            <span class="comment">// 将认证码显示到图象中,调用函数出来的颜色相同，可能是因为种子太接近，所以只能直接生成</span></span><br><span class="line">            <span class="comment">// graphics.setColor(new Color(20 + random.nextInt(130), 20 + random</span></span><br><span class="line">            <span class="comment">// .nextInt(130), 20 + random.nextInt(130)));</span></span><br><span class="line">            <span class="comment">// 设置字体颜色</span></span><br><span class="line">            graphics.setColor(Color.BLACK);</span><br><span class="line">            <span class="comment">// 设置字体样式</span></span><br><span class="line">            <span class="comment">// graphics.setFont(new Font(&quot;Arial Black&quot;, Font.ITALIC, 18));</span></span><br><span class="line">            graphics.setFont(<span class="keyword">new</span> <span class="title class_">Font</span>(<span class="string">&quot;Times New Roman&quot;</span>, Font.BOLD, <span class="number">24</span>));</span><br><span class="line">            <span class="comment">// 设置字符，字符间距，上边距</span></span><br><span class="line">            graphics.drawString(String.valueOf(resultCode.charAt(i)), (<span class="number">23</span> * i) + <span class="number">8</span>, <span class="number">26</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 图象生效</span></span><br><span class="line">        graphics.dispose();</span><br><span class="line">        <span class="keyword">return</span> image;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/05/jeecg/how-generate-jeecg-checkcode/" data-id="clin7xb4y001occonh4wq6a1c" data-title="jeecg 2.4.6 如何生成验证码" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" rel="tag">验证码生成</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-frp" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/05/frp/" class="article-date">
+  <time class="dt-published" datetime="2021-09-04T16:00:00.000Z" itemprop="datePublished">2021-09-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/frp/">frp</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/09/05/frp/">内网穿透工具 frp 介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="1-下载"><a href="#1-下载" class="headerlink" title="1.下载"></a>1.下载</h2><p>去它的<a target="_blank" rel="noopener" href="https://github.com/fatedier/frp/releases">release页面</a>下载对应系统的版本</p>
+<h2 id="2-配置与安装"><a href="#2-配置与安装" class="headerlink" title="2.配置与安装"></a>2.配置与安装</h2><p>服务端使用frps<em>文件,客户端使用frpc</em>文件,frps和frpc分别对应服务端和客户端的你主程序,.ini则分别是他们的对应配置文件,主要的配置见<a href="#%E5%8F%82%E8%80%831">参考链接1</a>,<a href="#%E5%8F%82%E8%80%832">参考链接2</a>,任选其1即可.</p>
+<h2 id="3-后台运行"><a href="#3-后台运行" class="headerlink" title="3.后台运行"></a>3.后台运行</h2><h3 id="3-1-nohup"><a href="#3-1-nohup" class="headerlink" title="3.1 nohup"></a>3.1 nohup</h3><p>使用nohup可以让你的程序在此次连接结束后依旧运行,远程服务器的时候可以使用<br>例如</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">nohup</span> ./frpc -c ./frpc.ini</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-以服务的方式运行"><a href="#3-2-以服务的方式运行" class="headerlink" title="3.2 以服务的方式运行"></a>3.2 以服务的方式运行</h3><h4 id="3-2-1-支持systemctl的方式"><a href="#3-2-1-支持systemctl的方式" class="headerlink" title="3.2.1 支持systemctl的方式"></a>3.2.1 支持systemctl的方式</h4><p>新版本解压后可以看到有systemd这个文件夹,里面是已经写好的服务文件,这里以<code>frpc.service</code>为例配置为客户端开机重启的服务</p>
+<ul>
+<li>首先</li>
+</ul>
+<p>你需要把<code>frpc.service</code>文件中的<code>ExecStart</code>和<code>ExecReload</code>替换你自己的程序路径</p>
+<ul>
+<li>其次</li>
+</ul>
+<p>把<code>frpc.service</code>文件放到系统服务对应的位置,ubuntu 16.04放在<code>/lib/systemd/system/</code>下,CentOS 7放在<code>/usr/lib/systemd/system/</code>下</p>
+<ul>
+<li>最后</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用service或者systemctl启动服务</span></span><br><span class="line">service frpc start|reload|stop|status</span><br><span class="line">systemctl frpc start|reload|stop|status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开机时启动一个服务</span></span><br><span class="line">systemctl enabl frpc</span><br><span class="line"><span class="comment"># 开机时禁用一个服务</span></span><br><span class="line">systemctl <span class="built_in">disable</span> frpc</span><br><span class="line"><span class="comment">#查看服务是否开机启动</span></span><br><span class="line">systemctl is-enabled frpc</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="3-2-2-支持services方式"><a href="#3-2-2-支持services方式" class="headerlink" title="3.2.2 支持services方式"></a>3.2.2 支持services方式</h4><p>如果你的系统版本比较老,比如RedHat 6.8,这类系统不支持systemctl启动服务,那么你就需要手写一个脚本来启动服务,并把这个服务放在<code>/etc/init.d</code>目录下,<br>参考脚本,以frpc为例,这个脚本是我以sshd为基础改的:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#chkconfig 2345 99 01</span></span><br><span class="line"><span class="comment"># frpc</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># description: frpc is a niwangchuantou tool</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># processname: frpc</span></span><br><span class="line"><span class="comment"># config: /etc/frp/frpc.ini</span></span><br><span class="line"></span><br><span class="line"><span class="comment">### BEGIN INIT INFO</span></span><br><span class="line"><span class="comment"># Provides: frpc</span></span><br><span class="line"><span class="comment"># Required-Start: $all</span></span><br><span class="line"><span class="comment"># Required-Stop: $all</span></span><br><span class="line"><span class="comment"># Default-Start: 2 3 4 5</span></span><br><span class="line"><span class="comment"># Default-Stop: 0 6</span></span><br><span class="line"><span class="comment"># Short-Description: Start up the frpc server daemon</span></span><br><span class="line"><span class="comment"># Description:      frpc is a neiwangchuantou tool </span></span><br><span class="line"><span class="comment">### END INIT INFO</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># source function library</span></span><br><span class="line">. /etc/rc.d/init.d/functions</span><br><span class="line"></span><br><span class="line">RETVAL=0</span><br><span class="line">prog=<span class="string">&quot;frpc&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Some functions to make the below more readable</span></span><br><span class="line">FRPC=/usr/bin/frpc</span><br><span class="line">INI_FILE=/etc/frp/frpc.ini</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">start</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="variable">$FRPC</span> -c <span class="variable">$INI_FILE</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">stop</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">	killall <span class="variable">$prog</span> 2&gt;/dev/null</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">reload</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="variable">$FRPC</span> reload -c <span class="variable">$INI_FILE</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">restart</span></span>() &#123;</span><br><span class="line">	stop</span><br><span class="line">	start</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="string">&quot;<span class="variable">$1</span>&quot;</span> <span class="keyword">in</span></span><br><span class="line">	start)</span><br><span class="line">		start &amp;</span><br><span class="line">		;;</span><br><span class="line">	stop)</span><br><span class="line">		stop &amp;</span><br><span class="line">		;;</span><br><span class="line">	restart)</span><br><span class="line">		restart &amp;</span><br><span class="line">		;;</span><br><span class="line">	reload)</span><br><span class="line">		reload &amp;</span><br><span class="line">		;;</span><br><span class="line">	*)</span><br><span class="line">		<span class="built_in">echo</span> $<span class="string">&quot;Usage: <span class="variable">$0</span> &#123;start|stop|restart|reload&#125;&quot;</span></span><br><span class="line">		RETVAL=2</span><br><span class="line"><span class="keyword">esac</span></span><br><span class="line"><span class="built_in">exit</span> <span class="variable">$RETVAL</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">赋予脚本执行权限</span><br><span class="line"><span class="built_in">chmod</span> +x frpc.service</span><br><span class="line">使用前加入chkconfig管理列表</span><br><span class="line">chkconfig --add frpc</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用"><a href="#使用" class="headerlink" title="使用:"></a>使用:</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#脚本中已经自动为开机启动</span></span><br><span class="line">service frpc start|reload|restart|stop</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><h3 id="frp参考链接"><a href="#frp参考链接" class="headerlink" title="frp参考链接"></a>frp参考链接</h3><h4 id="参考1"><a href="#参考1" class="headerlink" title="参考1"></a>参考1</h4><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/a621556fc07b">frp内网穿透</a></p>
+<h4 id="参考2"><a href="#参考2" class="headerlink" title="参考2"></a>参考2</h4><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/e8e26bcc6fe6">使用frp实现内网穿透</a></p>
+<h4 id="参考3"><a href="#参考3" class="headerlink" title="参考3"></a>参考3</h4><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/x7418520/article/details/81077652">Frp后台自动启动的几个方法</a></p>
+<h4 id="参考4"><a href="#参考4" class="headerlink" title="参考4"></a>参考4</h4><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1640620a5da5">FRP局域网穿透＋linux自动监控服务运行</a></p>
+<h3 id="linux-配置服务参考连接"><a href="#linux-配置服务参考连接" class="headerlink" title="linux 配置服务参考连接"></a>linux 配置服务参考连接</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_25969499/article/details/86133796">centos6添加系统服务</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_27754983/article/details/74520077">CentOS6自定义服务控制脚本</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/devilmaycry812839668/p/8481760.html">Centos7 服务 service 设置命令 systemctl 用法</a></p>
+<h3 id="以下是frp的github-ReadMe"><a href="#以下是frp的github-ReadMe" class="headerlink" title="以下是frp的github ReadMe"></a>以下是frp的github ReadMe</h3><p><a target="_blank" rel="noopener" href="https://github.com/fatedier/frp">英文版</a><br><a target="_blank" rel="noopener" href="https://github.com/fatedier/frp/blob/master/README_zh.md#%E5%BC%80%E5%8F%91%E7%8A%B6%E6%80%81">中文版</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/05/frp/" data-id="clin7xb3t0000ccon5axi779f" data-title="内网穿透工具 frp 介绍" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/frp/" rel="tag">frp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" rel="tag">内网穿透</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-ubuntu-compile-install-nginx" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/05/ubuntu-compile-install-nginx/" class="article-date">
+  <time class="dt-published" datetime="2021-09-04T16:00:00.000Z" itemprop="datePublished">2021-09-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/nginx/">nginx</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/09/05/ubuntu-compile-install-nginx/">Ubuntu 20.04 编译安装 nginx 1.20.1</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p><a target="_blank" rel="noopener" href="http://nginx.org/en/download.html">nginx源码下载地址</a> (nginx&#x2F;Windows为二进制版本)<br>这里假设你已经下载了nginx的源码并已解压</p>
+<h2 id="安装编译环境"><a href="#安装编译环境" class="headerlink" title="安装编译环境"></a>安装编译环境</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line"><span class="comment">#安装依赖：gcc、g++依赖库</span></span><br><span class="line">sudo apt-get install build-essential libtool</span><br><span class="line"><span class="comment">#安装 pcre依赖库（http://www.pcre.org/）</span></span><br><span class="line">sudo apt-get install libpcre3 libpcre3-dev</span><br><span class="line"><span class="comment">#安装 zlib依赖库（http://www.zlib.net）</span></span><br><span class="line">sudo apt-get install zlib1g-dev</span><br><span class="line"><span class="comment">#安装ssl依赖库</span></span><br><span class="line">sudo apt-get install openssl</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用默认配置安装()</span></span><br><span class="line">make check &amp;&amp; make</span><br></pre></td></tr></table></figure>
+
+<h2 id="为nginx建立软链接"><a href="#为nginx建立软链接" class="headerlink" title="为nginx建立软链接"></a>为<code>nginx</code>建立软链接</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查找nginx命令地址 无特殊配置，默认为/usr/local/nginx/sbin/nginx</span></span><br><span class="line">whereis nginx</span><br><span class="line"><span class="comment"># 建立软链接</span></span><br><span class="line"><span class="built_in">ln</span> -s /usr/local/nginx/sbin/nginx /usr/bin/nginx</span><br><span class="line"><span class="comment"># 测试 有正常输出意味着nginx安装完成</span></span><br><span class="line">nginx -V </span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/A156348933/article/details/85335089">Ubuntu18.04手动编译安装nginx</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/188505502">WSL2子系统安装CentOS8及源码编译Nginx1.18+PHP7.4+MySql8.0开发环境</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/05/ubuntu-compile-install-nginx/" data-id="clin7xb440005ccon1bhm3di7" data-title="Ubuntu 20.04 编译安装 nginx 1.20.1" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-upgrade-wsl12wsl2" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/08/28/upgrade-wsl12wsl2/" class="article-date">
+  <time class="dt-published" datetime="2021-08-28T13:35:00.000Z" itemprop="datePublished">2021-08-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/wsl/">wsl</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/08/28/upgrade-wsl12wsl2/">将wsl1更新为wsl2</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>安装wsl时,未注意版本,以为windows默认安装的就是2版本,今天想起配置时才发现安装的是1版本,为了使用docker,所以需要将wsl1更新为wsl2并将已安装的实例转为wsl2</p>
+<p>以下为参照windows官方文档的操作<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/wsl/install-win10#manual-installation-steps">Install WSL &amp; update to WSL2</a></p>
+<h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><p>已安装wsl1,且已安装Ubuntu-20.04版本也是wsl1</p>
+<h2 id="打开虚拟机平台功能"><a href="#打开虚拟机平台功能" class="headerlink" title="打开虚拟机平台功能"></a>打开<code>虚拟机平台</code>功能</h2><p><code>控制面板</code> &gt; <code>程序</code> &gt; <code>程序和功能</code> &gt; <code>启用或关闭Windwos功能</code> &gt; 允许<code>虚拟机平台</code>功能 &gt; 重启电脑</p>
+<p><img src="/assets/images/enable-vm.png" alt="enable-vm"></p>
+<h2 id="设置wsl默认版本"><a href="#设置wsl默认版本" class="headerlink" title="设置wsl默认版本"></a>设置wsl默认版本</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl --set-default-version 2</span><br></pre></td></tr></table></figure>
+
+<h2 id="转化已有实例为wsl2"><a href="#转化已有实例为wsl2" class="headerlink" title="转化已有实例为wsl2"></a>转化已有实例为wsl2</h2><p>比如,我的电脑已有实例<code>Ubuntu-20.04</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl --set-version Ubuntu-20.04 2</span><br></pre></td></tr></table></figure>
+
+<p>等待转化完毕后执行命令<code>wsl -l -v</code>就可以看到<code>Ubuntu-20.04</code>实例当前版本已经改为<code>2</code>版本</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/08/28/upgrade-wsl12wsl2/" data-id="clin7xb450006ccon8kpjdvf9" data-title="将wsl1更新为wsl2" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wsl1/" rel="tag">wsl1</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wsl2/" rel="tag">wsl2</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-wsl2-connect-host" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/08/28/wsl2-connect-host/" class="article-date">
+  <time class="dt-published" datetime="2021-08-28T13:35:00.000Z" itemprop="datePublished">2021-08-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/wsl/">wsl</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/08/28/wsl2-connect-host/">wsl2与host主机互通</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>在我的电脑上使用的是<code>wsl2</code>,每次重启,它的本地局域网ip是会改变的,虽然<code>host</code>与<code>wsl</code>之间可以使用<code>localhost</code>访问,但是当碰到端口映射等需要具体ip时,使用<code>localhost</code>就不是很方便了<br>所以我希望wsl的ip可以固定下来<br>以下假设希望设置host主机地址为<code>10.88.88.1</code>,设置wsl实例Ubuntu-20.04的ip地址为<code>10.88.88.2</code></p>
+<h2 id="设置host主机wsl虚拟网卡地址"><a href="#设置host主机wsl虚拟网卡地址" class="headerlink" title="设置host主机wsl虚拟网卡地址"></a>设置host主机wsl虚拟网卡地址</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 该设置需要管理员权限</span></span><br><span class="line">netsh interface ip add address <span class="string">&quot;vEthernet (WSL)&quot;</span> 10.88.88.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+<h2 id="设置wsl实例ip地址"><a href="#设置wsl实例ip地址" class="headerlink" title="设置wsl实例ip地址"></a>设置wsl实例ip地址</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl -d Ubuntu-20.04 -u root ip addr add 10.88.88.2/24 broadcast 10.88.88.255 dev eth0 label eth0:1</span><br></pre></td></tr></table></figure>
+
+<h2 id="计划任务"><a href="#计划任务" class="headerlink" title="计划任务"></a>计划任务</h2><p>由于以上两个设置系统一旦重启就需要重新配置,所以我们可以将其加入计划任务,开机自动运行即可<br>需要注意计划任务需要有管理员权限</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/08/28/wsl2-connect-host/" data-id="clin7xb470009ccon5zb552oa" data-title="wsl2与host主机互通" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wsl2/" rel="tag">wsl2</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-hexo-change-favicon" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/08/28/hexo-change-favicon/" class="article-date">
+  <time class="dt-published" datetime="2021-08-27T16:00:00.000Z" itemprop="datePublished">2021-08-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/hexo/">hexo</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/08/28/hexo-change-favicon/">如何改变Hexo无主题的favicon</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>找了半天也没发现修改<code>_config.yml</code>里面配置改变默认favicon的方法</p>
+<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>把要使用的ico图标命名为<code>favicon.png</code>放在<code>source</code>文件夹下,重启<code>hexo</code>服务器</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>通过分析发现,<code>hexo generate</code>生成的<code>public</code>文件夹下的<code>index.html</code>引入的是<code>favicon.png</code>,而我们放在<code>source</code>文件夹下的<code>favicon.png</code>会被认为是网站的<code>favicon</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/08/28/hexo-change-favicon/" data-id="clin7xb3y0001ccongnanajli" data-title="如何改变Hexo无主题的favicon" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/favicon/" rel="tag">favicon</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/4/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/HarmonyOS/">HarmonyOS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OnlyOffice/">OnlyOffice</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug-fix/">bug-fix</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug%E4%BF%AE%E5%A4%8D/">bug修复</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/cmake/">cmake</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dbapi/">dbapi</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/design-pattern/">design-pattern</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/frp/">frp</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jdbc/">jdbc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jeecg/">jeecg</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/npm/">npm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/orange/">orange</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-boot/">spring-boot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-form-making/">vue-form-making</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue2/">vue2</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/wsl/">wsl</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" rel="tag">Bean条件注入</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Connection/" rel="tag">Connection</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DatabaseMetaData/" rel="tag">DatabaseMetaData</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HarmonyOS/" rel="tag">HarmonyOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-LifeCycle/" rel="tag">Maven LifeCycle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-Plugin/" rel="tag">Maven Plugin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OnlyOffice/" rel="tag">OnlyOffice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ResultSet/" rel="tag">ResultSet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statement/" rel="tag">Statement</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" rel="tag">Vue 依赖收集</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-reactivity/" rel="tag">Vue2 reactivity</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bat/" rel="tag">bat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug-fix/" rel="tag">bug-fix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug%E4%BF%AE%E5%A4%8D/" rel="tag">bug修复</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cmake/" rel="tag">cmake</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/" rel="tag">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/favicon/" rel="tag">favicon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/frp/" rel="tag">frp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hci/" rel="tag">hci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jest-Test/" rel="tag">jest Test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/metaobject/" rel="tag">metaobject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="tag">mybatis执行器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm-scripts/" rel="tag">npm scripts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/online-form/" rel="tag">online-form</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/orange/" rel="tag">orange</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server-programming/" rel="tag">server-programming</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-form-making/" rel="tag">vue-form-making</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl1/" rel="tag">wsl1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl2/" rel="tag">wsl2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" rel="tag">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" rel="tag">启动流程分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" rel="tag">源码阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="tag">环境搭建</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" rel="tag">自动装配原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%93%9D%E7%89%99/" rel="tag">蓝牙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" rel="tag">表单设计器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" rel="tag">验证码校验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" rel="tag">验证码生成</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" style="font-size: 10px;">Bean条件注入</a> <a href="/tags/Connection/" style="font-size: 10px;">Connection</a> <a href="/tags/DatabaseMetaData/" style="font-size: 10px;">DatabaseMetaData</a> <a href="/tags/HarmonyOS/" style="font-size: 10px;">HarmonyOS</a> <a href="/tags/Maven/" style="font-size: 16px;">Maven</a> <a href="/tags/Maven-LifeCycle/" style="font-size: 10px;">Maven LifeCycle</a> <a href="/tags/Maven-Plugin/" style="font-size: 10px;">Maven Plugin</a> <a href="/tags/OnlyOffice/" style="font-size: 12px;">OnlyOffice</a> <a href="/tags/ResultSet/" style="font-size: 10px;">ResultSet</a> <a href="/tags/Statement/" style="font-size: 10px;">Statement</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" style="font-size: 10px;">Vue 依赖收集</a> <a href="/tags/Vue2-reactivity/" style="font-size: 10px;">Vue2 reactivity</a> <a href="/tags/bat/" style="font-size: 10px;">bat</a> <a href="/tags/bug-fix/" style="font-size: 10px;">bug-fix</a> <a href="/tags/bug%E4%BF%AE%E5%A4%8D/" style="font-size: 10px;">bug修复</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/cmake/" style="font-size: 10px;">cmake</a> <a href="/tags/dbapi/" style="font-size: 14px;">dbapi</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/element-ui/" style="font-size: 10px;">element-ui</a> <a href="/tags/favicon/" style="font-size: 10px;">favicon</a> <a href="/tags/frp/" style="font-size: 10px;">frp</a> <a href="/tags/hci/" style="font-size: 10px;">hci</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jdbc/" style="font-size: 20px;">jdbc</a> <a href="/tags/jeecg/" style="font-size: 14px;">jeecg</a> <a href="/tags/jest-Test/" style="font-size: 10px;">jest Test</a> <a href="/tags/metaobject/" style="font-size: 10px;">metaobject</a> <a href="/tags/mybatis/" style="font-size: 18px;">mybatis</a> <a href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" style="font-size: 10px;">mybatis执行器</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/npm-scripts/" style="font-size: 10px;">npm scripts</a> <a href="/tags/online-form/" style="font-size: 10px;">online-form</a> <a href="/tags/orange/" style="font-size: 10px;">orange</a> <a href="/tags/server-programming/" style="font-size: 10px;">server-programming</a> <a href="/tags/spring-boot/" style="font-size: 16px;">spring-boot</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue-form-making/" style="font-size: 10px;">vue-form-making</a> <a href="/tags/vue2/" style="font-size: 10px;">vue2</a> <a href="/tags/wsl1/" style="font-size: 10px;">wsl1</a> <a href="/tags/wsl2/" style="font-size: 12px;">wsl2</a> <a href="/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 12px;">事务</a> <a href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" style="font-size: 10px;">内网穿透</a> <a href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" style="font-size: 10px;">启动流程分析</a> <a href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" style="font-size: 10px;">源码阅读</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" style="font-size: 10px;">环境搭建</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" style="font-size: 10px;">自动装配原理</a> <a href="/tags/%E8%93%9D%E7%89%99/" style="font-size: 10px;">蓝牙</a> <a href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" style="font-size: 10px;">表单设计器</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" style="font-size: 10px;">验证码校验</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" style="font-size: 10px;">验证码生成</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">十二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">九月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/08/">八月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/12/18/element-ui/el-form-item-with-if/">ElFormItem使用v-if导致校验异常问题</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/11/dbapi/command_line_too_large_in_bat/">BAT命令行过长处理</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/16/harmony/collect_hci_log/">HarmonyOS手机蓝牙日志</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/02/mybatis/mysql_meta_object_analyse/">Mybatis MetaObject分析</a>
+          </li>
+        
+          <li>
+            <a href="/2022/06/15/orange/how_to_parse_dynamic_sql/">Orange是如何解析动态SQL的</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 fuzi<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

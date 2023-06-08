@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>技术琐话</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="技术琐话">
+<meta property="og:url" content="https://fuzi1996.github.io/page/2/index.html">
+<meta property="og:site_name" content="技术琐话">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="fuzi">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="技术琐话" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">技术琐话</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://fuzi1996.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-bug-fix/onlyoffice-build-tools-issues-461" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/05/07/bug-fix/onlyoffice-build-tools-issues-461/" class="article-date">
+  <time class="dt-published" datetime="2022-05-07T10:31:41.000Z" itemprop="datePublished">2022-05-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/bug-fix/">bug-fix</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/05/07/bug-fix/onlyoffice-build-tools-issues-461/">issues/461问题修复</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="BUG链接"><a href="#BUG链接" class="headerlink" title="BUG链接:"></a>BUG链接:</h2><p><a target="_blank" rel="noopener" href="https://github.com/ONLYOFFICE/build_tools/issues/461">issues&#x2F;461</a></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[fetch &amp; build]: boost</span><br><span class="line">command: ./bootstrap.sh &quot;--with-libraries=filesystem,system,date_time,regex&quot;</span><br><span class="line">./bootstrap.sh: 1: ./bootstrap.sh: ./tools/build/src/engine/build.sh: not found</span><br><span class="line">Building Boost.Build engine with toolset ... </span><br><span class="line">Failed to build Boost.Build build engine</span><br><span class="line">Consult &#x27;bootstrap.log&#x27; for more details</span><br><span class="line">Error (./bootstrap.sh): 1</span><br><span class="line">Error (./make.py): 1</span><br></pre></td></tr></table></figure>
+
+<h2 id="BUG说明"><a href="#BUG说明" class="headerlink" title="BUG说明"></a>BUG说明</h2><p>就是说在编译的时候报某某文件不存在</p>
+<h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><h3 id="1-首先BUG位置"><a href="#1-首先BUG位置" class="headerlink" title="1.首先BUG位置"></a>1.首先BUG位置</h3><p>我们根据<code>[fetch &amp; build]</code>知道应该是在编译<code>boost</code>的时候出现了问题,但是这个<code>boost</code>在哪里我们是不知道的,<br>所以问题就变成了我们要确定<code>boost</code>的文件位置</p>
+<p>通过搜索<code>[fetch &amp; build]: boost</code>关键字找到了<code>build_tools/scripts/core_common/modules/boost.py</code>这个文件<br>可以确定应该就是这个文件在执行的时候出现了问题,为了更加确定,我们添加一点调试信息</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (-<span class="number">1</span> != config.option(<span class="string">&quot;platform&quot;</span>).find(<span class="string">&quot;linux&quot;</span>)) <span class="keyword">and</span> <span class="keyword">not</span> base.is_dir(<span class="string">&quot;../build/linux_64&quot;</span>):</span><br><span class="line">  <span class="comment"># 调试信息</span></span><br><span class="line">  base.cmd(<span class="string">&#x27;pwd&#x27;</span>)</span><br><span class="line">  <span class="comment"># 调试信息</span></span><br><span class="line">  base.cmd(<span class="string">&quot;./bootstrap.sh&quot;</span>, [<span class="string">&quot;--with-libraries=filesystem,system,date_time,regex&quot;</span>])</span><br><span class="line">  base.cmd(<span class="string">&quot;./b2&quot;</span>, [<span class="string">&quot;headers&quot;</span>])</span><br><span class="line">  base.cmd(<span class="string">&quot;./b2&quot;</span>, [<span class="string">&quot;--clean&quot;</span>])</span><br><span class="line">  base.cmd(<span class="string">&quot;./b2&quot;</span>, [<span class="string">&quot;--prefix=./../build/linux_64&quot;</span>, <span class="string">&quot;link=static&quot;</span>, <span class="string">&quot;cxxflags=-fPIC&quot;</span>, <span class="string">&quot;install&quot;</span>])    </span><br><span class="line">  <span class="comment"># <span class="doctag">TODO:</span> support x86</span></span><br></pre></td></tr></table></figure>
+
+<p><code>base.cmd(&#39;pwd&#39;)</code>是我们添加的调试信息,通过<code>pwd</code>命令确定命令的执行目录<br>再次运行会发现,出错信息变成了</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[fetch &amp; build]: boost</span><br><span class="line">command: pwd</span><br><span class="line">(我的目录)/gitrepos/core/Common/3dParty/boost/boost_1_72_0</span><br><span class="line">command: ./bootstrap.sh &quot;--with-libraries=filesystem,system,date_time,regex&quot;</span><br><span class="line">./bootstrap.sh: 1: ./bootstrap.sh: ./tools/build/src/engine/build.sh: not found</span><br><span class="line">Building Boost.Build engine with toolset ... </span><br><span class="line">Failed to build Boost.Build build engine</span><br><span class="line">Consult &#x27;bootstrap.log&#x27; for more details</span><br><span class="line">Error (./bootstrap.sh): 1</span><br><span class="line">Error (./make.py): 1</span><br></pre></td></tr></table></figure>
+<p>我们切换到<code>(我的目录)/gitrepos/core/Common/3dParty/boost/boost_1_72_0</code>这个目录发现<br>这个目录下确实存在一个<code>bootstrap.sh</code>的可执行文件,我们打开这个文件,搜索<code>/tools/build/src/engine/build.sh</code><br>发现</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">my_dir=$(<span class="built_in">dirname</span> <span class="string">&quot;<span class="variable">$0</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Determine the toolset, if not already decided</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> <span class="string">&quot;x<span class="variable">$TOOLSET</span>&quot;</span> = x; <span class="keyword">then</span></span><br><span class="line">  guessed_toolset=`<span class="variable">$my_dir</span>/tools/build/src/engine/build.sh --guess-toolset`</span><br></pre></td></tr></table></figure>
+
+<p>所以说应该是<code>(我的目录)/gitrepos/core/Common/3dParty/boost/boost_1_72_0/tools/build</code>下缺少文件造成的这个错误</p>
+<h3 id="2-找到BUG原因"><a href="#2-找到BUG原因" class="headerlink" title="2.找到BUG原因"></a>2.找到BUG原因</h3><p>我们仔细看下<code>build_tools/scripts/core_common/modules/boost.py</code>这个文件,可以发现这么一段逻辑</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">&quot;[fetch &amp; build]: boost&quot;</span>)</span><br><span class="line"></span><br><span class="line">  base_dir = base.get_script_dir() + <span class="string">&quot;/../../core/Common/3dParty/boost&quot;</span></span><br><span class="line">  old_cur = os.getcwd()</span><br><span class="line">  os.chdir(base_dir)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># download</span></span><br><span class="line">  <span class="comment">#url = &quot;https://downloads.sourceforge.net/project/boost/boost/1.58.0/boost_1_58_0.7z&quot;  </span></span><br><span class="line">  <span class="comment">#if not base.is_file(&quot;boost_1_58_0.7z&quot;):</span></span><br><span class="line">  <span class="comment">#  base.download(&quot;https://downloads.sourceforge.net/project/boost/boost/1.58.0/boost_1_58_0.7z&quot;, &quot;boost_1_58_0.7z&quot;)</span></span><br><span class="line">  <span class="comment">#if not base.is_dir(&quot;boost_1_58_0&quot;):</span></span><br><span class="line">  <span class="comment">#  base.extract(&quot;boost_1_58_0.7z&quot;, &quot;./&quot;)</span></span><br><span class="line"></span><br><span class="line">  base.common_check_version(<span class="string">&quot;boost&quot;</span>, <span class="string">&quot;5&quot;</span>, clean)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> <span class="keyword">not</span> base.is_dir(<span class="string">&quot;boost_1_72_0&quot;</span>):</span><br><span class="line">    base.cmd(<span class="string">&quot;git&quot;</span>, [<span class="string">&quot;clone&quot;</span>, <span class="string">&quot;--recursive&quot;</span>, <span class="string">&quot;--depth=1&quot;</span>, <span class="string">&quot;https://github.com/boostorg/boost.git&quot;</span>, <span class="string">&quot;boost_1_72_0&quot;</span>, <span class="string">&quot;-b&quot;</span> <span class="string">&quot;boost-1.72.0&quot;</span>])</span><br><span class="line"></span><br><span class="line">  os.chdir(<span class="string">&quot;boost_1_72_0&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>也就是说<code>boost_1_72_0</code>这个文件是通过<code>git clone</code>得来的(之前是通过下载得到的),而访问<code>https://github.com/boostorg/boost.git</code>这个地址会发现</p>
+<p>它下面还有子模块<br><img src="/assets/images/bug-fix/boost.png" alt="boost.png"></p>
+<p>所以造成BUG的原因就清楚了:<br><code>boost</code>由下载压缩包改为<code>git clone</code>时没有初始化<code>boost</code>本身含有的子模块造成的bug</p>
+<p>可是我们要注意<code>git clone</code>时命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --recursive --depth=1 https://github.com/boostorg/boost.git boost_1_72_0 -b boost-1.72.0</span><br></pre></td></tr></table></figure>
+
+<p><code>--recursive</code>指在clone的时候循环初始化子模块,所以这个命令是考虑到子模块的问题.</p>
+<p>那我为什么会出现这个问题呢?</p>
+<p>我仔细回忆了初始化的过程,回想起第一次初始化时曾因为<code>GFW</code>问题导致<code>git clone</code>,所以应该就是在初始化<code>boost</code>下的某一个子模块的时候网络出现了问题,导致后面的子模块没有正常初始化</p>
+<h3 id="3-修复"><a href="#3-修复" class="headerlink" title="3.修复"></a>3.修复</h3><p>删掉<code>(我的目录)/gitrepos/core/Common/3dParty/boost/boost_1_72_0</code>这个目录,重新执行一遍编译</p>
+<p><code>FUCK GFW</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/05/07/bug-fix/onlyoffice-build-tools-issues-461/" data-id="clin7xb48000accondn7k5qut" data-title="issues/461问题修复" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bug-fix/" rel="tag">bug-fix</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-spring-boot/spring-boot-condition-bean" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/05/06/spring-boot/spring-boot-condition-bean/" class="article-date">
+  <time class="dt-published" datetime="2022-05-06T12:58:21.000Z" itemprop="datePublished">2022-05-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring-boot</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/05/06/spring-boot/spring-boot-condition-bean/">Bean条件注入</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <ul>
+<li>IHandler<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">IHandler</span> &#123;</span><br><span class="line">    String <span class="title function_">handle</span><span class="params">(String param)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>AHandlerImpl<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AHandlerImpl</span> <span class="keyword">implements</span> <span class="title class_">IHandler</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">handle</span><span class="params">(String param)</span> &#123;</span><br><span class="line">        log.info(<span class="string">&quot;exec A&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;A&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>BHandlerImpl<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BHandlerImpl</span> <span class="keyword">implements</span> <span class="title class_">IHandler</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">handle</span><span class="params">(String param)</span> &#123;</span><br><span class="line">        log.info(<span class="string">&quot;exec B&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;B&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p>controller使用到IHandler</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> IHandler handler;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>Bean重复问题<br>此时会报错,因为Spring不知道controller需要的<code>IHandler</code>是<code>AHandlerImpl</code>与<code>BHandlerImpl</code>中哪一个<br>这时候只需要在<code>AHandlerImpl</code>与<code>BHandlerImpl</code>上随便选择一个加上<code>@Primary</code>注解即可解决报错问题</p>
+</li>
+<li><p>在某种条件下实现Bean注入</p>
+</li>
+</ol>
+<ul>
+<li>有了<code>BHandlerImpl</code>就注入<code>BHandlerImpl</code>,否则就注入默认的<code>AHandlerImpl</code><br>在<code>AHandlerImpl</code>上添加<code>@ConditionalOnMissingBean</code>注解,例如:<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@ConditionalOnMissingBean(IHandler.class)</span> <span class="comment">// 只要存在实现IHandler接口的Bean,AHandlerImpl就不会注入进去</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AHandlerImpl</span> <span class="keyword">implements</span> <span class="title class_">IHandler</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>Conditional的解析发生在</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/05/06/spring-boot/spring-boot-condition-bean/" data-id="clin7xb5g0031cconf6rta4z9" data-title="Bean条件注入" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" rel="tag">Bean条件注入</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-cmake/cmake-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/05/03/cmake/cmake-study/" class="article-date">
+  <time class="dt-published" datetime="2022-05-03T03:05:05.000Z" itemprop="datePublished">2022-05-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/cmake/">cmake</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/05/03/cmake/cmake-study/">CMake学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="CMake"><a href="#CMake" class="headerlink" title="CMake"></a>CMake</h1><h2 id="语法介绍"><a href="#语法介绍" class="headerlink" title="语法介绍"></a>语法介绍</h2><ul>
+<li><p>基本语法格式</p>
+<ul>
+<li><p>指令(参数1 参数2)</p>
+<ul>
+<li>参数使用括号<code>(</code>和<code>)</code>(括号)包裹</li>
+<li>参数之间使用空格或分号分隔</li>
+</ul>
+</li>
+<li><p>指令是大小无关的,参数和变量是大小有关的</p>
+</li>
+<li><p>变量使用<code>$&#123;&#125;</code>方式取值,但是在<code>IF</code>控制语句中直接使用变量名</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="基本指令"><a href="#基本指令" class="headerlink" title="基本指令"></a>基本指令</h2><h3 id="include-directories"><a href="#include-directories" class="headerlink" title="include_directories"></a>include_directories</h3><p>向工程添加多个特定的头文件搜索路径<br>相当于<code>-I</code>参数</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include_directories</span>(</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/<span class="keyword">include</span></span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/../<span class="keyword">include</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="link-directories"><a href="#link-directories" class="headerlink" title="link_directories"></a>link_directories</h3><p>向工程添加多个特定的库文件搜索路径<br>相当于<code>-L</code>参数</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">link_directories</span>(</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/lib</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/../lib</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h3 id="add-library"><a href="#add-library" class="headerlink" title="add_library"></a>add_library</h3><p>生成一个库文件</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_library</span>(</span><br><span class="line">  mytest</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/mytest.cpp</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="add-compile-options"><a href="#add-compile-options" class="headerlink" title="add_compile_options"></a>add_compile_options</h3><p>添加编译选项</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_compile_options</span>(</span><br><span class="line">  -Wall</span><br><span class="line">  -Wextra</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="add-executable"><a href="#add-executable" class="headerlink" title="add_executable"></a>add_executable</h3><p>生成一个可执行文件</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 其中mytest相当于target</span></span><br><span class="line"><span class="keyword">add_executable</span>(</span><br><span class="line">  mytest</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/mytest.cpp</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="target-link-libraries"><a href="#target-link-libraries" class="headerlink" title="target_link_libraries"></a>target_link_libraries</h3><p>添加库文件到可执行文件<br>相当于<code>-l</code>参数</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_link_libraries</span>(</span><br><span class="line">  mytest</span><br><span class="line">  mytestlib</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="add-subdirectory"><a href="#add-subdirectory" class="headerlink" title="add_subdirectory"></a>add_subdirectory</h3><p>向工程添加子目录,并可以指定中间二进制和目标二进制的存放路径</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_subdirectory</span>(</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/subdir</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>/subdir</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="aux-source-directory"><a href="#aux-source-directory" class="headerlink" title="aux_source_directory"></a>aux_source_directory</h3><p>发现指定目录下的所有源文件,并将其添加到一个变量中</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">aux_source_directory</span>(</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/subdir</span><br><span class="line">  <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>/subdir</span><br><span class="line">  SOURCES</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_executable</span>(</span><br><span class="line">  mytest</span><br><span class="line">  <span class="variable">$&#123;SOURCES&#125;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="常用变量"><a href="#常用变量" class="headerlink" title="常用变量"></a>常用变量</h2><h3 id="CMAKE-C-FLAGS"><a href="#CMAKE-C-FLAGS" class="headerlink" title="CMAKE_C_FLAGS"></a>CMAKE_C_FLAGS</h3><p>gcc编译选项</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">&quot;$&#123;CMAKE_C_FLAGS&#125; -Wall -Wextra&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="CMAKE-CXX-FLAGS"><a href="#CMAKE-CXX-FLAGS" class="headerlink" title="CMAKE_CXX_FLAGS"></a>CMAKE_CXX_FLAGS</h3><p>g++编译选项</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">&quot;$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Wextra&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="CMAKE-BUILD-TYPE"><a href="#CMAKE-BUILD-TYPE" class="headerlink" title="CMAKE_BUILD_TYPE"></a>CMAKE_BUILD_TYPE</h3><p>编译类型</p>
+<ul>
+<li>Debug</li>
+<li>Release</li>
+<li>RelWithDebInfo</li>
+<li>MinSizeRel</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_BUILD_TYPE Debug)</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/05/03/cmake/cmake-study/" data-id="clin7xb4a000eccon105zghey" data-title="CMake学习" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cmake/" rel="tag">cmake</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-spring-boot/spring-boot-auto-config-analyse" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/04/21/spring-boot/spring-boot-auto-config-analyse/" class="article-date">
+  <time class="dt-published" datetime="2022-04-21T13:24:34.000Z" itemprop="datePublished">2022-04-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring-boot</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/04/21/spring-boot/spring-boot-auto-config-analyse/">Spring Boot自动装配</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><strong>基于SpringBoot 2.3.9.RELEASE 版本</strong></p>
+<ol>
+<li>先扫描得到配置类</li>
+<li>org.springframework.boot.autoconfigure.AutoConfigurationImportSelector#selectImports 得到自动配置类<br>  AutoConfigurationImportSelector实现了DeferredImportSelector接口,DeferredImportSelector就保证一定在配置类全部解析完成后才调用selectImports方法</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/04/21/spring-boot/spring-boot-auto-config-analyse/" data-id="clin7xb5e002vcconcjvq6l3w" data-title="Spring Boot自动装配" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" rel="tag">自动装配原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-spring-boot/spring-boot-start-analyse" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/04/21/spring-boot/spring-boot-start-analyse/" class="article-date">
+  <time class="dt-published" datetime="2022-04-21T12:24:34.000Z" itemprop="datePublished">2022-04-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring-boot</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/04/21/spring-boot/spring-boot-start-analyse/">Spring Boot启动分析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><strong>基于SpringBoot 2.3.9.RELEASE 版本</strong></p>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><p>使用<code>SpringApplication.run</code>方法启动一个SpringBoot程序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SampleTestApplication</span> &#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		SpringApplication.run(SampleTestApplication.class, args);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h2><h3 id="前期"><a href="#前期" class="headerlink" title="前期"></a>前期</h3><p><code>org.springframework.boot.SpringApplication#run(java.lang.Class&lt;?&gt;, java.lang.String...)</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> ConfigurableApplicationContext <span class="title function_">run</span><span class="params">(Class&lt;?&gt; primarySource, String... args)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> run(<span class="keyword">new</span> <span class="title class_">Class</span>&lt;?&gt;[] &#123; primarySource &#125;, args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>会把传入的<code>SampleTestApplication.class</code>包装成<code>Class&lt;?&gt;</code>数组,最终调用的是<br><code>org.springframework.boot.SpringApplication#run(java.lang.Class&lt;?&gt;[], java.lang.String[])</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> ConfigurableApplicationContext <span class="title function_">run</span><span class="params">(Class&lt;?&gt;[] primarySources, String[] args)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">SpringApplication</span>(primarySources).run(args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以SpringBoot启动时主类可以有多个</p>
+<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><h4 id="1-通过new-SpringApplication-primarySources-生成一个SpringApplication对象"><a href="#1-通过new-SpringApplication-primarySources-生成一个SpringApplication对象" class="headerlink" title="1. 通过new SpringApplication(primarySources)生成一个SpringApplication对象"></a>1. 通过<code>new SpringApplication(primarySources)</code>生成一个SpringApplication对象</h4><h5 id="1-确定web应用类型-NONE-SERVLET-REACTIVE"><a href="#1-确定web应用类型-NONE-SERVLET-REACTIVE" class="headerlink" title="1.确定web应用类型 NONE,SERVLET,REACTIVE"></a>1.确定web应用类型 NONE,SERVLET,REACTIVE</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过判断相关类是否存在确定应用类型</span></span><br><span class="line"><span class="built_in">this</span>.webApplicationType = WebApplicationType.deduceFromClasspath();</span><br></pre></td></tr></table></figure>
+<h5 id="2-从META-INF-spring-factories初始化初始化器-获取ApplicationContextInitializer对象"><a href="#2-从META-INF-spring-factories初始化初始化器-获取ApplicationContextInitializer对象" class="headerlink" title="2.从META-INF/spring.factories初始化初始化器(获取ApplicationContextInitializer对象)"></a>2.从<code>META-INF/spring.factories</code>初始化初始化器(获取ApplicationContextInitializer对象)</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-从META-INF-spring-factories初始化监听器-获取ApplicationListener对象"><a href="#3-从META-INF-spring-factories初始化监听器-获取ApplicationListener对象" class="headerlink" title="3.从META-INF/spring.factories初始化监听器(获取ApplicationListener对象)"></a>3.从<code>META-INF/spring.factories</code>初始化监听器(获取ApplicationListener对象)</h5><pre><code>事件那一套使用的
+</code></pre>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));</span><br></pre></td></tr></table></figure>
+
+<h5 id="4-找到主类-Main方法所在类"><a href="#4-找到主类-Main方法所在类" class="headerlink" title="4. 找到主类(Main方法所在类)"></a>4. 找到主类(Main方法所在类)</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这个方法比较有意思,是通过主动抛出异常的方式找到主类</span></span><br><span class="line"><span class="built_in">this</span>.mainApplicationClass = deduceMainApplicationClass();</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-SpringApplication的对象-run-方法执行"><a href="#2-SpringApplication的对象-run-方法执行" class="headerlink" title="2. SpringApplication的对象.run()方法执行"></a>2. SpringApplication的对象.run()方法执行</h4>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">SpringApplication</span>(primarySources).run(args)</span><br></pre></td></tr></table></figure>
+
+<h5 id="1-从spring-factories中获取SpringApplicationRunListeners对象-默认会获取一个EventPublishingRunlistener-它会触发启动过程中各个阶段的事件"><a href="#1-从spring-factories中获取SpringApplicationRunListeners对象-默认会获取一个EventPublishingRunlistener-它会触发启动过程中各个阶段的事件" class="headerlink" title="1.从spring.factories中获取SpringApplicationRunListeners对象,默认会获取一个EventPublishingRunlistener,它会触发启动过程中各个阶段的事件"></a>1.从spring.factories中获取SpringApplicationRunListeners对象,默认会获取一个EventPublishingRunlistener,它会触发启动过程中各个阶段的事件</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// listeners中默认会找到一个EventPublishingRunlistener</span></span><br><span class="line"><span class="type">SpringApplicationRunListeners</span> <span class="variable">listeners</span> <span class="operator">=</span> getRunListeners(args);</span><br></pre></td></tr></table></figure>
+
+<h5 id="2-SpringApplicationRunListener-starting"><a href="#2-SpringApplicationRunListener-starting" class="headerlink" title="2.SpringApplicationRunListener.starting()"></a>2.SpringApplicationRunListener.starting()</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">listeners.starting();</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-创建一个Spring容器-也叫上下文-ConfigurableApplicationContext"><a href="#3-创建一个Spring容器-也叫上下文-ConfigurableApplicationContext" class="headerlink" title="3.创建一个Spring容器(也叫上下文,ConfigurableApplicationContext)"></a>3.创建一个Spring容器(也叫上下文,ConfigurableApplicationContext)</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据应用类型创建容器</span></span><br><span class="line">context = createApplicationContext();</span><br></pre></td></tr></table></figure>
+<h5 id="4-上下文准备-prepareContext"><a href="#4-上下文准备-prepareContext" class="headerlink" title="4.上下文准备(prepareContext)"></a>4.上下文准备(prepareContext)</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方法内:</span></span><br><span class="line"><span class="comment">// 5. 调用ApplicationContextInitializer的initialize方法</span></span><br><span class="line"><span class="comment">// 6. 调用SpringApplicationRunListener的contextPrepared方法</span></span><br><span class="line"><span class="comment">// 7. 把run方法传进来的类注入到容器中</span></span><br><span class="line"><span class="comment">// 8. 调用SpringApplicationRunListener的contextLoaded方法</span></span><br><span class="line">prepareContext(context, environment, listeners, applicationArguments, printedBanner);</span><br></pre></td></tr></table></figure>
+
+<h5 id="9-刷新上下文-refreshContext"><a href="#9-刷新上下文-refreshContext" class="headerlink" title="9.刷新上下文(refreshContext)"></a>9.刷新上下文(refreshContext)</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 会解析配置类,扫描,启动WebServer(Tomcat/Jetty/Undertow)(AutoConfigurationImportSelector,DeferredImportSelector)&#x27;</span></span><br><span class="line">refreshContext(context)</span><br></pre></td></tr></table></figure>
+
+
+<h5 id="9-调用ApplicationRunner和CommandLineRunner-callRunner"><a href="#9-调用ApplicationRunner和CommandLineRunner-callRunner" class="headerlink" title="9.调用ApplicationRunner和CommandLineRunner(callRunner)"></a>9.调用ApplicationRunner和CommandLineRunner(callRunner)</h5>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">callRunners(context, applicationArguments)</span><br></pre></td></tr></table></figure>
+
+<p>  1##### 0.SpringApplicationRunListener.running()</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">listeners.running(context)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/04/21/spring-boot/spring-boot-start-analyse/" data-id="clin7xb5i0036ccon8m9qfyhv" data-title="Spring Boot启动分析" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" rel="tag">启动流程分析</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-spring-boot/spring-boot-code-read" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/04/21/spring-boot/spring-boot-code-read/" class="article-date">
+  <time class="dt-published" datetime="2022-04-21T11:24:34.000Z" itemprop="datePublished">2022-04-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring-boot</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/04/21/spring-boot/spring-boot-code-read/">Spring Boot源码阅读环境搭建</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><strong>基于SpringBoot 2.3.9.RELEASE 版本</strong></p>
+<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><p>如果希望搭建SpringBoot源码阅读环境,必须科学上网,不要相信使用国内源下载依赖,阿里的源会有问题</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><ol>
+<li><p>克隆代码,切换到<code>2.3.9.release</code>分支,导入IDE</p>
+</li>
+<li><p>这里如果下载依赖正常,通常还是会报错的,需要注释掉源码中的两处</p>
+</li>
+</ol>
+<ul>
+<li><p><code>settings.gradle</code>中注释掉’io.spring.ge.conventions’</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">  id <span class="string">&quot;com.gradle.enterprise&quot;</span> version <span class="string">&quot;3.5.2&quot;</span></span><br><span class="line">  <span class="comment">// id &quot;io.spring.ge.conventions&quot; version &quot;0.0.7&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>buildSrc</code>下<code>build.gradle</code>中注释掉<code>io.spring.javaformat</code></p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">  id <span class="string">&quot;java-gradle-plugin&quot;</span></span><br><span class="line">  <span class="comment">//id &quot;io.spring.javaformat&quot; version &quot;$&#123;javaFormatVersion&#125;&quot;</span></span><br><span class="line">  id <span class="string">&quot;checkstyle&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="补充说明"><a href="#补充说明" class="headerlink" title="补充说明"></a>补充说明</h2><p>一般下载完依赖，注释掉格式化等插件就可以直接在IDE中运行<code>spring-boot-tests</code>下的测试用例了<br>但我选择在源码根目录下新建<code>spring-boot-test</code>模块然后新建一个正常的SpringBoot程序,只不过引用的是源码中的依赖<br>我使用的版本是<code>v2.3.9.release</code>版,使用<code>gradle</code>做依赖管理,下面是<code>build.gradle</code>示例</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">    id <span class="string">&#x27;java&#x27;</span></span><br><span class="line">    id <span class="string">&quot;org.springframework.boot.conventions&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">description = <span class="string">&quot;Spring Boot Test test&quot;</span></span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    implementation(project(<span class="string">&quot;:spring-boot-project:spring-boot-starters:spring-boot-starter-web&quot;</span>))</span><br><span class="line"></span><br><span class="line">    testImplementation(project(<span class="string">&quot;:spring-boot-project:spring-boot-starters:spring-boot-starter-test&quot;</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/04/21/spring-boot/spring-boot-code-read/" data-id="clin7xb5g002zccongsu285cx" data-title="Spring Boot源码阅读环境搭建" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" rel="tag">源码阅读</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="tag">环境搭建</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-dbapi/issues_I51LOI" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/04/16/dbapi/issues_I51LOI/" class="article-date">
+  <time class="dt-published" datetime="2022-04-16T03:35:19.000Z" itemprop="datePublished">2022-04-16</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/bug%E4%BF%AE%E5%A4%8D/">bug修复</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/04/16/dbapi/issues_I51LOI/">解决DBApi gateway 中文乱码问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="问题链接"><a href="#问题链接" class="headerlink" title="问题链接"></a>问题链接</h2><p><a target="_blank" rel="noopener" href="https://gitee.com/freakchicken/db-api/issues/I51LOI">gateway中文乱码</a></p>
+<p><img src="/assets/images/dbapi/dbapi%E7%9A%84gateway%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.png" alt="dbapi的gateway中文乱码问题"></p>
+<h2 id="排查思路"><a href="#排查思路" class="headerlink" title="排查思路"></a>排查思路</h2><h3 id="初步分析"><a href="#初步分析" class="headerlink" title="初步分析"></a>初步分析</h3><p>dbapi支持两种部署模式,一种是单机版(<code>standalone</code>模式),一种是集群版(<code>gateway</code>调<code>apiserver</code>版本).两种模式同一请求返回结果不一致，<br>那么一定是两种模式下存在某些差异导致中文乱码</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p><img src="/assets/images/dbapi/dbapi%E8%B0%83%E7%94%A8%E6%9C%8D%E5%8A%A1%E6%8B%93%E6%89%91%E5%9B%BE.drawio.png" alt="dbapi调用服务拓扑图"></p>
+<p>需要启动<code>dbapi-standalone</code>,<code>dbapi-cluster-gateway</code>,<code>dbapi-cluster-apiServer</code><br>其中<code>dbapi-cluster-gateway</code>,<code>dbapi-cluster-apiServer</code>需要通过nacos暴露服务</p>
+<h3 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h3><p>在复现的时候，我发现的确如果返回值中存在中文,单机版返回正常,访问<code>gateway</code>返回的中文乱码。<br>因为<code>gateway</code>最终也是调用的<code>apiserver</code>,所以我们直接调用<code>apiserver</code>，发现<strong>apiserver返回的中文乱码</strong><br>至此我们怀疑是<code>apiserver</code>造成中文乱码问题<br>同时注意到单机版返回的<code>response</code>的<code>content-type</code>正常,<code>apiserver</code>返回的<code>response</code>没有<code>content-type</code></p>
+<p>单机版返回response示例:</p>
+<p><img src="/assets/images/dbapi/%E5%8D%95%E6%9C%BA%E8%BF%94%E5%9B%9Eresponse.png" alt="单机返回response"></p>
+<p><code>apiserver</code>返回response示例:</p>
+<p><img src="/assets/images/dbapi/apiserver%E8%BF%94%E5%9B%9Eresponse.png" alt="apiserver返回response"></p>
+<p>因此我们怀疑是<strong>apiserver没有为response设置content-type造成中文乱码</strong></p>
+<h3 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h3><p><strong>使用代码版本: dev分支:409a6cf2c0ec222946754d195846bb7023ca0c3b</strong></p>
+<p>使用关键字<code>.setContentType(</code>搜索,代码中为返回值设置response的地方共有6处,其中我们需要关心以下两个地方:</p>
+<ul>
+<li>com.gitee.freakchicken.dbapi.basic.conf.JwtAuthenticationInterceptor</li>
+<li>com.gitee.freakchicken.dbapi.basic.filter.ApiIPFilter</li>
+</ul>
+<p>通过<code>com.gitee.freakchicken.dbapi.basic.conf.MyConfig#addInterceptors</code>发现<code>JwtAuthenticationInterceptor</code>主要校验前端UI,因此请求进来的时候起作用只能是<code>ApiIPFilter</code><br>要么是请求打到<code>apiserver</code>,请求调用的时候没有经历这个<code>ApiIPFilter</code>,要么就是请求通过这个<code>ApiIPFilter</code>设置的response content-type没有效果</p>
+<p>通过测试,发现当直接请求<code>apiserver</code>时并没有通过<code>ApiIPFilter</code>,通过分析<code>apiserver</code>代码,在<code>com.gitee.freakchicken.dbapi.apiserver.DBApiApiServer</code>的<code>ComponentScan</code>中排除了<code>com.gitee.freakchicken.dbapi.basic.filter.ApiIPFilter</code></p>
+<p>同时我们发现<code>gateway</code>存在<code>com.gitee.freakchicken.dbapi.gateway.filter.GatewayIPFilter</code>,应该是作者认为<code>gateway</code>存在了ip过滤,apiserver就不应该再过滤一遍ip,但是却忽略了response设置编码这一环</p>
+<h3 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h3><p>添加一个统一的请求头过滤器<code>com.gitee.freakchicken.dbapi.basic.filter.ApiHeaderFilter</code>只针对<code>dbapi.api.context</code>配置的地址,同时调整注册filter与sevlet的代码结构</p>
+<p>分别为:</p>
+<ul>
+<li>com.gitee.freakchicken.dbapi.conf.FilterConfig<br>将<code>ipFilter</code> order设置为1,<code>authFilter</code> order设置为2,<code>apiHeaderFilter</code> order设置为3(这里有坑,下面有解释)</li>
+<li>com.gitee.freakchicken.dbapi.conf.ServletConfig</li>
+<li>com.gitee.freakchicken.dbapi.apiserver.conf.FilterConfig<br>将<code>authFilter</code> order设置为2,<code>apiHeaderFilter</code> order设置为3(这里有坑,下面有解释)</li>
+<li>com.gitee.freakchicken.dbapi.apiserver.conf.ServletConfig</li>
+</ul>
+<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><ol>
+<li>发现单机模式下返回值正常,集群模式下返回值有<code>content-type</code>,但是<code>content-type</code>却不是我们设置的<code>utf-8</code></li>
+</ol>
+<p>集群模式下response<br><img src="/assets/images/dbapi/%E7%AC%AC%E4%B8%80%E6%AC%A1%E4%BF%AE%E5%A4%8Dresponse.png" alt="第一次修复response"></p>
+<ol start="2">
+<li>我将<code>com.gitee.freakchicken.dbapi.basic.filter.ApiHeaderFilter#doFilter</code>的代码改为<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">characterEncoding</span> <span class="operator">=</span> response.getCharacterEncoding();</span><br><span class="line">System.out.println(<span class="string">&quot;设置CharacterEncoding前: &quot;</span>+characterEncoding);</span><br><span class="line">response.setCharacterEncoding(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">characterEncoding = response.getCharacterEncoding();</span><br><span class="line">System.out.println(<span class="string">&quot;设置CharacterEncoding后: &quot;</span>+characterEncoding);</span><br><span class="line"></span><br><span class="line"><span class="type">String</span> <span class="variable">contentType</span> <span class="operator">=</span> response.getContentType();</span><br><span class="line">System.out.println(<span class="string">&quot;设置ContentType前: &quot;</span>+contentType);</span><br><span class="line">response.setContentType(<span class="string">&quot;application/json; charset=utf-8&quot;</span>);</span><br><span class="line">contentType = response.getContentType();</span><br><span class="line">System.out.println(<span class="string">&quot;设置ContentType后: &quot;</span>+contentType);</span><br></pre></td></tr></table></figure>
+用以调试</li>
+</ol>
+<p>发现<code>response.setContentType</code>与<code>response.setCharacterEncoding</code>不起作用</p>
+<p>当请求单机版时发现输出为</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">设置CharacterEncoding前: utf-8</span><br><span class="line">设置CharacterEncoding后: utf-8</span><br><span class="line">设置ContentType前: application/json;charset=utf-8</span><br><span class="line">设置ContentType后: application/json;charset=utf-8</span><br></pre></td></tr></table></figure>
+
+<p>当请求<code>apiserver</code>时发现输出为</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">设置CharacterEncoding前: ISO-8859-1</span><br><span class="line">设置CharacterEncoding后: ISO-8859-1</span><br><span class="line">设置ContentType前: null</span><br><span class="line">设置ContentType后: application/json;charset=ISO-8859-1</span><br></pre></td></tr></table></figure>
+
+<p>下面就<code>response.setContentType</code>与<code>response.setCharacterEncoding</code>问题分为单机版与集群版两种模式下讨论<br>首先我们要注意，dbapi在两种模式下的<code>FilterChain</code>是不同的</p>
+<ol>
+<li>单机版FilterChain</li>
+</ol>
+<p><img src="/assets/images/dbapi/%E5%8D%95%E6%9C%BA%E7%89%88FilterChain.png" alt="单机版FilterChain"></p>
+<p>当请求单机版时,<code>apiIPFilter</code>在<code>apiHeaderFilter</code>之前,因此此时<code>apiHeaderFilter</code>设不设置无所谓</p>
+<ol start="2">
+<li>集群版FilterChain</li>
+</ol>
+<p><img src="/assets/images/dbapi/%E9%9B%86%E7%BE%A4%E7%89%88FilterChain.png" alt="集群版FilterChain"></p>
+<p>当请求集群版时,<code>apiAuthFilter</code>在<code>apiHeaderFilter</code>之前,此时<code>apiHeaderFilter</code>再设置就不起作用了</p>
+<p>通过断点调试,发现在<code>apiAuthFilter</code>的<code>response.getWriter()</code>时会<code>setCharacterEncoding</code>,而这个set的值就是<code>ISO-8859-1</code>,同时<code>org.apache.catalina.connector.Response</code>在设置完编码后会将<code>usingWriter</code>设为<code>true</code>导致下次设置就不会起作用</p>
+<p>这告诉我们<strong>不使用writer的时候不要提前获取response的writer,否则无法在后续filter中设置编码</strong>,同时<strong>设置response的编码最好放在第一个</strong></p>
+<p>按照这个原则,我们再次修改代码,调试提交</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/04/16/dbapi/issues_I51LOI/" data-id="clin7xb4g000qccongvxgd8ak" data-title="解决DBApi gateway 中文乱码问题" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bug%E4%BF%AE%E5%A4%8D/" rel="tag">bug修复</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-java/registerAsParallelCapable_analyse" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/04/02/java/registerAsParallelCapable_analyse/" class="article-date">
+  <time class="dt-published" datetime="2022-04-02T11:22:28.000Z" itemprop="datePublished">2022-04-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/04/02/java/registerAsParallelCapable_analyse/">类加载器的并行加载模式registerAsParallelCapable源码分析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="并行加载模式"><a href="#并行加载模式" class="headerlink" title="并行加载模式"></a>并行加载模式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * Try to solve the classloader dead lock. See https://github.com/apache/skywalking/pull/2016</span></span><br><span class="line"><span class="comment">    * 为了解决ClassLoader死锁问题,开启类加载器的并行加载模式</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">  registerAsParallelCapable();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>在JDK 1.7之前，类加载器在加载类的时候是串行加载的，比如有100个类需要加载，那么就排队，加载完上一个再加载下一个，这样加载效率就很低, ClassLoader加载类的时候加锁的时候是用自身作为锁的，容易产生死锁</p>
+</li>
+<li><p>在JDK 1.7之后，就提供了类加载器并行能力，就是把锁的粒度变小，现在是每一个类都有一个独立的锁</p>
+</li>
+</ul>
+<h2 id="ClassLoader的registerAsParallelCapable-方法源码"><a href="#ClassLoader的registerAsParallelCapable-方法源码" class="headerlink" title="ClassLoader的registerAsParallelCapable()方法源码"></a>ClassLoader的registerAsParallelCapable()方法源码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">ClassLoader</span> &#123; </span><br><span class="line">  <span class="comment">/** </span></span><br><span class="line"><span class="comment">    * 将调用该方法的类加载器注册为具备并行能力的 </span></span><br><span class="line"><span class="comment">    * 同时满足以下两个条件时,注册才会成功 </span></span><br><span class="line"><span class="comment">    * 1.调用该方法的类加载器实例还未创建 </span></span><br><span class="line"><span class="comment">    * 2.调用该方法的类加载器所有父类(Object类除外)都注册为具备并行能力的 </span></span><br><span class="line"><span class="comment">    */</span> </span><br><span class="line">  <span class="meta">@CallerSensitive</span> </span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">registerAsParallelCapable</span><span class="params">()</span> &#123; </span><br><span class="line">    <span class="comment">// 把调用该方法的Class对象转换为ClassLoader的子类 </span></span><br><span class="line">    <span class="type">Class</span> <span class="variable">callerClass</span> <span class="operator">=</span> Reflection.getCallerClass().asSubclass(ClassLoader.class); </span><br><span class="line">    <span class="comment">// 注册为具备并行能力的 </span></span><br><span class="line">    <span class="keyword">return</span> ParallelLoaders.register(callerClass); </span><br><span class="line">  &#125; </span><br><span class="line">  </span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">ParallelLoaders</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">ParallelLoaders</span><span class="params">()</span> &#123;&#125; </span><br><span class="line">    <span class="comment">// loaderTypes中保存了所有具备并行能力的类加载器 </span></span><br><span class="line">    <span class="comment">// 注意这里是WeakHashMap 可参考https://blog.csdn.net/kaka0509/article/details/73459419</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Set&gt; loaderTypes = Collections.newSetFromMap(<span class="keyword">new</span> <span class="title class_">WeakHashMap</span>&lt;&gt;()); </span><br><span class="line">    <span class="keyword">static</span> &#123; </span><br><span class="line">      <span class="comment">// ClassLoader本身就是支持并行加载的 </span></span><br><span class="line">      <span class="keyword">synchronized</span> (loaderTypes) &#123; </span><br><span class="line">        loaderTypes.add(ClassLoader.class); </span><br><span class="line">      &#125; </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">register</span><span class="params">(Class c)</span> &#123; </span><br><span class="line">      <span class="keyword">synchronized</span> (loaderTypes) &#123; </span><br><span class="line">        <span class="comment">// 当且仅当该类加载器的所有父类都具备并行能力时,该类加载器才能被注册成功 </span></span><br><span class="line">        <span class="keyword">if</span> (loaderTypes.contains(c.getSuperclass())) &#123; </span><br><span class="line">          loaderTypes.add(c); </span><br><span class="line">          <span class="keyword">return</span> <span class="literal">true</span>; </span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; </span><br><span class="line">          <span class="keyword">return</span> <span class="literal">false</span>; </span><br><span class="line">        &#125; </span><br><span class="line">      &#125; </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">/** </span></span><br><span class="line"><span class="comment">      * 判定给定的类加载器是否具备并行能力 </span></span><br><span class="line"><span class="comment">      */</span> </span><br><span class="line">    <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">isRegistered</span><span class="params">(Class c)</span> &#123; </span><br><span class="line">      <span class="keyword">synchronized</span> (loaderTypes) &#123; </span><br><span class="line">        <span class="keyword">return</span> loaderTypes.contains(c); </span><br><span class="line">      &#125; </span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="并行加载的实现"><a href="#并行加载的实现" class="headerlink" title="并行加载的实现"></a>并行加载的实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ConcurrentHashMap&lt;String, Object&gt; parallelLockMap;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">ClassLoader</span><span class="params">(Void unused, String name, ClassLoader parent)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.parent = parent;</span><br><span class="line">        <span class="built_in">this</span>.unnamedModule = <span class="keyword">new</span> <span class="title class_">Module</span>(<span class="built_in">this</span>);</span><br><span class="line">      	<span class="comment">// 判断当前类加载器是否具备并行能力,如果具备则对parallelLockMap进行初始化</span></span><br><span class="line">        <span class="keyword">if</span> (ParallelLoaders.isRegistered(<span class="built_in">this</span>.getClass())) &#123;</span><br><span class="line">            parallelLockMap = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;();</span><br><span class="line">            package2certs = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;();</span><br><span class="line">            assertionLock = <span class="keyword">new</span> <span class="title class_">Object</span>();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// no finer-grained lock; lock on the classloader instance</span></span><br><span class="line">            parallelLockMap = <span class="literal">null</span>;</span><br><span class="line">            package2certs = <span class="keyword">new</span> <span class="title class_">Hashtable</span>&lt;&gt;();</span><br><span class="line">            assertionLock = <span class="built_in">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">this</span>.nameAndId = nameAndId(<span class="built_in">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; loadClass(String name, <span class="type">boolean</span> resolve)</span><br><span class="line">        <span class="keyword">throws</span> ClassNotFoundException</span><br><span class="line">    &#123;</span><br><span class="line">      	<span class="comment">// 加锁,调用getClassLoadingLock方法获取类加载时的锁</span></span><br><span class="line">        <span class="keyword">synchronized</span> (getClassLoadingLock(name)) &#123;</span><br><span class="line">            <span class="comment">// First, check if the class has already been loaded</span></span><br><span class="line">            Class&lt;?&gt; c = findLoadedClass(name);</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="type">long</span> <span class="variable">t0</span> <span class="operator">=</span> System.nanoTime();</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (parent != <span class="literal">null</span>) &#123;</span><br><span class="line">                        c = parent.loadClass(name, <span class="literal">false</span>);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        c = findBootstrapClassOrNull(name);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">                    <span class="comment">// ClassNotFoundException thrown if class not found</span></span><br><span class="line">                    <span class="comment">// from the non-null parent class loader</span></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (c == <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// If still not found, then invoke findClass in order</span></span><br><span class="line">                    <span class="comment">// to find the class.</span></span><br><span class="line">                    <span class="type">long</span> <span class="variable">t1</span> <span class="operator">=</span> System.nanoTime();</span><br><span class="line">                    c = findClass(name);</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// this is the defining class loader; record the stats</span></span><br><span class="line">                    PerfCounter.getParentDelegationTime().addTime(t1 - t0);</span><br><span class="line">                    PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</span><br><span class="line">                    PerfCounter.getFindClasses().increment();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (resolve) &#123;</span><br><span class="line">                resolveClass(c);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> c;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 支持并行加载的关键</span></span><br><span class="line">    <span class="comment">// 并行加载的原理:</span></span><br><span class="line">    <span class="comment">// 如果当前类加载器是支持并行加载的，就把加载类时锁的粒度降低到加载的具体的某一个类上，而不是锁掉整个类加载器</span></span><br><span class="line">    <span class="keyword">protected</span> Object <span class="title function_">getClassLoadingLock</span><span class="params">(String className)</span> &#123;</span><br><span class="line">      	<span class="comment">// 默认(非并行)锁是自身</span></span><br><span class="line">        <span class="type">Object</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="built_in">this</span>;</span><br><span class="line">        <span class="keyword">if</span> (parallelLockMap != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 并行，所就是每一个class一个对象</span></span><br><span class="line">            <span class="type">Object</span> <span class="variable">newLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Object</span>();</span><br><span class="line">          	<span class="comment">// k:要加载的类名 v:新的锁</span></span><br><span class="line">            lock = parallelLockMap.putIfAbsent(className, newLock);</span><br><span class="line">          	<span class="comment">// 如果是第一次put,则返回newLock</span></span><br><span class="line">            <span class="keyword">if</span> (lock == <span class="literal">null</span>) &#123;</span><br><span class="line">                lock = newLock;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> lock;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_40378034/article/details/121882943">SkyWalking8.7源码解析（一）：Agent启动流程、Agent配置加载流程、自定义类加载器AgentClassLoader、插件定义体系、插件加载</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/04/02/java/registerAsParallelCapable_analyse/" data-id="clin7xb4p0014cconay4z9awx" data-title="类加载器的并行加载模式registerAsParallelCapable源码分析" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/" rel="tag">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-maven/maven-plugins-introduction" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/03/26/maven/maven-plugins-introduction/" class="article-date">
+  <time class="dt-published" datetime="2022-03-26T04:02:37.000Z" itemprop="datePublished">2022-03-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Maven/">Maven</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/03/26/maven/maven-plugins-introduction/">maven插件介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="maven-compiler-plugin"><a href="#maven-compiler-plugin" class="headerlink" title="maven-compiler-plugin"></a>maven-compiler-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/plugins/maven-compiler-plugin/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><p>编译jar包</p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">encoding</span>&gt;</span>utf-8<span class="tag">&lt;/<span class="name">encoding</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="maven-clean-plugin"><a href="#maven-clean-plugin" class="headerlink" title="maven-clean-plugin"></a>maven-clean-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-clean-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能-1"><a href="#功能-1" class="headerlink" title="功能"></a>功能</h3><p>执行命令mvn clean时调用的就是这个插件</p>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-clean-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 即使清理出错构建仍将继续 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">failOnError</span>&gt;</span>true<span class="tag">&lt;/<span class="name">failOnError</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filesets</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">fileset</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 将被删除的文件路径,因为默认是target,所以这里需要配置 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;basedir&#125;/dist<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">fileset</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">filesets</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="versions-maven-plugin"><a href="#versions-maven-plugin" class="headerlink" title="versions-maven-plugin"></a>versions-maven-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://www.mojohaus.org/versions-maven-plugin/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.mojo<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>versions-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能-2"><a href="#功能-2" class="headerlink" title="功能"></a>功能</h3><p>批量修改版本号</p>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.mojo<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>versions-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">generateBackupPoms</span>&gt;</span>false<span class="tag">&lt;/<span class="name">generateBackupPoms</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="maven-source-plugin"><a href="#maven-source-plugin" class="headerlink" title="maven-source-plugin"></a>maven-source-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/plugins/maven-source-plugin/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-source-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能-3"><a href="#功能-3" class="headerlink" title="功能"></a>功能</h3><p>可以在配置的Maven生命周期中为当前工程创建源码jar包</p>
+<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-source-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 该execution的目的是在mvn打包时生成一个含有源代码的jar包 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>attach-sources<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 默认绑定的生命周期阶段是package --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">goal</span>&gt;</span>jar-no-fork<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="maven-jar-plugin"><a href="#maven-jar-plugin" class="headerlink" title="maven-jar-plugin"></a>maven-jar-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/plugins/maven-jar-plugin/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-jar-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能-4"><a href="#功能-4" class="headerlink" title="功能"></a>功能</h3><p>创建jar包</p>
+<h3 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-jar-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">excludes</span>&gt;</span><span class="comment">&lt;!--不把配置文件打的jar包里面--&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>**/*.xml<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>**/*.properties<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>**/*.db<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">id</span>&gt;</span>default-jar<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">goal</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/d44f713b1ec9">Maven maven-jar-plugin</a></li>
+</ol>
+<h2 id="maven-antrun-plugin"><a href="#maven-antrun-plugin" class="headerlink" title="maven-antrun-plugin"></a>maven-antrun-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/plugins/maven-antrun-plugin/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-antrun-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能-5"><a href="#功能-5" class="headerlink" title="功能"></a>功能</h3><p>运行ant命令,文件拷贝与删除</p>
+<h3 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-antrun-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>move-dist-to-static<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">phase</span>&gt;</span>validate<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">goal</span>&gt;</span>run<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="comment">&lt;!-- 删除static文件夹内容--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">target</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">delete</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">&quot;$&#123;basedir&#125;/src/main/resources/static/&quot;</span></span></span><br><span class="line"><span class="tag">                                  <span class="attr">includes</span>=<span class="string">&quot;**/*.*&quot;</span>/&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">delete</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">                <span class="comment">&lt;!--   复制dist文件夹到static文件夹--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">target</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">copy</span> <span class="attr">todir</span>=<span class="string">&quot;$&#123;basedir&#125;/src/main/resources/static&quot;</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">&quot;$&#123;basedir&#125;/../dbapi-ui/dist&quot;</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">include</span> <span class="attr">name</span>=<span class="string">&quot;**/*.*&quot;</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">fileset</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">copy</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="参考-1"><a href="#参考-1" class="headerlink" title="参考"></a>参考</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/yanliang1/article/details/52230713">Maven 插件之 maven-antrun-plugin</a></li>
+</ol>
+<h2 id="exec-maven-plugin"><a href="#exec-maven-plugin" class="headerlink" title="exec-maven-plugin"></a>exec-maven-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://www.mojohaus.org/exec-maven-plugin/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.mojo<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>exec-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能-6"><a href="#功能-6" class="headerlink" title="功能"></a>功能</h3><p>执行java或命令行命令</p>
+<h3 id="示例-6"><a href="#示例-6" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.mojo<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>exec-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>exec-npm-install<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">phase</span>&gt;</span>validate<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">goal</span>&gt;</span>exec<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executable</span>&gt;</span>npm<span class="tag">&lt;/<span class="name">executable</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">arguments</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">argument</span>&gt;</span>install<span class="tag">&lt;/<span class="name">argument</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">arguments</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">workingDirectory</span>&gt;</span>$&#123;basedir&#125;<span class="tag">&lt;/<span class="name">workingDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>exec-npm-run-build<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">phase</span>&gt;</span>validate<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">goal</span>&gt;</span>exec<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executable</span>&gt;</span>npm<span class="tag">&lt;/<span class="name">executable</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">arguments</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">argument</span>&gt;</span>run<span class="tag">&lt;/<span class="name">argument</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">argument</span>&gt;</span>build<span class="tag">&lt;/<span class="name">argument</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">arguments</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">workingDirectory</span>&gt;</span>$&#123;basedir&#125;<span class="tag">&lt;/<span class="name">workingDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="参考-2"><a href="#参考-2" class="headerlink" title="参考"></a>参考</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/bluishglc/article/details/7622286">Exec Maven Plugin全面解析和使用示例</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lianshan/p/7358966.html">exec-maven-plugin配置及使用</a></li>
+</ol>
+<h2 id="maven-gpg-plugin"><a href="#maven-gpg-plugin" class="headerlink" title="maven-gpg-plugin"></a>maven-gpg-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/plugins/maven-gpg-plugin/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-gpg-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能-7"><a href="#功能-7" class="headerlink" title="功能"></a>功能</h3><p>使用GnuPG对项目的所有附加构件进行签名(发布时使用)</p>
+<h3 id="示例-7"><a href="#示例-7" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-gpg-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">id</span>&gt;</span>sign-artifacts<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">phase</span>&gt;</span>verify<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>sign<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="maven-assembly-plugin"><a href="#maven-assembly-plugin" class="headerlink" title="maven-assembly-plugin"></a>maven-assembly-plugin</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/plugins/maven-assembly-plugin/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-assembly-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="功能-8"><a href="#功能-8" class="headerlink" title="功能"></a>功能</h3><p>编译jar包</p>
+<h3 id="示例-8"><a href="#示例-8" class="headerlink" title="示例"></a>示例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-assembly-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">descriptors</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!--对应着打包配置--&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">descriptor</span>&gt;</span>binary.xml<span class="tag">&lt;/<span class="name">descriptor</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">descriptors</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>$&#123;project.parent.basedir&#125;/dist<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">id</span>&gt;</span>make-assembly<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>single<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>binary.xml配置详见<a target="_blank" rel="noopener" href="https://maven.apache.org/plugins/maven-assembly-plugin/examples/single/using-components.html">Using Component Descriptors</a>中介绍,<br>示例详见<a href=""></a></p>
+<h3 id="参考-3"><a href="#参考-3" class="headerlink" title="参考"></a>参考</h3><p>1.<a target="_blank" rel="noopener" href="https://blog.csdn.net/liupeifeng3514/article/details/79777976">Maven教程（20）— 使用 maven-assembly-plugin插件来定制化打包</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/03/26/maven/maven-plugins-introduction/" data-id="clin7xb52001zccon41ll7fel" data-title="maven插件介绍" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven-Plugin/" rel="tag">Maven Plugin</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-maven/know-maven-in-open-source-project-01" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/03/26/maven/know-maven-in-open-source-project-01/" class="article-date">
+  <time class="dt-published" datetime="2022-03-26T03:36:50.000Z" itemprop="datePublished">2022-03-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Maven/">Maven</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/03/26/maven/know-maven-in-open-source-project-01/">从开源项目看Maven配置(01) -- dbapi</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>本文将介绍开源项目<a target="_blank" rel="noopener" href="https://gitee.com/freakchicken/db-api">DBApi</a>的Maven配置,通过学习它的配置进而学习Maven知识</p>
+<h2 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h2><p><strong>这里并没有使用原仓库进行分析,而是使用了其他人fork的分支,该分支修复了一些jar包冲突<a target="_blank" rel="noopener" href="https://gitee.com/kensan/db-api/tree/feature%2Ffix_version_conflicts">https://gitee.com/kensan/db-api/tree/feature%2Ffix_version_conflicts</a></strong></p>
+<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>DBApi提供零代码开发api服务，只需编写sql，就可以生成http api服务。支持api动态创建，多数据源连接，动态添加数据源，兼容多种数据库。 适用于BI报表、数据可视化大屏的后端接口快速开发</p>
+<h3 id="pom结构"><a href="#pom结构" class="headerlink" title="pom结构"></a>pom结构</h3><ul>
+<li>dbapi</li>
+<li>dbapi-ui</li>
+<li>dbapi-common</li>
+<li>dbapi-plugin</li>
+<li>dbapi-service</li>
+<li>dbapi-controller</li>
+<li>dbapi-standalone</li>
+<li>dbapi-cluster-apiServer</li>
+<li>dbapi-cluster-manager</li>
+<li>dbapi-cluster-gateway</li>
+<li>dbapi-assembly</li>
+</ul>
+<h2 id="各模块pom配置"><a href="#各模块pom配置" class="headerlink" title="各模块pom配置"></a>各模块pom配置</h2><h3 id="dbapi根pom"><a href="#dbapi根pom" class="headerlink" title="dbapi根pom"></a>dbapi根pom</h3><h4 id="properties"><a href="#properties" class="headerlink" title="properties"></a>properties</h4><ol>
+<li><p>根pom中使用<code>properties</code>声明了一些jar包的版本,搭配<code>dependencyManagement</code>便可以控制其子模块中引用的jar包版本</p>
+</li>
+<li><p><code>properties</code>中版本的定义使用的是<code>groupId</code>+<code>artifactId</code>,这样就可以避免属性被覆盖的问题,详情可以查看<a target="_blank" rel="noopener" href="https://blog.csdn.net/vtopqx/article/details/79034835">Maven properties覆盖</a></p>
+</li>
+</ol>
+<h4 id="profiles"><a href="#profiles" class="headerlink" title="profiles"></a>profiles</h4><ol>
+<li><p>使用<code>profiles</code>定义了两种模式,每种模式引入的子模块<code>module</code>不同,这样仅需切换<code>profile</code>就能满足不同场景下打包的需求</p>
+</li>
+<li><p>参考文章:<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/6e0ed7b341e6">Maven - Profile</a></p>
+</li>
+</ol>
+<h4 id="dependencyManagement"><a href="#dependencyManagement" class="headerlink" title="dependencyManagement"></a>dependencyManagement</h4><ol>
+<li><p>多模块管理时控制jar包版本,解决jar包冲突</p>
+</li>
+<li><p>配合<code>properties</code>可以方便的调整jar包版本</p>
+</li>
+<li><p>参考文章<a target="_blank" rel="noopener" href="https://blog.csdn.net/vtopqx/article/details/79034835">Maven中dependencyManagement作用说明</a></p>
+</li>
+</ol>
+<h4 id="build"><a href="#build" class="headerlink" title="build"></a>build</h4><h5 id="plugins"><a href="#plugins" class="headerlink" title="plugins"></a>plugins</h5><p>使用的插件maven-compiler-plugin,maven-clean-plugin,versions-maven-plugin,maven-source-plugin,maven-gpg-plugin详见<a href="/2022/03/26/maven/maven-plugins-introduction">maven插件介绍</a>中对应插件的介绍</p>
+<h4 id="developers"><a href="#developers" class="headerlink" title="developers"></a>developers</h4><p>开发者信息</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/pom.html#Developers --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">developers</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">developer</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>freakchicken<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">email</span>&gt;</span>jiangqiang110@126.com<span class="tag">&lt;/<span class="name">email</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url</span>&gt;</span>https://gitee.com/freakchicken/db-api<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">developer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">developers</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="scm"><a href="#scm" class="headerlink" title="scm"></a>scm</h4><p>软件管理方面</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/pom.html#Developers --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">scm</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">url</span>&gt;</span>https://gitee.com/freakchicken/db-api.git<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">connection</span>&gt;</span>scm:git:https://gitee.com/freakchicken/db-api.git<span class="tag">&lt;/<span class="name">connection</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">developerConnection</span>&gt;</span>scm:git:https://gitee.com/freakchicken/db-api.git<span class="tag">&lt;/<span class="name">developerConnection</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">scm</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="licenses"><a href="#licenses" class="headerlink" title="licenses"></a>licenses</h4><p>版权信息</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://maven.apache.org/pom.html#Licenses --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">licenses</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">license</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>The Apache Software License, Version 2.0<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://www.apache.org/licenses/LICENSE-2.0.txt<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">distribution</span>&gt;</span>repo<span class="tag">&lt;/<span class="name">distribution</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">license</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">licenses</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="distributionManagement"><a href="#distributionManagement" class="headerlink" title="distributionManagement"></a>distributionManagement</h4><p>分发</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">distributionManagement</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">snapshotRepository</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span>&gt;</span>ossrh<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url</span>&gt;</span>https://s01.oss.sonatype.org/content/repositories/snapshots<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">snapshotRepository</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">repository</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span>&gt;</span>ossrh<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url</span>&gt;</span>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">distributionManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>以下将着重介绍各子模块对maven插件的使用</strong></p>
+<h3 id="dbapi-assembly"><a href="#dbapi-assembly" class="headerlink" title="dbapi-assembly"></a>dbapi-assembly</h3><p>这里有必要介绍下dbapi打包后的产物的目录结构,运行<code>mvn package</code>后,会在项目根目录生成一个<code>dist</code>文件夹。<code>dist</code>文件夹中会包含一个<code>tar.gz</code>文件，解压该文件可得到一个以下结构的文件夹</p>
+<p><img src="/assets/images/maven/dbapi-target-file.png" alt="dist文件结构"></p>
+<p>其中<br><code>/bin/</code>中为shell脚本,对应<code>dbapi-assembly</code>下的<code>bin</code>目录<br><code>/conf/</code>中为配置文件<br><code>/docs/</code>中为文档,对应<code>dbapi-assembly</code>下的<code>docs</code>目录<br><code>/lib/</code>中为使用的jar包<br><code>/sql/</code>中为初始脚本,对应<code>dbapi-assembly</code>下的<code>sql</code>目录</p>
+<p>这里重点介绍<code>maven-assembly-plugin</code>插件(<a href="/2022/03/26/maven/maven-plugins-introduction#maven-assembly-plugin">maven插件介绍</a>)中<code>binary.xml</code>文件</p>
+<h4 id="UsingComponentDescriptors"><a href="#UsingComponentDescriptors" class="headerlink" title="UsingComponentDescriptors"></a>UsingComponentDescriptors</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">assembly</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0&quot;</span></span></span><br><span class="line"><span class="tag">          <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">          <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 指定 id 的话，目标文件则是 &#123;artifactId&#125;-&#123;id&#125;.&#123;format&#125; --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>bin<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">formats</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">format</span>&gt;</span>tar.gz<span class="tag">&lt;/<span class="name">format</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">formats</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">includeBaseDirectory</span>&gt;</span>true<span class="tag">&lt;/<span class="name">includeBaseDirectory</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">baseDirectory</span>&gt;</span>DBApi-$&#123;project.version&#125;<span class="tag">&lt;/<span class="name">baseDirectory</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 用来定制工程依赖 jar 包的打包方式 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencySets</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependencySet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">useProjectArtifact</span>&gt;</span>true<span class="tag">&lt;/<span class="name">useProjectArtifact</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>lib<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">excludes</span>&gt;</span></span><br><span class="line">                <span class="comment">&lt;!--  排除assembly自身打的jar包--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>com.gitee.freakchicken.dbapi:dbapi-assembly<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--            &lt;unpack&gt;false&lt;/unpack&gt;--&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependencySet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencySets</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">fileSets</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 把`dbapi-assembly`模块下`bin`目录的所有以`.sh`结尾的文件输出到压缩包的`bin`目录下 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.basedir&#125;/bin<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>bin<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">lineEnding</span>&gt;</span>unix<span class="tag">&lt;/<span class="name">lineEnding</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 指定文件属性，使用八进制表达，分别为(User)(Group)(Other)所属属性，默认为 0644 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">fileMode</span>&gt;</span>744<span class="tag">&lt;/<span class="name">fileMode</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.sh<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 把`dbapi-assembly`模块下`bin`目录的`install_config.conf`文件输出到压缩包的`conf`目录下 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.basedir&#125;/bin<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>conf<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">lineEnding</span>&gt;</span>unix<span class="tag">&lt;/<span class="name">lineEnding</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">fileMode</span>&gt;</span>744<span class="tag">&lt;/<span class="name">fileMode</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>install_config.conf<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 把`dbapi-assembly`模块下`bin`目录的所有以`.bat`结尾的文件输出到压缩包的`bin`目录下 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.basedir&#125;/bin<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>bin<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--            &lt;lineEnding&gt;windows&lt;/lineEnding&gt;--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.bat<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 把`dbapi-assembly`模块下`docs`目录的所有以`.md`结尾的文件输出到压缩包的`docs`目录下 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.basedir&#125;/docs<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>docs<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.md<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 把dbapi根目录下的所有以`.md`结尾的文件输出到压缩包的`docs`目录下 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.basedir&#125;/../<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>docs<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.md<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 把`dbapi-assembly`模块下`sql`目录的所有以`.sql`结尾的文件输出到压缩包的`sql`目录下 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.basedir&#125;/sql<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>sql<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">lineEnding</span>&gt;</span>unix<span class="tag">&lt;/<span class="name">lineEnding</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">fileMode</span>&gt;</span>644<span class="tag">&lt;/<span class="name">fileMode</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.sql<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 以下就是把各个模块下的resources下的配置文件输出到压缩包conf目录下--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.parent.basedir&#125;/dbapi-standalone/src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>conf<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--            不要设置文件编码格式之类的，否则sqlite数据库文件会损坏--&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--            &lt;lineEnding&gt;unix&lt;/lineEnding&gt;--&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--            &lt;fileMode&gt;644&lt;/fileMode&gt;--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.properties<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.db<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.yml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.parent.basedir&#125;/dbapi-service/src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>conf<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.properties<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.db<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.yml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.parent.basedir&#125;/dbapi-cluster-gateway/src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>conf<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.properties<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.db<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.yml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.parent.basedir&#125;/dbapi-cluster-manager/src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>conf<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.properties<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.db<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.yml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.parent.basedir&#125;/dbapi-cluster-apiServer/src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>conf<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.properties<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.db<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.yml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.parent.basedir&#125;/dbapi-common/src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>conf<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.properties<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.db<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.yml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileSet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.parent.basedir&#125;/dbapi-plugin/src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>conf<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.properties<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.db<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>*.yml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileSet</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">fileSets</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">assembly</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ol>
+<li><p>参考<a target="_blank" rel="noopener" href="https://maven.apache.org/plugins/maven-assembly-plugin/examples/single/using-components.html">Using Component Descriptors</a></p>
+</li>
+<li><p>参考<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/14bcb17b99e0">maven-assembly-plugin 入门指南</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.51cto.com/u_15047484/2560349">使用Maven的assembly插件实现自定义打包</a></p>
+</li>
+</ol>
+<h3 id="dbapi-controller"><a href="#dbapi-controller" class="headerlink" title="dbapi-controller"></a>dbapi-controller</h3><p>观察dbapi打包后产物,解压后没有在lib中发现前端产物因此就可以推测前端产物一定是放在某个jar包的静态资源路径下,果然在dbapi-controller jar包中的static路径下发现了静态产物</p>
+<p>这里主要介绍一下<code>dbapi-controller</code>模块下几个插件的使用</p>
+<h4 id="maven-clean-plugin"><a href="#maven-clean-plugin" class="headerlink" title="maven-clean-plugin"></a>maven-clean-plugin</h4><p>介绍<a href="/2022/03/26/maven/maven-plugins-introduction#maven-clean-plugin">maven-clean-plugin插件介绍</a></p>
+<p>示例:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--  mvn clean 命令执行的时候删除static文件夹--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-clean-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">failOnError</span>&gt;</span>true<span class="tag">&lt;/<span class="name">failOnError</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filesets</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">fileset</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;basedir&#125;/src/main/resources/static/<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">fileset</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">filesets</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="maven-jar-plugin"><a href="#maven-jar-plugin" class="headerlink" title="maven-jar-plugin"></a>maven-jar-plugin</h4><p>介绍<a href="/2022/03/26/maven/maven-plugins-introduction#maven-jar-plugin">maven-jar-plugin插件介绍</a></p>
+<p>示例:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-jar-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">excludes</span>&gt;</span><span class="comment">&lt;!--不把配置文件打的jar包里面--&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>**/*.xml<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>**/*.properties<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>**/*.db<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">id</span>&gt;</span>default-jar<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">goal</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="maven-antrun-plugin"><a href="#maven-antrun-plugin" class="headerlink" title="maven-antrun-plugin"></a>maven-antrun-plugin</h4><p>介绍<a href="/2022/03/26/maven/maven-plugins-introduction#maven-antrun-plugin">maven-antrun-plugin插件介绍</a></p>
+<p>示例:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-antrun-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>move-dist-to-static<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">phase</span>&gt;</span>validate<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">goal</span>&gt;</span>run<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="comment">&lt;!-- 删除static文件夹内容--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">target</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">delete</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">&quot;$&#123;basedir&#125;/src/main/resources/static/&quot;</span></span></span><br><span class="line"><span class="tag">                                  <span class="attr">includes</span>=<span class="string">&quot;**/*.*&quot;</span>/&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">delete</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">                <span class="comment">&lt;!--   复制dist文件夹到static文件夹--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">target</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">copy</span> <span class="attr">todir</span>=<span class="string">&quot;$&#123;basedir&#125;/src/main/resources/static&quot;</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">&quot;$&#123;basedir&#125;/../dbapi-ui/dist&quot;</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">include</span> <span class="attr">name</span>=<span class="string">&quot;**/*.*&quot;</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">fileset</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">copy</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="dbapi-ui"><a href="#dbapi-ui" class="headerlink" title="dbapi-ui"></a>dbapi-ui</h3><p><code>dbapi-ui</code>模块下仅关注<code>exec-maven-plugin</code>这个插件,对于<code>maven-antrun-plugin</code>的使用与<code>dbapi-controller</code>模块中一致这里不再赘述</p>
+<h4 id="exec-maven-plugin"><a href="#exec-maven-plugin" class="headerlink" title="exec-maven-plugin"></a>exec-maven-plugin</h4><p>介绍<a href="/2022/03/26/maven/maven-plugins-introduction#exec-maven-plugin">exec-maven-plugin插件介绍</a></p>
+<p>示例:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.mojo<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>exec-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>exec-npm-install<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">phase</span>&gt;</span>validate<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">goal</span>&gt;</span>exec<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executable</span>&gt;</span>npm<span class="tag">&lt;/<span class="name">executable</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">arguments</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">argument</span>&gt;</span>install<span class="tag">&lt;/<span class="name">argument</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">arguments</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">workingDirectory</span>&gt;</span>$&#123;basedir&#125;<span class="tag">&lt;/<span class="name">workingDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>exec-npm-run-build<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">phase</span>&gt;</span>validate<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">goal</span>&gt;</span>exec<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executable</span>&gt;</span>npm<span class="tag">&lt;/<span class="name">executable</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">arguments</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">argument</span>&gt;</span>run<span class="tag">&lt;/<span class="name">argument</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">argument</span>&gt;</span>build<span class="tag">&lt;/<span class="name">argument</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">arguments</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">workingDirectory</span>&gt;</span>$&#123;basedir&#125;<span class="tag">&lt;/<span class="name">workingDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>其他模块的使用大同小异,不再赘述</strong></p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ol>
+<li>DBApi项目地址:<a target="_blank" rel="noopener" href="https://gitee.com/freakchicken/db-api">https://gitee.com/freakchicken/db-api</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/03/26/maven/know-maven-in-open-source-project-01/" data-id="clin7xb50001uccon1i4q2shx" data-title="从开源项目看Maven配置(01) -- dbapi" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">下一页 &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/HarmonyOS/">HarmonyOS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OnlyOffice/">OnlyOffice</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug-fix/">bug-fix</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug%E4%BF%AE%E5%A4%8D/">bug修复</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/cmake/">cmake</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dbapi/">dbapi</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/design-pattern/">design-pattern</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/frp/">frp</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jdbc/">jdbc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jeecg/">jeecg</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/npm/">npm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/orange/">orange</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-boot/">spring-boot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-form-making/">vue-form-making</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue2/">vue2</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/wsl/">wsl</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" rel="tag">Bean条件注入</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Connection/" rel="tag">Connection</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DatabaseMetaData/" rel="tag">DatabaseMetaData</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HarmonyOS/" rel="tag">HarmonyOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-LifeCycle/" rel="tag">Maven LifeCycle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-Plugin/" rel="tag">Maven Plugin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OnlyOffice/" rel="tag">OnlyOffice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ResultSet/" rel="tag">ResultSet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statement/" rel="tag">Statement</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" rel="tag">Vue 依赖收集</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-reactivity/" rel="tag">Vue2 reactivity</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bat/" rel="tag">bat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug-fix/" rel="tag">bug-fix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug%E4%BF%AE%E5%A4%8D/" rel="tag">bug修复</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cmake/" rel="tag">cmake</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/" rel="tag">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/favicon/" rel="tag">favicon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/frp/" rel="tag">frp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hci/" rel="tag">hci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jest-Test/" rel="tag">jest Test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/metaobject/" rel="tag">metaobject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="tag">mybatis执行器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm-scripts/" rel="tag">npm scripts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/online-form/" rel="tag">online-form</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/orange/" rel="tag">orange</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server-programming/" rel="tag">server-programming</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-form-making/" rel="tag">vue-form-making</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl1/" rel="tag">wsl1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl2/" rel="tag">wsl2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" rel="tag">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" rel="tag">启动流程分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" rel="tag">源码阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="tag">环境搭建</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" rel="tag">自动装配原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%93%9D%E7%89%99/" rel="tag">蓝牙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" rel="tag">表单设计器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" rel="tag">验证码校验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" rel="tag">验证码生成</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" style="font-size: 10px;">Bean条件注入</a> <a href="/tags/Connection/" style="font-size: 10px;">Connection</a> <a href="/tags/DatabaseMetaData/" style="font-size: 10px;">DatabaseMetaData</a> <a href="/tags/HarmonyOS/" style="font-size: 10px;">HarmonyOS</a> <a href="/tags/Maven/" style="font-size: 16px;">Maven</a> <a href="/tags/Maven-LifeCycle/" style="font-size: 10px;">Maven LifeCycle</a> <a href="/tags/Maven-Plugin/" style="font-size: 10px;">Maven Plugin</a> <a href="/tags/OnlyOffice/" style="font-size: 12px;">OnlyOffice</a> <a href="/tags/ResultSet/" style="font-size: 10px;">ResultSet</a> <a href="/tags/Statement/" style="font-size: 10px;">Statement</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" style="font-size: 10px;">Vue 依赖收集</a> <a href="/tags/Vue2-reactivity/" style="font-size: 10px;">Vue2 reactivity</a> <a href="/tags/bat/" style="font-size: 10px;">bat</a> <a href="/tags/bug-fix/" style="font-size: 10px;">bug-fix</a> <a href="/tags/bug%E4%BF%AE%E5%A4%8D/" style="font-size: 10px;">bug修复</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/cmake/" style="font-size: 10px;">cmake</a> <a href="/tags/dbapi/" style="font-size: 14px;">dbapi</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/element-ui/" style="font-size: 10px;">element-ui</a> <a href="/tags/favicon/" style="font-size: 10px;">favicon</a> <a href="/tags/frp/" style="font-size: 10px;">frp</a> <a href="/tags/hci/" style="font-size: 10px;">hci</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jdbc/" style="font-size: 20px;">jdbc</a> <a href="/tags/jeecg/" style="font-size: 14px;">jeecg</a> <a href="/tags/jest-Test/" style="font-size: 10px;">jest Test</a> <a href="/tags/metaobject/" style="font-size: 10px;">metaobject</a> <a href="/tags/mybatis/" style="font-size: 18px;">mybatis</a> <a href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" style="font-size: 10px;">mybatis执行器</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/npm-scripts/" style="font-size: 10px;">npm scripts</a> <a href="/tags/online-form/" style="font-size: 10px;">online-form</a> <a href="/tags/orange/" style="font-size: 10px;">orange</a> <a href="/tags/server-programming/" style="font-size: 10px;">server-programming</a> <a href="/tags/spring-boot/" style="font-size: 16px;">spring-boot</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue-form-making/" style="font-size: 10px;">vue-form-making</a> <a href="/tags/vue2/" style="font-size: 10px;">vue2</a> <a href="/tags/wsl1/" style="font-size: 10px;">wsl1</a> <a href="/tags/wsl2/" style="font-size: 12px;">wsl2</a> <a href="/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 12px;">事务</a> <a href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" style="font-size: 10px;">内网穿透</a> <a href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" style="font-size: 10px;">启动流程分析</a> <a href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" style="font-size: 10px;">源码阅读</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" style="font-size: 10px;">环境搭建</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" style="font-size: 10px;">自动装配原理</a> <a href="/tags/%E8%93%9D%E7%89%99/" style="font-size: 10px;">蓝牙</a> <a href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" style="font-size: 10px;">表单设计器</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" style="font-size: 10px;">验证码校验</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" style="font-size: 10px;">验证码生成</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">十二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">九月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/08/">八月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/12/18/element-ui/el-form-item-with-if/">ElFormItem使用v-if导致校验异常问题</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/11/dbapi/command_line_too_large_in_bat/">BAT命令行过长处理</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/16/harmony/collect_hci_log/">HarmonyOS手机蓝牙日志</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/02/mybatis/mysql_meta_object_analyse/">Mybatis MetaObject分析</a>
+          </li>
+        
+          <li>
+            <a href="/2022/06/15/orange/how_to_parse_dynamic_sql/">Orange是如何解析动态SQL的</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 fuzi<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>技术琐话</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="技术琐话">
+<meta property="og:url" content="https://fuzi1996.github.io/page/3/index.html">
+<meta property="og:site_name" content="技术琐话">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="fuzi">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="技术琐话" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">技术琐话</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://fuzi1996.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-vue/vue_reactivity" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/03/11/vue/vue_reactivity/" class="article-date">
+  <time class="dt-published" datetime="2022-03-11T14:03:37.000Z" itemprop="datePublished">2022-03-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Vue/">Vue</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/03/11/vue/vue_reactivity/">Vue2响应式与依赖收集原理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="响应式"><a href="#响应式" class="headerlink" title="响应式"></a>响应式</h2><p>Vue2的响应式依赖<code>ES5</code>的<code>Object.defineProperty</code>,主要使用这个API改写对象的<code>Getter</code>与<code>Setter</code>,用来依赖收集与触发更新</p>
+<h2 id="依赖收集原理"><a href="#依赖收集原理" class="headerlink" title="依赖收集原理"></a>依赖收集原理</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 工具函数用来判断obj是不是一个object</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">isObject</span> (obj) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">typeof</span> obj === <span class="string">&#x27;object&#x27;</span></span><br><span class="line">      &amp;&amp; !<span class="title class_">Array</span>.<span class="title function_">isArray</span>(obj)</span><br><span class="line">      &amp;&amp; obj !== <span class="literal">null</span></span><br><span class="line">      &amp;&amp; obj !== <span class="literal">undefined</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// `observe`函数用来把一个普通的对象转为响应式对象</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">observe</span> (obj) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="title function_">isObject</span>(obj)) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">TypeError</span>()</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="title class_">Object</span>.<span class="title function_">keys</span>(obj).<span class="title function_">forEach</span>(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> internalValue = obj[key]</span><br><span class="line">    <span class="comment">// 每一个属性都有一个独立的依赖收集器</span></span><br><span class="line">    <span class="keyword">let</span> dep = <span class="keyword">new</span> <span class="title class_">Dep</span>()</span><br><span class="line">    <span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(obj, key, &#123;</span><br><span class="line">      get () &#123;</span><br><span class="line">        <span class="comment">// 这里用来收集依赖</span></span><br><span class="line">        dep.<span class="title function_">depend</span>()</span><br><span class="line">        <span class="keyword">return</span> internalValue</span><br><span class="line">      &#125;,</span><br><span class="line">      set (newValue) &#123;</span><br><span class="line">        <span class="keyword">const</span> isChanged = internalValue !== newValue</span><br><span class="line">        <span class="keyword">if</span> (isChanged) &#123;</span><br><span class="line">          internalValue = newValue</span><br><span class="line">          <span class="comment">// 如果修改了值,这里用来通知修改</span></span><br><span class="line">          dep.<span class="title function_">notify</span>()</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">window</span>.<span class="property">Dep</span> = <span class="keyword">class</span> <span class="title class_">Dep</span> &#123;</span><br><span class="line">  <span class="title function_">constructor</span> () &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">subscribers</span> = <span class="keyword">new</span> <span class="title class_">Set</span>()</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  depend () &#123;</span><br><span class="line">    <span class="keyword">if</span> (activeUpdate) &#123;</span><br><span class="line">      <span class="comment">// register the current active update as a subscriber</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">subscribers</span>.<span class="title function_">add</span>(activeUpdate)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  notify () &#123;</span><br><span class="line">    <span class="comment">// run all subscriber functions</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">subscribers</span>.<span class="title function_">forEach</span>(<span class="function"><span class="params">subscriber</span> =&gt;</span> <span class="title function_">subscriber</span>())</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// activeUpdate是一个运行函数</span></span><br><span class="line"><span class="keyword">let</span> activeUpdate</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这只是依赖收集的简单示例，示例代码还是存在不少问题的</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">autorun</span> (update) &#123;</span><br><span class="line">  <span class="comment">// 函数wrappedUpdate这里使用闭包,保存了update方法</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">wrappedUpdate</span> () &#123;</span><br><span class="line">    activeUpdate = wrappedUpdate</span><br><span class="line">    <span class="title function_">update</span>()</span><br><span class="line">    activeUpdate = <span class="literal">null</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="title function_">wrappedUpdate</span>()</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/03/11/vue/vue_reactivity/" data-id="clin7xb5k003ccconermtgff0" data-title="Vue2响应式与依赖收集原理" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" rel="tag">Vue 依赖收集</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Vue2-reactivity/" rel="tag">Vue2 reactivity</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-maven/maven-lifecycle-and-plugin" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/11/maven/maven-lifecycle-and-plugin/" class="article-date">
+  <time class="dt-published" datetime="2021-12-11T03:58:45.000Z" itemprop="datePublished">2021-12-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Maven/">Maven</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/11/maven/maven-lifecycle-and-plugin/">Maven生命周期与插件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="maven生命周期"><a href="#maven生命周期" class="headerlink" title="maven生命周期"></a>maven生命周期</h2><p>Maven拥有三套相互独立的生命周期，它们分别为clean、default和site。clean生命周期的目的是清理项目，default生命周期的目的是构建项目，而site生命周期的目的是建立项目站点<br>每个生命周期下面有不同的阶段</p>
+<h3 id="clean生命周期"><a href="#clean生命周期" class="headerlink" title="clean生命周期"></a>clean生命周期</h3><p>  clean生命周期的目的是清理项目，它包含三个阶段：</p>
+<ul>
+<li>pre-clean执行一些清理前需要完成的工作。</li>
+<li>clean清理上一次构建生成的文件。</li>
+<li>post-clean执行一些清理后需要完成的工作。</li>
+</ul>
+<h3 id="default生命周期"><a href="#default生命周期" class="headerlink" title="default生命周期"></a>default生命周期</h3><ul>
+<li>validate</li>
+<li>initialize</li>
+<li>generate-sources</li>
+<li>process-sources处理项目主资源文件。一般来说，是对src&#x2F;main&#x2F;resources目录的内容进行变量替换等工作后，复制到项目输出的主classpath目录中。</li>
+<li>generate-resources</li>
+<li>process-resources</li>
+<li><strong>compile</strong>编译项目的主源码。一般来说，是编译src&#x2F;main&#x2F;java目录下的Java文件至项目输出的主classpath目录中。</li>
+<li>process-classes</li>
+<li>generate-test-sources</li>
+<li>process-test-sources处理项目测试资源文件。一般来说，是对src&#x2F;test&#x2F;resources目录的内容进行变量替换等工作后，复制到项目输出的测试classpath目录中。</li>
+<li>generate-test-resources</li>
+<li>process-test-resources</li>
+<li>test-compile编译项目的测试代码。一般来说，是编译src&#x2F;test&#x2F;java目录下的Java文件至项目输出的测试classpath目录中。</li>
+<li>process-test-classes</li>
+<li><strong>test</strong>使用单元测试框架运行测试，测试代码不会被打包或部署。</li>
+<li>prepare-package</li>
+<li><strong>package</strong>接受编译好的代码，打包成可发布的格式，如JAR。</li>
+<li>pre-integration-test</li>
+<li>integration-test</li>
+<li>post-integration-test</li>
+<li>verify</li>
+<li><strong>install</strong>将包安装到Maven本地仓库，供本地其他Maven项目使用。</li>
+<li><strong>deploy</strong>将最终的包复制到远程仓库，供其他开发人员和Maven项目使用。</li>
+</ul>
+<h3 id="site生命周期"><a href="#site生命周期" class="headerlink" title="site生命周期"></a>site生命周期</h3><p>site生命周期的目的是建立和发布项目站点，Maven能够基于POM所包含的信息，自动生成一个友好的站点，方便团队交流和发布项目信息。该生命周期包含如下阶段：</p>
+<ul>
+<li>pre-site执行一些在生成项目站点之前需要完成的工作。</li>
+<li>site生成项目站点文档。</li>
+<li>post-site执行一些在生成项目站点之后需要完成的工作。</li>
+<li>site-deploy将生成的项目站点发布到服务器上。</li>
+</ul>
+<h2 id="插件与指令绑定"><a href="#插件与指令绑定" class="headerlink" title="插件与指令绑定"></a>插件与指令绑定</h2><h3 id="插件远程仓库"><a href="#插件远程仓库" class="headerlink" title="插件远程仓库"></a>插件远程仓库</h3><p>插件的远程仓库使用pluginRepositories和pluginRepository配置,<br>在POM中配置插件的时候，如果该插件是Maven的官方插件（即如果其groupId为org.apache.maven.plugins），就可以省略groupId配置</p>
+<h3 id="maven插件版本"><a href="#maven插件版本" class="headerlink" title="maven插件版本"></a>maven插件版本</h3><p>Maven在超级POM中为所有核心插件设定了版本，超级POM是所有Maven项目的父POM，所有项目都继承这个超级POM的配置，因此，即使用户不加任何配置，Maven使用核心插件的时候，它们的版本就已经确定了</p>
+<h3 id="解析插件前缀"><a href="#解析插件前缀" class="headerlink" title="解析插件前缀"></a>解析插件前缀</h3><p>通过配置settings.xml让Maven检查其他groupId上的插件仓库元数据</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">＜settings＞</span><br><span class="line">  ＜pluginGroups＞</span><br><span class="line">    ＜pluginGroup＞com.your.plugins＜/pluginGroup＞</span><br><span class="line">  ＜/pluginGroups＞</span><br><span class="line">＜/settings＞</span><br></pre></td></tr></table></figure>
+
+<h3 id="指令绑定"><a href="#指令绑定" class="headerlink" title="指令绑定"></a>指令绑定</h3><p>用户通过命令行调用生命周期阶段的时候，对应的插件目标就会执行相应的任务</p>
+<h3 id="自定义绑定"><a href="#自定义绑定" class="headerlink" title="自定义绑定"></a>自定义绑定</h3><p>用户还能够自己选择将某个插件目标绑定到生命周期的某个阶段上<br>有很多插件的目标在编写时已经定义了默认绑定阶段<br>当多个插件目标绑定到同一个阶段的时候，这些插件声明的先后顺序决定了目标的执行顺序</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">＜build＞</span><br><span class="line">  ＜plugins＞</span><br><span class="line">    ＜plugin＞</span><br><span class="line">      ＜groupId＞org.apache.maven.plugins＜/groupId＞</span><br><span class="line">      ＜artifactId＞maven-source-plugin＜/artifactId＞</span><br><span class="line">      ＜version＞2.1.1＜/version＞</span><br><span class="line">      ＜executions＞</span><br><span class="line">        <span class="comment">&lt;!-- 每个execution子元素可以用来配置执行一个任务 --&gt;</span></span><br><span class="line">        ＜execution＞</span><br><span class="line">          ＜id＞attach-sources＜/id＞</span><br><span class="line">          <span class="comment">&lt;!-- phrase配置，将其绑定到verify生命周期阶段 --&gt;</span></span><br><span class="line">          ＜phase＞verify＜/phase＞</span><br><span class="line">          ＜goals＞</span><br><span class="line">            <span class="comment">&lt;!-- 通过goals配置指定要执行的插件目标 --&gt;</span></span><br><span class="line">            ＜goal＞jar-no-fork＜/goal＞</span><br><span class="line">          ＜/goals＞</span><br><span class="line">        ＜/execution＞</span><br><span class="line">      ＜/executions＞</span><br><span class="line">    ＜/plugin＞</span><br><span class="line">  ＜/plugins＞</span><br><span class="line">＜/build＞</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用maven-help-plugin查看插件详细信息，了解插件目标的默认绑定阶段</span></span><br><span class="line">mvn <span class="built_in">help</span>:describe -Dplugin=org.apache.maven.plugins:maven-source-plugin</span><br><span class="line"><span class="comment"># 其他命令</span></span><br><span class="line">mvn <span class="built_in">help</span>:describe -Dcmd=install</span><br><span class="line">mvn <span class="built_in">help</span>:describe -Dcmd=<span class="built_in">help</span>:describe</span><br><span class="line">mvn <span class="built_in">help</span>:describe -Dplugin=org.apache.maven.plugins:maven-help-plugin</span><br><span class="line">mvn <span class="built_in">help</span>:describe -DgroupId=org.apache.maven.plugins -DartifactId=maven-help-plugin</span><br></pre></td></tr></table></figure>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>1.《Maven实战》</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/11/maven/maven-lifecycle-and-plugin/" data-id="clin7xb51001vccon8xlqbd8i" data-title="Maven生命周期与插件" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven-LifeCycle/" rel="tag">Maven LifeCycle</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-maven/maven-remote-repositry-and-dependency" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/04/maven/maven-remote-repositry-and-dependency/" class="article-date">
+  <time class="dt-published" datetime="2021-12-04T14:31:59.000Z" itemprop="datePublished">2021-12-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Maven/">Maven</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/04/maven/maven-remote-repositry-and-dependency/">Maven远程仓库配置与依赖</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="不常用的命令"><a href="#不常用的命令" class="headerlink" title="不常用的命令"></a>不常用的命令</h2><ul>
+<li>mvn help</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 显示配置信息</span></span><br><span class="line">mvn <span class="built_in">help</span>:system</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>mvn dependency</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 显示依赖</span></span><br><span class="line">mvn dependency:tree</span><br><span class="line">mvn dependency:list</span><br><span class="line"><span class="comment"># 依赖分析</span></span><br><span class="line">mvn dependency:analyse</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置文件区别"><a href="#配置文件区别" class="headerlink" title="配置文件区别"></a>配置文件区别</h2><ul>
+<li><code>$M2_HOME/conf/settings.xml</code>是全局配置</li>
+<li><code>～/.m2/settings.xml</code>是用户配置</li>
+</ul>
+<h2 id="远程仓库配置"><a href="#远程仓库配置" class="headerlink" title="远程仓库配置"></a>远程仓库配置</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">＜project＞</span><br><span class="line">  ＜repositories＞</span><br><span class="line">    ＜repository＞</span><br><span class="line">      ＜id＞jboss＜/id＞</span><br><span class="line">      ＜name＞JBoss Repository＜/name＞</span><br><span class="line">      ＜url＞http://repository.jboss.com/maven2/＜/url＞</span><br><span class="line">      ＜releases＞</span><br><span class="line">        <span class="comment">&lt;!-- 发布版本下载支持 --&gt;</span></span><br><span class="line">        ＜enabled＞true＜/enabled＞</span><br><span class="line">        <span class="comment">&lt;!-- 远程仓库检查更新的频率,never—从不检查更新；always—每次构建都检查更新；interval:X—每隔X分钟检查一次更新（X为任意整数）；daily，表示Maven每天检查一次 --&gt;</span></span><br><span class="line">        ＜updatePolicy＞daily＜/updatePolicy＞</span><br><span class="line">        <span class="comment">&lt;!-- Maven检查检验和文件的策略,warn时，Maven会在执行构建时输出警告信息;fail—Maven遇到校验和错误就让构建失败；ignore—使Maven完全忽略校验和错误 --&gt;</span></span><br><span class="line">        ＜checksumPolicy＞ignore＜/checksumPolicy＞</span><br><span class="line">      ＜/releases＞</span><br><span class="line">      ＜snapshots＞</span><br><span class="line">        <span class="comment">&lt;!-- 快照版本的下载支持 --&gt;</span></span><br><span class="line">        ＜enabled＞false＜/enabled＞</span><br><span class="line">        ＜updatePolicy＞daily＜/updatePolicy＞</span><br><span class="line">        ＜checksumPolicy＞ignore＜/checksumPolicy＞</span><br><span class="line">      ＜/snapshots＞</span><br><span class="line">      ＜layout＞default＜/layout＞</span><br><span class="line">    ＜/repository＞</span><br><span class="line">  ＜/repositories＞</span><br><span class="line">＜/project＞</span><br></pre></td></tr></table></figure>
+<h3 id="远程仓库认证"><a href="#远程仓库认证" class="headerlink" title="远程仓库认证"></a>远程仓库认证</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">＜settings＞</span><br><span class="line">  ＜servers＞</span><br><span class="line">    ＜server＞</span><br><span class="line">      ＜id＞my-proj＜/id＞</span><br><span class="line">      ＜username＞repo-user＜/username＞</span><br><span class="line">      ＜password＞repo-pwd＜/password＞</span><br><span class="line">    ＜/server＞</span><br><span class="line">  ＜/servers＞</span><br><span class="line">＜/settings＞</span><br></pre></td></tr></table></figure>
+<p>settings.xml中server元素的id必须与POM中需要认证的repository元素的id完全一致，正是这个id将认证信息与仓库配置联系在了一起</p>
+<h3 id="部署至远程仓库"><a href="#部署至远程仓库" class="headerlink" title="部署至远程仓库"></a>部署至远程仓库</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">＜project＞</span><br><span class="line">  ＜distributionManagement＞</span><br><span class="line">    ＜repository＞</span><br><span class="line">      ＜id＞proj-releases＜/id＞</span><br><span class="line">      ＜name＞Proj Release Repository＜/name＞</span><br><span class="line">      ＜url＞http://192.168.1.100/content/repositories/proj-releases＜/url＞</span><br><span class="line">    ＜/repository＞</span><br><span class="line">    ＜snapshotRepository＞</span><br><span class="line">      ＜id＞proj-snapshots＜/id＞</span><br><span class="line">      ＜name＞Proj Snapshot Repository＜/name＞</span><br><span class="line">      ＜url＞http://192.168.1.100/content/repositories/proj-snapshots＜/url＞</span><br><span class="line">    ＜/snapshotRepository＞</span><br><span class="line">  ＜/distributionManagement＞</span><br><span class="line">＜/project＞</span><br></pre></td></tr></table></figure>
+<p>distributionManagement:<br>repository和snapshotRepository子元素，前者表示发布版本构件的仓库，后者表示快照版本的仓库。关于发布版本和快照版本</p>
+<h3 id="maven镜像"><a href="#maven镜像" class="headerlink" title="maven镜像"></a>maven镜像</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">＜settings＞</span><br><span class="line">  ＜mirrors＞</span><br><span class="line">    ＜mirror＞</span><br><span class="line">      ＜id＞maven.net.cn＜/id＞</span><br><span class="line">      ＜name＞one of the central mirrors in China＜/name＞</span><br><span class="line">      ＜url＞http://maven.net.cn/content/groups/public/＜/url＞</span><br><span class="line">      ＜mirrorOf＞central＜/mirrorOf＞</span><br><span class="line">    ＜/mirror＞</span><br><span class="line">  ＜/mirrors＞</span><br><span class="line">＜/settings＞</span><br></pre></td></tr></table></figure>
+<ul>
+<li>＜mirrorOf＞的值为central，表示该配置为中央仓库的镜像，任何对于中央仓库的请求都会转至该镜像</li>
+<li>＜mirrorOf＞*＜&#x2F;mirrorOf＞：匹配所有远程仓库。</li>
+<li>＜mirrorOf＞external：*＜&#x2F;mirrorOf＞：匹配所有远程仓库，使用localhost的除外，使用file:&#x2F;&#x2F;协议的除外。也就是说，匹配所有不在本机上的远程仓库。</li>
+<li>＜mirrorOf＞repo1，repo2＜&#x2F;mirrorOf＞：匹配仓库repo1和repo2，使用逗号分隔多个远程仓库。</li>
+<li>＜mirrorOf＞*，！repo1＜&#x2F;mirrorOf＞：匹配所有远程仓库，repo1除外，使用感叹号将仓库从匹配中排除</li>
+</ul>
+<h2 id="依赖范围"><a href="#依赖范围" class="headerlink" title="依赖范围"></a>依赖范围</h2><ul>
+<li><p>compile: 默认,对于编译，运行，测试三种classpath都有效<br>例如：spring-core，在程序编译，运行，测试都有效果</p>
+</li>
+<li><p>test: 编译测试代码和运行测试代码才需要<br>例如: junit</p>
+</li>
+<li><p>provided: 以提供依赖,对于编译,测试有效，运行无效<br>例如: sevelet-api</p>
+</li>
+<li><p>runtime: 运行时依赖,运行测试有效,编译无效<br>例如: jdbc驱动程序<br><code>runtime</code>不会造成依赖继承,</p>
+<blockquote>
+<p>Setting dependency to runtime ensure that there isn’t an accidental dependency on the code, and also keeps the dependency from being transitive. So that, for example, if module A has a runtime dependency on library X, and module B depends on module A, it does not inherit the dependency on library X. Using “provided” or “compile” would cause B to depend on X.</p>
+</blockquote>
+</li>
+<li><p>system: 与<code>provided</code>一致,但需使用<code>systemPath</code>指定引用包路径</p>
+</li>
+<li><p>import: 导入依赖范围</p>
+</li>
+</ul>
+<h3 id="传递性依赖和依赖范围"><a href="#传递性依赖和依赖范围" class="headerlink" title="传递性依赖和依赖范围"></a>传递性依赖和依赖范围</h3><p>假设A依赖于B,B依赖于C，我们说A对于B是第一直接依赖，B对于C是第二直接依赖，A对于C是传递性依赖</p>
+<ul>
+<li>当第二直接依赖的范围是compile的时候，传递性依赖的范围与第一直接依赖的范围一致；</li>
+<li>当第二直接依赖的范围是test的时候，依赖不会得以传递；</li>
+<li>当第二直接依赖的范围是provided的时候，只传递第一直接依赖范围也为provided的依赖，且传递性依赖的范围同样为provided；</li>
+<li>当第二直接依赖的范围是runtime的时候，传递性依赖的范围与第一直接依赖的范围一致，但compile例外，此时传递性依赖的范围为runtime</li>
+</ul>
+<h3 id="依赖调解"><a href="#依赖调解" class="headerlink" title="依赖调解"></a>依赖调解</h3><p>当一个项目同时经过不同的路径依赖于同一个组件时，会选择其深度最短的对应组件进行依赖。当深度一样的时候Maven会根据申明的依赖顺序来进行选择，先申明的会被作为依赖包</p>
+<h3 id="可选依赖"><a href="#可选依赖" class="headerlink" title="可选依赖"></a>可选依赖</h3><p><optional>可选依赖不会被传递,例如框架引用的数据库驱动,如果使用了可选依赖,不会被传递到使用该框架的项目上</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>1.《Maven实战》</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/04/maven/maven-remote-repositry-and-dependency/" data-id="clin7xb530021ccon5citghv3" data-title="Maven远程仓库配置与依赖" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-mybatis/mybatis-core-widget" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/04/mybatis/mybatis-core-widget/" class="article-date">
+  <time class="dt-published" datetime="2021-12-04T11:08:06.000Z" itemprop="datePublished">2021-12-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/04/mybatis/mybatis-core-widget/">MyBatis核心组件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h2><p>  MyBatis的主配置信息</p>
+<h2 id="MappedStatement"><a href="#MappedStatement" class="headerlink" title="MappedStatement"></a>MappedStatement</h2><p>  Mapper中的SQL配置信息</p>
+<h2 id="SqlSession"><a href="#SqlSession" class="headerlink" title="SqlSession"></a>SqlSession</h2><p>  面向用户操作的api<br>  SqlSession是Executor组件的外观，目的是为用户提供更友好的数据库操作接口，这是设计模式中外观(门面)模式的典型应用</p>
+<h2 id="Executor"><a href="#Executor" class="headerlink" title="Executor"></a>Executor</h2><p>  执行器</p>
+<h2 id="StatementHandler"><a href="#StatementHandler" class="headerlink" title="StatementHandler"></a>StatementHandler</h2><p>  封装了JDBC Statement的操作</p>
+<h2 id="ParameterHandler"><a href="#ParameterHandler" class="headerlink" title="ParameterHandler"></a>ParameterHandler</h2><p>  当MyBatis框架使用的Statement类型为CallableStatement和PreparedStatement时，ParameterHandler用于为Statement对象参数占位符设置值</p>
+<h2 id="ResultSetHandler"><a href="#ResultSetHandler" class="headerlink" title="ResultSetHandler"></a>ResultSetHandler</h2><p>  封装了对JDBC中的ResultSet对象操作</p>
+<h2 id="TypeHandler"><a href="#TypeHandler" class="headerlink" title="TypeHandler"></a>TypeHandler</h2><p>  Mybatis类型处理器</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>MyBatis 3源码深度解析／江荣波</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/04/mybatis/mybatis-core-widget/" data-id="clin7xb540025ccon8wza7b61" data-title="MyBatis核心组件" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-mybatis/mybatis-util-class-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/04/mybatis/mybatis-util-class-study/" class="article-date">
+  <time class="dt-published" datetime="2021-12-04T10:04:28.000Z" itemprop="datePublished">2021-12-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/04/mybatis/mybatis-util-class-study/">MyBatis常用工具类学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="ScriptRunner"><a href="#ScriptRunner" class="headerlink" title="ScriptRunner"></a>ScriptRunner</h2><p>  执行SQL脚本</p>
+<h2 id="SqlRunner"><a href="#SqlRunner" class="headerlink" title="SqlRunner"></a>SqlRunner</h2><p>  执行SQL</p>
+<h2 id="MetaObject"><a href="#MetaObject" class="headerlink" title="MetaObject"></a>MetaObject</h2><p>  获取和设置对象的属性值<br>  可以使用<code>SystemMetaObject.forObject(Object object)</code>创建</p>
+<h2 id="MetaClass"><a href="#MetaClass" class="headerlink" title="MetaClass"></a>MetaClass</h2><p>  获取类相关的信息</p>
+<h2 id="ObjectFactory"><a href="#ObjectFactory" class="headerlink" title="ObjectFactory"></a>ObjectFactory</h2><p>  用于创建对象<br>  List、Map、Set接口对应的实现分别为ArrayList、HashMap、HashSet<br>  应用:MyBatis提供的一种扩展机制，在得到映射结果之前我们需要处理一些逻辑，或者在执行该类的有参构造方法时，在传入参数之前，要对参数进行一些处理，这时我们可以通过自定义ObjectFactory来实现</p>
+<h2 id="ProxyFactory"><a href="#ProxyFactory" class="headerlink" title="ProxyFactory"></a>ProxyFactory</h2><p>  代理工厂，主要用于创建动态代理对象<br>  两种实现:CglibProxyFactory和JavassistProxyFactory<br>  应用:ProxyFactory主要用于实现MyBatis的懒加载功能。当开启懒加载后，MyBatis创建Mapper映射结果对象后，会通过ProxyFactory创建映射结果对象的代理对象。当我们调用代理对象的Getter方法获取数据时，会执行CglibProxyFactory或JavassistProxyFactory中定义的拦截逻辑，然后执行一次额外的查询</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>MyBatis 3源码深度解析／江荣波</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/04/mybatis/mybatis-util-class-study/" data-id="clin7xb58002fccon414m8hxj" data-title="MyBatis常用工具类学习" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-jdbc/jdbc-transaction-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/04/jdbc/jdbc-transaction-study/" class="article-date">
+  <time class="dt-published" datetime="2021-12-04T04:48:34.000Z" itemprop="datePublished">2021-12-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jdbc/">jdbc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/04/jdbc/jdbc-transaction-study/">JDBC事务学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="自动提交"><a href="#自动提交" class="headerlink" title="自动提交"></a>自动提交</h2><p>启用自动提交后，会在每个SQL语句执行完毕后自动提交事务</p>
+<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><a href="/2021/10/01/db/transaction/" title="数据库事务">事务隔离级别</a>
+
+<h2 id="保存点"><a href="#保存点" class="headerlink" title="保存点"></a>保存点</h2><p>一旦设置保存点，事务就可以回滚到保存点，而不影响保存点之前的操作</p>
+<p>DatabaseMetaData接口提供了supportsSavepoints()方法，用于判断JDBC驱动是否支持保存点</p>
+<p>Connection接口中提供了setSavepoint()方法用于在当前事务中设置保存点，如果setSavepoint()方法在事务外调用，则调用该方法后会在setSavepoint()方法调用处开启一个新的事务。setSavepoint()方法的返回值是一个Savepoint对象，该对象可作为Connection对象rollback()方法的参数，用于回滚到对应的保存点</p>
+<p>Connection对象中提供了一个releaseSavepoint()方法，接收一个Savepoint对象作为参数，用于释放当前事务中的保存点</p>
+<p>事务中创建的所有保存点在事务提交或完成回滚之后会自动释放，事务回滚到某一保存点后，该保存点之后创建的保存点会自动释放</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>MyBatis 3源码深度解析／江荣波</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/04/jdbc/jdbc-transaction-study/" data-id="clin7xb4u001fcconb3vh5yoy" data-title="JDBC事务学习" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-jdbc/databasemetadata-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/04/jdbc/databasemetadata-study/" class="article-date">
+  <time class="dt-published" datetime="2021-12-04T04:23:03.000Z" itemprop="datePublished">2021-12-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jdbc/">jdbc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/04/jdbc/databasemetadata-study/">DatabaseMetaData学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="DatabaseMetaData接口"><a href="#DatabaseMetaData接口" class="headerlink" title="DatabaseMetaData接口"></a>DatabaseMetaData接口</h2><ul>
+<li>获取数据源信息</li>
+<li>确定数据源是否支持某一特性或功能</li>
+<li>获取数据源的限制</li>
+<li>确定数据源包含哪些SQL对象以及这些对象的属性</li>
+<li>获取数据源对事务的支持</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">DatabaseMetaData</span> <span class="variable">metaData</span> <span class="operator">=</span> connection.getMetaData();</span><br><span class="line">pringln(metaData.getURL(),<span class="string">&quot;获取数据库URL&quot;</span>);</span><br><span class="line">pringln(metaData.getUserName(),<span class="string">&quot;获取数据库已知的用户&quot;</span>);</span><br><span class="line">pringln(metaData.getDatabaseProductName(),<span class="string">&quot;获取数据库产品名&quot;</span>);</span><br><span class="line">pringln(metaData.getDatabaseProductVersion(),<span class="string">&quot;获取数据库产品版本&quot;</span>);</span><br><span class="line">pringln(metaData.getDriverMajorVersion(),<span class="string">&quot;获取驱动主版本&quot;</span>);</span><br><span class="line">pringln(metaData.getDriverMinorVersion(),<span class="string">&quot;获取驱动副版本&quot;</span>);</span><br><span class="line">pringln(metaData.getSchemaTerm(),<span class="string">&quot;获取数据库供应商用于Schema的首选术语&quot;</span>);</span><br><span class="line">pringln(metaData.getCatalogTerm(),<span class="string">&quot;获取数据库供应商用于Catalog的首选术语&quot;</span>);</span><br><span class="line">pringln(metaData.getProcedureTerm(),<span class="string">&quot;获取数据库供应商用于Procedure的首选术语&quot;</span>);</span><br><span class="line">pringln(metaData.nullsAreSortedHigh(),<span class="string">&quot;获取null值是否高排序&quot;</span>);</span><br><span class="line">pringln(metaData.nullsAreSortedLow(),<span class="string">&quot;获取null值是否低排序&quot;</span>);</span><br><span class="line">pringln(metaData.usesLocalFiles(),<span class="string">&quot;获取数据库是否将表存储在本地文件中&quot;</span>);</span><br><span class="line">pringln(metaData.usesLocalFilePerTable(),<span class="string">&quot;获取数据库是否为每个表使用一个文件&quot;</span>);</span><br><span class="line">pringln(metaData.getSQLKeywords(),<span class="string">&quot;获取数据库SQL关键字&quot;</span>);</span><br><span class="line">pringln(metaData.supportsAlterTableWithDropColumn(),<span class="string">&quot;检索此数据源是否支持带有删除列的ALTER TABLE语句&quot;</span>);</span><br><span class="line">pringln(metaData.supportsBatchUpdates(),<span class="string">&quot;检索此数据源是否支持批量更新&quot;</span>);</span><br><span class="line">pringln(metaData.supportsTableCorrelationNames(),<span class="string">&quot;检索此数据源是否支持表相关名称&quot;</span>);</span><br><span class="line">pringln(metaData.supportsPositionedDelete(),<span class="string">&quot;检索此数据源是否支持定位的DELETE语句&quot;</span>);</span><br><span class="line">pringln(metaData.supportsFullOuterJoins(),<span class="string">&quot;检索此数据源是否支持完整地嵌套外部连接&quot;</span>);</span><br><span class="line">pringln(metaData.supportsStoredProcedures(),<span class="string">&quot;检索此数据源是否存储过程&quot;</span>);</span><br><span class="line">pringln(metaData.supportsMixedCaseQuotedIdentifiers(),<span class="string">&quot;检索此数据源是否将用双引号引起来的大小写混合的SQL标识符视为区分大小写，并以混合大小写方式存储它们&quot;</span>);</span><br><span class="line">pringln(metaData.supportsANSI92EntryLevelSQL(),<span class="string">&quot;检索此数据源是否支持ANSI92入门级SQL语法&quot;</span>);</span><br><span class="line">pringln(metaData.supportsCoreSQLGrammar(),<span class="string">&quot;检索此数据源是否支持ODBC核心SQL语法&quot;</span>);</span><br><span class="line">pringln(metaData.getMaxRowSize(),<span class="string">&quot;获取最大行数&quot;</span>);</span><br><span class="line">pringln(metaData.getMaxStatementLength(),<span class="string">&quot;获取此数据库在SQL语句中允许的最大字符数&quot;</span>);</span><br><span class="line">pringln(metaData.getMaxTablesInSelect(),<span class="string">&quot;获取此数据库在SELECT语句中允许的最大表数&quot;</span>);</span><br><span class="line">pringln(metaData.getMaxConnections(),<span class="string">&quot;获取此数据库支持的最大连接数&quot;</span>);</span><br><span class="line">pringln(metaData.getMaxCharLiteralLength(),<span class="string">&quot;获取数据库支持的字符串字面量长度&quot;</span>);</span><br><span class="line">pringln(metaData.getMaxColumnsInTable(),<span class="string">&quot;获取数据库表中允许的最大列数&quot;</span>);</span><br><span class="line"><span class="comment">//pringln(metaData.getSchemas(),&quot;获取Schema信息&quot;);//返回ResultSet</span></span><br><span class="line"><span class="comment">//pringln(metaData.getCatalogs(),&quot;获取Catalog信息&quot;);//返回ResultSet</span></span><br><span class="line"><span class="comment">//pringln(metaData.getTables(catalog, schemaPattern,tableNamePattern, types),&quot;获取表信息&quot;);</span></span><br><span class="line"><span class="comment">//pringln(metaData.getPrimaryKeys(catalog,schema,table),&quot;获取主键信息&quot;);//返回ResultSet</span></span><br><span class="line"><span class="comment">//pringln(metaData.getProcedures(catalog,schemaPattern,procedureNamePattern),&quot;获取存储过程信息&quot;);//返回ResultSet</span></span><br><span class="line"><span class="comment">//pringln(metaData.getProcedureColumns(catalog,schemaPattern,procedureNamePattern,columnNamePattern),&quot;获取给定类别的存储过程参数和结果列的信息&quot;);//返回ResultSet</span></span><br><span class="line"><span class="comment">//pringln(metaData.getUDTs(catalog, schemaPattern,tableNamePattern, types),&quot;获取用户自定义数据类型&quot;);//返回ResultSet</span></span><br><span class="line"><span class="comment">//pringln(metaData.getFunctions(catalog,schemaPattern,functionNamePattern),&quot;获取函数信息&quot;);//返回ResultSet</span></span><br><span class="line"><span class="comment">//pringln(metaData.getFunctionColumns(catalog,schemaPattern,functionNamePattern,columnNamePattern),&quot;获取给定类别的函数参数和结果列的信息&quot;);//返回ResultSet</span></span><br><span class="line"><span class="comment">//pringln(metaData.supportsTransactionIsolationLevel(level),&quot;是否支持某一事务隔离级别&quot;);</span></span><br><span class="line">pringln(metaData.supportsTransactions(),<span class="string">&quot;是否支持事务&quot;</span>);</span><br><span class="line">pringln(metaData.getDefaultTransactionIsolation(),<span class="string">&quot;获取默认的事务隔离级别&quot;</span>);</span><br><span class="line">pringln(metaData.supportsMultipleTransactions(),<span class="string">&quot;是否支持同时开启多个事务&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>MyBatis 3源码深度解析／江荣波</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/04/jdbc/databasemetadata-study/" data-id="clin7xb4s001accon8tj64r0k" data-title="DatabaseMetaData学习" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DatabaseMetaData/" rel="tag">DatabaseMetaData</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-jdbc/resultset-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/04/jdbc/resultset-study/" class="article-date">
+  <time class="dt-published" datetime="2021-12-04T03:58:50.000Z" itemprop="datePublished">2021-12-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jdbc/">jdbc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/04/jdbc/resultset-study/">ResultSet学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="ResultSet类型"><a href="#ResultSet类型" class="headerlink" title="ResultSet类型"></a>ResultSet类型</h2><ul>
+<li><p>主要体现:</p>
+<ul>
+<li>游标可操作的方式</li>
+<li>ResultSet对象的修改对数据库的影响</li>
+</ul>
+</li>
+<li><p>类型:</p>
+<ul>
+<li><p>TYPE_FORWARD_ONLY<br>ResultSet不可滚动，游标只能向前移动，从第一行到最后一行，不允许向后移动</p>
+</li>
+<li><p>TYPE_SCROLL_INSENSITIVE<br>ResultSet是可滚动的，它的游标可以相对于当前位置向前或向后移动，也可以移动到绝对位置<br>ResultSet没有关闭时，ResultSet对象的修改不会影响对应的数据库中的记录</p>
+</li>
+<li><p>TYPE_SCROLL_SENSITIVE<br>ResultSet是可滚动的，它的游标可以相对于当前位置向前或向后移动，也可以移动到绝对位置<br>ResultSet没有关闭时，对ResultSet对象的修改会直接影响数据库中的记录</p>
+</li>
+</ul>
+</li>
+<li><p>判断</p>
+<ul>
+<li>DatabaseMetaData接口中提供了一个supportsResultSetType()方法，用于判断数据库驱动是否支持某种类型的ResultSet对象</li>
+<li>当Statement对象执行时，产生的ResultSet对象可以通过ResultSet对象的getType()方法确定它的类型</li>
+</ul>
+</li>
+</ul>
+<h2 id="ResultSet并行性"><a href="#ResultSet并行性" class="headerlink" title="ResultSet并行性"></a>ResultSet并行性</h2><ul>
+<li><p>类型</p>
+<ul>
+<li><p>CONCUR_READ_ONLY<br>为ResultSet对象设置这种属性后，只能从ResulSet对象中读取数据，但是不能更新ResultSet对象中的数据</p>
+</li>
+<li><p>CONCUR_UPDATABLE<br>该属性表明，既可以从ResulSet对象中读取数据，又能更新ResultSet中的数据</p>
+</li>
+</ul>
+</li>
+<li><p>判断</p>
+<ul>
+<li>DatabaseMetaData接口中提供了一个supportsResultSetConcurrency()方法，用于判断JDBC驱动是否支持某一级别的并行性</li>
+<li>在应用程序中，可以调用ResultSet对象的getConcurrency()方法获取ResultSet的并行性级别</li>
+</ul>
+</li>
+</ul>
+<h2 id="ResultSet可保持性"><a href="#ResultSet可保持性" class="headerlink" title="ResultSet可保持性"></a>ResultSet可保持性</h2><p>ResultSet对象的holdability属性使得应用程序能够在Connection对象的commit()方法调用后控制ResultSet对象是否关闭</p>
+<ul>
+<li><p>类型:</p>
+<ul>
+<li><p>HOLD_CURSORS_OVER_COMMIT<br>当调用Connection对象的commit()方法时，不关闭当前事务创建的ResultSet对象。</p>
+</li>
+<li><p>CLOSE_CURSORS_AT_COMMIT<br>当前事务创建的ResultSet对象在事务提交后会被关闭，对一些应用程序来说，这样能够提升系统性能。</p>
+</li>
+</ul>
+</li>
+<li><p>判断</p>
+<ul>
+<li>DatabaseMetaData接口中提供了getResultSetHoldability()方法用于获取JDBC驱动的默认可保持性</li>
+<li>应用程序可以调用ResultSet对象的getHoldability()方法获取ResultSet的可保持性</li>
+</ul>
+</li>
+</ul>
+<h2 id="属性设置"><a href="#属性设置" class="headerlink" title="属性设置"></a>属性设置</h2><p>ResultSet的类型、并行性和可保持性等属性可以在调用Connection对象的createStatement()、prepareStatement()或prepareCall()方法创建Statement对象时设置</p>
+<h2 id="ResultSet游标"><a href="#ResultSet游标" class="headerlink" title="ResultSet游标"></a>ResultSet游标</h2><p>ResultSet对象中维护了一个游标，游标指向当前数据行<br>当ResultSet对象第一次创建时，游标指向数据的第一行</p>
+<h2 id="关闭ResultSet对象"><a href="#关闭ResultSet对象" class="headerlink" title="关闭ResultSet对象"></a>关闭ResultSet对象</h2><ul>
+<li><p>ResultSet对象在下面两种情况下会显式地关闭：</p>
+<ul>
+<li>调用ResultSet对象的close()方法</li>
+<li>创建ResultSet对象的Statement或者Connection对象被显式地关闭</li>
+</ul>
+</li>
+<li><p>在下面两种情况下ResultSet对象会被隐式地关闭：</p>
+<ul>
+<li>相关联的Statement对象重复执行时</li>
+<li>可保持性为CLOSE_CURSORS_AT_COMMIT的ResultSet对象在当前事务提交后会被关闭</li>
+</ul>
+</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>MyBatis 3源码深度解析／江荣波</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/04/jdbc/resultset-study/" data-id="clin7xb4v001hcconajlqhhnq" data-title="ResultSet学习" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ResultSet/" rel="tag">ResultSet</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-jdbc/statement-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/04/jdbc/statement-study/" class="article-date">
+  <time class="dt-published" datetime="2021-12-04T03:28:37.000Z" itemprop="datePublished">2021-12-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jdbc/">jdbc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/04/jdbc/statement-study/">Statement 学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="Statement接口"><a href="#Statement接口" class="headerlink" title="Statement接口"></a>Statement接口</h2><ul>
+<li>使用Statement对象执行完SQL后也需要关闭</li>
+</ul>
+<h2 id="PreparedStatement接口"><a href="#PreparedStatement接口" class="headerlink" title="PreparedStatement接口"></a>PreparedStatement接口</h2><ul>
+<li>在Statement接口的基础上增加了参数占位符功能,可以为占位符设置值</li>
+<li>PreparedStatement的实例表示可以被预编译的SQL语句，执行一次后，后续多次执行时效率会比较高</li>
+<li>参数占位符的位置（从1开始）</li>
+<li>PreparedStatement对象设置的参数在执行后不能被重置，需要显式地调用clearParameters()方法清除先前设置的值，再为参数重新设置值即可</li>
+</ul>
+<h2 id="CallableStatement接口"><a href="#CallableStatement接口" class="headerlink" title="CallableStatement接口"></a>CallableStatement接口</h2><ul>
+<li>继承自PreparedStatement，在此基础上增加了调用存储过程以及检索存储过程调用结果的方法</li>
+<li>使用setXXX()方法为参数占位符设置值时，下标必须从1开始</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>MyBatis 3源码深度解析／江荣波</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/04/jdbc/statement-study/" data-id="clin7xb4x001mccon96or0tnb" data-title="Statement 学习" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Statement/" rel="tag">Statement</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-jdbc/connection-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/12/04/jdbc/connection-study/" class="article-date">
+  <time class="dt-published" datetime="2021-12-04T02:21:51.000Z" itemprop="datePublished">2021-12-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jdbc/">jdbc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/12/04/jdbc/connection-study/">Connection学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>一个Connection对象表示通过JDBC驱动与数据源建立的连接，这里的数据源可以是关系型数据库管理系统（DBMS）、文件系统(所以也可以通过Connection访问文件)或者其他通过JDBC驱动访问的数据</p>
+<ul>
+<li>如何获取Connection对象:<ul>
+<li>DriverManager</li>
+<li>DataSource</li>
+</ul>
+</li>
+<li>Connection必须显示关闭<br>Connection关闭后,由该Connection对象创建的所有Statement对象都会被关闭</li>
+<li>通过isClose关闭Connection</li>
+<li>为了更好的兼容性,通过isValid关闭Connection</li>
+</ul>
+<h2 id="JDBC驱动类型"><a href="#JDBC驱动类型" class="headerlink" title="JDBC驱动类型"></a>JDBC驱动类型</h2><ul>
+<li>JDBC-ODBC Bridge Driver<br>利用现成的ODBC架构将JDBC调用转换为ODBC调用,并非所有功能都能直接转换并正常调用，而多层调用转换对性能也有一定的影响</li>
+<li>Native API Driver<br>直接调用数据库提供的原生链接库或客户端,没有中间过程，访问速度通常表现良好,驱动程序与数据库和平台绑定无法达到JDBC跨平台的基本目的</li>
+<li>JDBC-Net Driver<br>将JDBC调用转换为独立于数据库的协议，然后通过特定的中间组件或服务器转换为数据库通信协议，主要目的是获得更好的架构灵活性，通过中间服务器转换会对性能有一定影响</li>
+<li>Native Protocol Driver<br>驱动程序把JDBC调用转换为数据库特定的网络通信协议</li>
+</ul>
+<h2 id="java-sql-Driver接口"><a href="#java-sql-Driver接口" class="headerlink" title="java.sql.Driver接口"></a>java.sql.Driver接口</h2><p>所有的JDBC驱动都必须实现Driver接口，而且实现类必须包含一个静态初始化代码块(调用DriverManager的registerDriver方法)注册驱动<br>在使用Class.forName方法加载驱动时,驱动需要提供一个无参构造方法</p>
+<p>注册方式:</p>
+<ul>
+<li>驱动实现类静态代码块主动注册</li>
+<li>在DriverManager类初始化时，会试图加载所有jdbc.drivers属性指定的驱动类，因此可以通过指定jdbc.drivers属性来注册驱动<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Djdbc.drivers=xxx ExampleApplication</span><br></pre></td></tr></table></figure></li>
+<li>Java的SPI机制加载驱动<br>必须存在一个META-INF&#x2F;services&#x2F;java.sql.Driver文件，在java.sql.Driver文件中必须指定Driver接口的实现类</li>
+</ul>
+<h2 id="Java-SPI机制简介"><a href="#Java-SPI机制简介" class="headerlink" title="Java SPI机制简介"></a>Java SPI机制简介</h2><p>当服务的提供者提供了一种接口的实现之后，需要在classpath下的META-INF&#x2F;services目录中创建一个以服务接口命名的文件，这个文件中的内容就是这个接口具体的实现类。当其他的程序需要这个服务的时候，就可以查找这个JAR包中META-INF&#x2F;services目录的配置文件，配置文件中有接口的具体实现类名，可以根据这个类名加载服务实现类，然后就可以使用该服务了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ServiceLoader&lt;Driver&gt; drivers = ServiceLoader.load(java.sql.Driver.class);</span><br><span class="line"><span class="keyword">for</span> (Driver driver : drivers ) &#123;</span><br><span class="line">    System.out.println(driver.getClass().getName());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="java-sql-DriverAction接口"><a href="#java-sql-DriverAction接口" class="headerlink" title="java.sql.DriverAction接口"></a>java.sql.DriverAction接口</h3><p>JDBC驱动可以通过实现DriverAction接口来监听DriverManager类的deregisterDriver()方法的调用</p>
+<h3 id="java-sql-DriverManager类"><a href="#java-sql-DriverManager类" class="headerlink" title="java.sql.DriverManager类"></a>java.sql.DriverManager类</h3><p>DriverManager类通过Driver接口为JDBC客户端管理一组可用的驱动实现</p>
+<h3 id="javax-sql-DataSource接口"><a href="#javax-sql-DataSource接口" class="headerlink" title="javax.sql.DataSource接口"></a>javax.sql.DataSource接口</h3><ul>
+<li>通过连接池提高系统性能和伸缩性</li>
+<li>通过XADataSource接口支持分布式事务</li>
+</ul>
+<p>DataSource接口的实现必须包含一个无参构造方法</p>
+<h3 id="JNDI"><a href="#JNDI" class="headerlink" title="JNDI"></a>JNDI</h3><p>为应用程序提供了一种通过网络访问远程服务的方式,例如数据库配置放在tomcat的配置中，通过JNDI获取数据库连接</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>MyBatis 3源码深度解析／江荣波</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/12/04/jdbc/connection-study/" data-id="clin7xb4q0016ccon6yoc1ser" data-title="Connection学习" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Connection/" rel="tag">Connection</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/HarmonyOS/">HarmonyOS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OnlyOffice/">OnlyOffice</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug-fix/">bug-fix</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug%E4%BF%AE%E5%A4%8D/">bug修复</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/cmake/">cmake</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dbapi/">dbapi</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/design-pattern/">design-pattern</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/frp/">frp</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jdbc/">jdbc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jeecg/">jeecg</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/npm/">npm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/orange/">orange</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-boot/">spring-boot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-form-making/">vue-form-making</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue2/">vue2</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/wsl/">wsl</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" rel="tag">Bean条件注入</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Connection/" rel="tag">Connection</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DatabaseMetaData/" rel="tag">DatabaseMetaData</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HarmonyOS/" rel="tag">HarmonyOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-LifeCycle/" rel="tag">Maven LifeCycle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-Plugin/" rel="tag">Maven Plugin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OnlyOffice/" rel="tag">OnlyOffice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ResultSet/" rel="tag">ResultSet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statement/" rel="tag">Statement</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" rel="tag">Vue 依赖收集</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-reactivity/" rel="tag">Vue2 reactivity</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bat/" rel="tag">bat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug-fix/" rel="tag">bug-fix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug%E4%BF%AE%E5%A4%8D/" rel="tag">bug修复</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cmake/" rel="tag">cmake</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/" rel="tag">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/favicon/" rel="tag">favicon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/frp/" rel="tag">frp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hci/" rel="tag">hci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jest-Test/" rel="tag">jest Test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/metaobject/" rel="tag">metaobject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="tag">mybatis执行器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm-scripts/" rel="tag">npm scripts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/online-form/" rel="tag">online-form</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/orange/" rel="tag">orange</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server-programming/" rel="tag">server-programming</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-form-making/" rel="tag">vue-form-making</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl1/" rel="tag">wsl1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl2/" rel="tag">wsl2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" rel="tag">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" rel="tag">启动流程分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" rel="tag">源码阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="tag">环境搭建</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" rel="tag">自动装配原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%93%9D%E7%89%99/" rel="tag">蓝牙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" rel="tag">表单设计器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" rel="tag">验证码校验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" rel="tag">验证码生成</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" style="font-size: 10px;">Bean条件注入</a> <a href="/tags/Connection/" style="font-size: 10px;">Connection</a> <a href="/tags/DatabaseMetaData/" style="font-size: 10px;">DatabaseMetaData</a> <a href="/tags/HarmonyOS/" style="font-size: 10px;">HarmonyOS</a> <a href="/tags/Maven/" style="font-size: 16px;">Maven</a> <a href="/tags/Maven-LifeCycle/" style="font-size: 10px;">Maven LifeCycle</a> <a href="/tags/Maven-Plugin/" style="font-size: 10px;">Maven Plugin</a> <a href="/tags/OnlyOffice/" style="font-size: 12px;">OnlyOffice</a> <a href="/tags/ResultSet/" style="font-size: 10px;">ResultSet</a> <a href="/tags/Statement/" style="font-size: 10px;">Statement</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" style="font-size: 10px;">Vue 依赖收集</a> <a href="/tags/Vue2-reactivity/" style="font-size: 10px;">Vue2 reactivity</a> <a href="/tags/bat/" style="font-size: 10px;">bat</a> <a href="/tags/bug-fix/" style="font-size: 10px;">bug-fix</a> <a href="/tags/bug%E4%BF%AE%E5%A4%8D/" style="font-size: 10px;">bug修复</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/cmake/" style="font-size: 10px;">cmake</a> <a href="/tags/dbapi/" style="font-size: 14px;">dbapi</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/element-ui/" style="font-size: 10px;">element-ui</a> <a href="/tags/favicon/" style="font-size: 10px;">favicon</a> <a href="/tags/frp/" style="font-size: 10px;">frp</a> <a href="/tags/hci/" style="font-size: 10px;">hci</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jdbc/" style="font-size: 20px;">jdbc</a> <a href="/tags/jeecg/" style="font-size: 14px;">jeecg</a> <a href="/tags/jest-Test/" style="font-size: 10px;">jest Test</a> <a href="/tags/metaobject/" style="font-size: 10px;">metaobject</a> <a href="/tags/mybatis/" style="font-size: 18px;">mybatis</a> <a href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" style="font-size: 10px;">mybatis执行器</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/npm-scripts/" style="font-size: 10px;">npm scripts</a> <a href="/tags/online-form/" style="font-size: 10px;">online-form</a> <a href="/tags/orange/" style="font-size: 10px;">orange</a> <a href="/tags/server-programming/" style="font-size: 10px;">server-programming</a> <a href="/tags/spring-boot/" style="font-size: 16px;">spring-boot</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue-form-making/" style="font-size: 10px;">vue-form-making</a> <a href="/tags/vue2/" style="font-size: 10px;">vue2</a> <a href="/tags/wsl1/" style="font-size: 10px;">wsl1</a> <a href="/tags/wsl2/" style="font-size: 12px;">wsl2</a> <a href="/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 12px;">事务</a> <a href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" style="font-size: 10px;">内网穿透</a> <a href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" style="font-size: 10px;">启动流程分析</a> <a href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" style="font-size: 10px;">源码阅读</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" style="font-size: 10px;">环境搭建</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" style="font-size: 10px;">自动装配原理</a> <a href="/tags/%E8%93%9D%E7%89%99/" style="font-size: 10px;">蓝牙</a> <a href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" style="font-size: 10px;">表单设计器</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" style="font-size: 10px;">验证码校验</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" style="font-size: 10px;">验证码生成</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">十二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">九月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/08/">八月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/12/18/element-ui/el-form-item-with-if/">ElFormItem使用v-if导致校验异常问题</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/11/dbapi/command_line_too_large_in_bat/">BAT命令行过长处理</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/16/harmony/collect_hci_log/">HarmonyOS手机蓝牙日志</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/02/mybatis/mysql_meta_object_analyse/">Mybatis MetaObject分析</a>
+          </li>
+        
+          <li>
+            <a href="/2022/06/15/orange/how_to_parse_dynamic_sql/">Orange是如何解析动态SQL的</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 fuzi<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

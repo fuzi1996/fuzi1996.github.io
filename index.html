@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>技术琐话</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="技术琐话">
+<meta property="og:url" content="https://fuzi1996.github.io/index.html">
+<meta property="og:site_name" content="技术琐话">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="fuzi">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="技术琐话" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">技术琐话</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://fuzi1996.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-element-ui/el-form-item-with-if" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/12/18/element-ui/el-form-item-with-if/" class="article-date">
+  <time class="dt-published" datetime="2022-12-18T04:51:46.000Z" itemprop="datePublished">2022-12-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/12/18/element-ui/el-form-item-with-if/">ElFormItem使用v-if导致校验异常问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vue: `2.6.14`</span><br><span class="line">element-ui: `2.15.12`</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>当使用<code>v-if</code>控制多个<code>ElFormItem</code>显隐时，表单校验不生效。</p>
+<p>不生效体现在两点:</p>
+<ul>
+<li>1.使用<code>elform.validate</code>显式调用无效</li>
+<li>2.<code>blur/change</code>无法触发的校验</li>
+</ul>
+<p>这里有几个关键:</p>
+<ul>
+<li>使用<code>v-if</code>控制</li>
+<li>多个<code>ElFormItem</code></li>
+<li>先展示的是不进行校验的<code>ElFormItem</code></li>
+<li>不进行校验的<code>ElFormItem</code>数量多余进行校验的<code>ElFormItem</code></li>
+</ul>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><h3 id="使用elform-validate显式调用无效"><a href="#使用elform-validate显式调用无效" class="headerlink" title="使用elform.validate显式调用无效"></a>使用<code>elform.validate</code>显式调用无效</h3><p>先展示的<code>ElFormItem</code>不带<code>prop</code>导致<code>mounted</code>阶段没有向<code>ElForm</code>注册自身示例.</p>
+<p><code>v-if</code>组件缓存,导致显式调用<code>elForm.validate</code>找不到后面展示的<code>ElFormItem</code>示例</p>
+<p>针对这个问题直接在<code>el-form-item</code>标签上添加<code>prop</code>即可解决</p>
+<h3 id="blur-change无法触发的校验"><a href="#blur-change无法触发的校验" class="headerlink" title="blur/change无法触发的校验"></a><code>blur/change</code>无法触发的校验</h3><p><code>v-if</code>组件缓存,导致复用了先前展示的<code>ElFormItem</code>实例,而由于先前展示的<code>ElFormItem</code>是非必填的,<br>所以复用的实例并没有绑定<code>el.form.blur</code>与<code>el.form.change</code>事件(<code>ElFormItem</code>的<code>addValidateEvents</code>方法),进而导致<code>blur/change</code>无法触发的校验</p>
+<p>针对这个问题直接在<code>el-form-item</code>标签上添加<code>key</code>即可解决</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;el-form</span><br><span class="line">    :model=&quot;ruleForm&quot;</span><br><span class="line">    :rules=&quot;rules&quot;</span><br><span class="line">    ref=&quot;ruleForm&quot;</span><br><span class="line">    label-width=&quot;100px&quot;</span><br><span class="line">  &gt;</span><br><span class="line">    &lt;!-- &lt;el-form-item</span><br><span class="line">      label=&quot;活动名称2&quot;</span><br><span class="line">      prop=&quot;name2&quot;</span><br><span class="line">      key=&quot;name2&quot;</span><br><span class="line">      v-if=&quot;show2&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;el-input v-model=&quot;ruleForm.name2&quot; /&gt;</span><br><span class="line">    &lt;/el-form-item&gt;</span><br><span class="line">    &lt;el-form-item</span><br><span class="line">      label=&quot;活动名称5&quot;</span><br><span class="line">      prop=&quot;name5&quot;</span><br><span class="line">      key=&quot;name5&quot;</span><br><span class="line">      v-if=&quot;show2&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;el-input v-model=&quot;ruleForm.name5&quot; /&gt;</span><br><span class="line">    &lt;/el-form-item&gt; --&gt;</span><br><span class="line">    &lt;el-form-item</span><br><span class="line">      label=&quot;活动名称2&quot;</span><br><span class="line">      prop=&quot;name2&quot;</span><br><span class="line">      v-if=&quot;show2&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;el-input v-model=&quot;ruleForm.name2&quot; /&gt;</span><br><span class="line">    &lt;/el-form-item&gt;</span><br><span class="line">    &lt;el-form-item</span><br><span class="line">      label=&quot;活动名称5&quot;</span><br><span class="line">      prop=&quot;name5&quot;</span><br><span class="line">      v-if=&quot;show2&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;el-input v-model=&quot;ruleForm.name5&quot; /&gt;</span><br><span class="line">    &lt;/el-form-item&gt;</span><br><span class="line">    &lt;el-form-item</span><br><span class="line">      label=&quot;活动名称3&quot;</span><br><span class="line">      prop=&quot;name3&quot;</span><br><span class="line">      v-if=&quot;show34&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;el-input v-model=&quot;ruleForm.name3&quot; /&gt;</span><br><span class="line">    &lt;/el-form-item&gt;</span><br><span class="line">    &lt;el-form-item</span><br><span class="line">      label=&quot;活动名称4&quot;</span><br><span class="line">      prop=&quot;name4&quot;</span><br><span class="line">      v-if=&quot;show34&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;el-input v-model=&quot;ruleForm.name4&quot; /&gt;</span><br><span class="line">    &lt;/el-form-item&gt;</span><br><span class="line">    &lt;el-button</span><br><span class="line">      type=&quot;primary&quot;</span><br><span class="line">      @click=&quot;show2=!show2;show34=!show34&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      SHOW2-SHOW34</span><br><span class="line">    &lt;/el-button&gt;</span><br><span class="line">    &lt;el-button</span><br><span class="line">      type=&quot;primary&quot;</span><br><span class="line">      @click=&quot;submitForm(&#x27;ruleForm&#x27;)&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      提交</span><br><span class="line">    &lt;/el-button&gt;</span><br><span class="line">    &lt;el-button @click=&quot;resetForm(&#x27;ruleForm&#x27;)&quot;&gt;</span><br><span class="line">      重置</span><br><span class="line">    &lt;/el-button&gt;</span><br><span class="line">  &lt;/el-form&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#x27;Root&#x27;,</span><br><span class="line">  data () &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      show2: true,</span><br><span class="line">      show34: false,</span><br><span class="line">      ruleForm: &#123;</span><br><span class="line">        name1: &#x27;&#x27;,</span><br><span class="line">        name2: &#x27;&#x27;,</span><br><span class="line">        name3: &#x27;&#x27;,</span><br><span class="line">        name4: &#x27;&#x27;</span><br><span class="line">      &#125;,</span><br><span class="line">      rules: &#123;</span><br><span class="line">        name3: [</span><br><span class="line">          &#123; required: true, message: &#x27;请输入活动名称3&#x27;, trigger: &#x27;blur&#x27; &#125;</span><br><span class="line">        ],</span><br><span class="line">        name4: [</span><br><span class="line">          &#123; required: true, message: &#x27;请输入活动名称4&#x27;, trigger: &#x27;blur&#x27; &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    submitForm (formName) &#123;</span><br><span class="line">      this.$refs[formName].validate((valid) =&gt; &#123;</span><br><span class="line">        if (valid) &#123;</span><br><span class="line">          alert(&#x27;submit!&#x27;)</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          console.log(&#x27;error submit!!&#x27;)</span><br><span class="line">          return false</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;,</span><br><span class="line">    resetForm (formName) &#123;</span><br><span class="line">      this.ruleForm = &#123; ...this.$options.data().ruleForm &#125;</span><br><span class="line">      this.$refs[formName].resetFields()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/12/18/element-ui/el-form-item-with-if/" data-id="clin7xb4j000vccon0l5tfvbj" data-title="ElFormItem使用v-if导致校验异常问题" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-dbapi/command_line_too_large_in_bat" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/09/11/dbapi/command_line_too_large_in_bat/" class="article-date">
+  <time class="dt-published" datetime="2022-09-11T02:47:16.000Z" itemprop="datePublished">2022-09-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/dbapi/">dbapi</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/09/11/dbapi/command_line_too_large_in_bat/">BAT命令行过长处理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>DBApi最新版并没有提供bat启动脚本,我在添加启动脚本时发现启动时容易出现命令行过长错误,本文就记录了该问题的处理</p>
+<h2 id="处理方式"><a href="#处理方式" class="headerlink" title="处理方式"></a>处理方式</h2><h3 id="Jar-Manifest"><a href="#Jar-Manifest" class="headerlink" title="Jar Manifest"></a>Jar Manifest</h3><p>该方式是把启动参数写入<code>MANIFEST.INF</code>中,并打包在一个jar包内,然后使用<code>java -jar xxx.jar</code>启动</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">@echo off</span><br><span class="line"></span><br><span class="line">@REM ---------------------------------------------------------------------------</span><br><span class="line">@REM Start script for the DBApi</span><br><span class="line">@REM usage: dbapi.bat [-rebuild:if libs change]</span><br><span class="line">@REM ---------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">setlocal enabledelayedexpansion</span><br><span class="line"></span><br><span class="line">@REM get CURRENT_DIR</span><br><span class="line">set CURRENT_DIR=%~dp0</span><br><span class="line"></span><br><span class="line">cd &quot;%CURRENT_DIR%..&quot;</span><br><span class="line"></span><br><span class="line">@REM set param</span><br><span class="line">set DBAPI_HOME=%cd%</span><br><span class="line">set DBAPI_CONF_HOME=file:/%DBAPI_HOME%\conf\</span><br><span class="line">set DBAPI_LIB_HOME=%DBAPI_HOME%\lib</span><br><span class="line">set DBAPI_MAIN_CLASS=com.gitee.freakchicken.dbapi.DBApiStandalone</span><br><span class="line">set DBAPI_TEMP_PATH=%temp%\dbapi</span><br><span class="line">set DBAPI_MANIFEST_FILE_PARENT_PATH=%DBAPI_TEMP_PATH%\META-INF</span><br><span class="line">set DBAPI_MANIFEST_FILE_PATH=%DBAPI_MANIFEST_FILE_PARENT_PATH%\MANIFEST.MF</span><br><span class="line">set DBAPI_START_JAR_PATH=%DBAPI_TEMP_PATH%\DBApi-start.jar</span><br><span class="line">set DBAPI_EXCLUDE_JAR_NAMES=spring-boot-starter-webflux;spring-webflux;spring-cloud-gateway-server;spring-cloud-starter-gateway</span><br><span class="line">set DBAPI_RE_BUILD_START_JAR_FLAG=%1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if not exist %DBAPI_MANIFEST_FILE_PARENT_PATH% md %DBAPI_MANIFEST_FILE_PARENT_PATH%</span><br><span class="line"></span><br><span class="line">@REM if exist %DBAPI_MANIFEST_FILE_PATH% (</span><br><span class="line">@REM   del /f /q %DBAPI_MANIFEST_FILE_PATH%</span><br><span class="line">@REM )</span><br><span class="line"></span><br><span class="line">if exist %DBAPI_START_JAR_PATH% (</span><br><span class="line">  if &quot;%DBAPI_RE_BUILD_START_JAR_FLAG%&quot;==&quot;-rebuild&quot; (</span><br><span class="line">    call:rebuild_start_jar</span><br><span class="line">  )</span><br><span class="line">) else (</span><br><span class="line">  call:rebuild_start_jar</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">java -jar %DBAPI_START_JAR_PATH%</span><br><span class="line"></span><br><span class="line">:rebuild_start_jar</span><br><span class="line">SETLOCAL</span><br><span class="line">@REM set &quot;DBAPI_JAR_PATH=%DBAPI_CONF_HOME%&quot;</span><br><span class="line">echo Manifest-Version: 1.0 &gt; %DBAPI_MANIFEST_FILE_PATH%</span><br><span class="line">echo Created-By: DBApi &gt;&gt; %DBAPI_MANIFEST_FILE_PATH%</span><br><span class="line">echo Main-Class: %DBAPI_MAIN_CLASS% &gt;&gt; %DBAPI_MANIFEST_FILE_PATH%</span><br><span class="line">echo Class-Path: %DBAPI_CONF_HOME% &gt;&gt; %DBAPI_MANIFEST_FILE_PATH%</span><br><span class="line"></span><br><span class="line">set &quot;DBAPI_JAR_PATH=%DBAPI_CONF_HOME%&quot;</span><br><span class="line">for /R %DBAPI_LIB_HOME% %%f in (*.jar) do (</span><br><span class="line">  set file_path=%%f</span><br><span class="line">  echo handle !file_path!</span><br><span class="line">  if defined file_path (</span><br><span class="line">    set result=0</span><br><span class="line">    call:exclude_jar %%f result</span><br><span class="line">    if !result!==0 (</span><br><span class="line">      (echo  file:/%%f ) &gt;&gt; %DBAPI_MANIFEST_FILE_PATH%</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">jar -cvfm %DBAPI_START_JAR_PATH% %DBAPI_MANIFEST_FILE_PATH%</span><br><span class="line">ENDLOCAL</span><br><span class="line">goto:eof</span><br><span class="line"></span><br><span class="line">:exclude_jar</span><br><span class="line">SETLOCAL</span><br><span class="line">set result=0</span><br><span class="line">set jar_path=%1</span><br><span class="line">if defined jar_path (</span><br><span class="line">  for %%i in (%DBAPI_EXCLUDE_JAR_NAMES%) do (</span><br><span class="line">    set result=0</span><br><span class="line">    call:is_str_same_as !jar_path! %%i result</span><br><span class="line">    @REM echo jar_path=!jar_path! str=%%i result=%result%</span><br><span class="line">    if !result!==1 (</span><br><span class="line">      goto break</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line">) else (</span><br><span class="line">  ENDLOCAL &amp; goto:eof</span><br><span class="line">)</span><br><span class="line">:break</span><br><span class="line">ENDLOCAL&amp;set %~2=%result%</span><br><span class="line">goto:eof</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">:is_str_same_as</span><br><span class="line">SETLOCAL</span><br><span class="line">set result=0</span><br><span class="line">set str=%1</span><br><span class="line">set regexp=.*%2.*</span><br><span class="line">if defined str (</span><br><span class="line">  echo %str%|findstr /r /c:&quot;%regexp%&quot; &gt;nul &amp;&amp; (</span><br><span class="line">    set result=1</span><br><span class="line">  ) || (</span><br><span class="line">    set result=0</span><br><span class="line">  )</span><br><span class="line">  @REM echo str=%str% regexp=%regexp% result=%result%</span><br><span class="line">) else (</span><br><span class="line">  ENDLOCAL &amp; goto:eof</span><br><span class="line">)</span><br><span class="line">ENDLOCAL&amp;set %~3=%result%</span><br><span class="line">goto:eof</span><br></pre></td></tr></table></figure>
+
+<h3 id="classpath-file"><a href="#classpath-file" class="headerlink" title="classpath file"></a>classpath file</h3><p>这种启动方式来自于IDEA的<code>Shorten Command Line</code>,不过在<code>JDK 9</code>及以上版本被废除</p>
+<p>代码位置:<code>com.intellij.rt.execution.CommandLineWrapper</code></p>
+<p>主要就是通过<code>System.setProperty</code>预先设置一些变量,然后通过反射调用主启动类的main方法启动</p>
+<h3 id="argfile-方式"><a href="#argfile-方式" class="headerlink" title="@argfile 方式"></a>@argfile 方式</h3><p><code>Java 9+</code>支持的启动方式,来源于IDEA</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/09/11/dbapi/command_line_too_large_in_bat/" data-id="clin7xb4e000lccon674e2lwz" data-title="BAT命令行过长处理" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bat/" rel="tag">bat</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-harmony/collect_hci_log" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/07/16/harmony/collect_hci_log/" class="article-date">
+  <time class="dt-published" datetime="2022-07-16T02:28:00.000Z" itemprop="datePublished">2022-07-16</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/HarmonyOS/">HarmonyOS</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/07/16/harmony/collect_hci_log/">HarmonyOS手机蓝牙日志</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HarmonyOS version: 2.0.0</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>已经开启了<code>USB调试</code>和<code>HCI 信息收集日志</code>功能</p>
+<p><img src="/assets/images/harmony/collect_hci_log/dev_config.png" alt="开发者选项"></p>
+<p>在尝试获取HCI log时</p>
+<p>使用<code>adb pull /data/log/bt</code>时提示</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/data/log/bt/: 0 files pulled, 0 skipped.</span><br></pre></td></tr></table></figure>
+
+<p>通过<code>adb pull /data/log/bt/btsnoop_hci.log</code>获取时提示</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb: error: failed to stat remote object &#x27;/data/log/bt/btsnoop_hci.log&#x27;: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>但是<code>/etc/bluetooth/bt_stack.conf</code>文件内配置如下</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># BtSnoop log output file</span><br><span class="line">BtSnoopFileName=/data/log/bt/btsnoop_hci.log</span><br></pre></td></tr></table></figure>
+
+<p>也就是说日志文件的路径应该是没有问题的</p>
+<p>尝试通过<code>ls /data/log/bt/</code> 查看目录下文件时，提示<code>Permission denied</code>，不能查看到目录</p>
+<p>也无法通过<code>adb root</code>获取权限，那么获取HCI的日志的呢？</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ol>
+<li><p><code>开发者选项中</code> -&gt; <code>启用蓝牙HCI信息收集日志</code> 是打开的</p>
+</li>
+<li><p>进入手机拨号界面输入：<code>*#*#2846579#*#*</code><br>依次选择<code>后台设置</code>—<code>AP LOG设置</code>—<code>点击打开</code> 保存即可</p>
+<p><img src="/assets/images/harmony/collect_hci_log/p1.png" alt="step1"><br><img src="/assets/images/harmony/collect_hci_log/p2.png" alt="step2"><br><img src="/assets/images/harmony/collect_hci_log/p3.png" alt="step3"></p>
+</li>
+<li><p>重新操作蓝牙即可观察到日志,但是注意日志文件名并不是<code>btsnoop_hci.log</code>,而是附带了日期例如<code>btsnoop_hci_20220716_101108.log</code></p>
+</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://developer.huawei.com/consumer/cn/forum/topic/0203903590526040118">请问HarmonyOS中如何获取HCI日志</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/coldrainbow/article/details/108595331">华为手机抓取hci log</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/07/16/harmony/collect_hci_log/" data-id="clin7xb4m0010ccon5mhiebnq" data-title="HarmonyOS手机蓝牙日志" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HarmonyOS/" rel="tag">HarmonyOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hci/" rel="tag">hci</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%93%9D%E7%89%99/" rel="tag">蓝牙</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-mybatis/mysql_meta_object_analyse" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/07/02/mybatis/mysql_meta_object_analyse/" class="article-date">
+  <time class="dt-published" datetime="2022-07-02T05:06:59.000Z" itemprop="datePublished">2022-07-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/07/02/mybatis/mysql_meta_object_analyse/">Mybatis MetaObject分析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><code>MyBatis</code>中的<code>MetaObject</code>是<code>MyBatis</code>中的反射工具,可以使用<code>MetaObject</code>完成获取值和设值的任务</p>
+<p><strong>本文基于MyBatis 3.5.7</strong></p>
+<h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><p>根据路径获取值和设值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> buildUser();</span><br><span class="line"></span><br><span class="line"><span class="type">MetaObject</span> <span class="variable">metaObject</span> <span class="operator">=</span> SystemMetaObject.forObject(user);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 查找user对象中第一个tag的创建者姓名</span></span><br><span class="line"><span class="type">Object</span> <span class="variable">value</span> <span class="operator">=</span> metaObject.getValue(<span class="string">&quot;tags[0].creator.name&quot;</span>);</span><br><span class="line"><span class="comment">// Creator-0</span></span><br><span class="line">System.out.println(value);</span><br><span class="line"></span><br><span class="line">metaObject.setValue(<span class="string">&quot;tags[0].creator.name&quot;</span>,<span class="string">&quot;CreatorName&quot;</span>);</span><br><span class="line"></span><br><span class="line">value = metaObject.getValue(<span class="string">&quot;tags[0].creator.name&quot;</span>);</span><br><span class="line"><span class="comment">// CreatorName</span></span><br><span class="line">System.out.println(value);</span><br></pre></td></tr></table></figure>
+
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p><img src="/assets/images/mybatis/meta_object_struct.drawio.png" alt="meta_object_struct"></p>
+<p>这里面最主要的就是<code>ObjectWrapper</code>,而<code>ObjectWrapper</code>主要分为以下几类</p>
+<ul>
+<li>Bean Wrapper</li>
+<li>Map Wrapper</li>
+<li>Collection Wrapper</li>
+<li>自定义 Wrapper</li>
+</ul>
+<h3 id="Bean-Wrapper"><a href="#Bean-Wrapper" class="headerlink" title="Bean Wrapper"></a>Bean Wrapper</h3><p><code>BeanWrapper</code>中<code>MetaClass</code>是<code>MyBatis</code>类反射工具类,使用它可以非常方便的使用<code>java</code>反射而无须担心访问权限的问题.</p>
+<p><code>BeanWrapper</code>本质上就是根据字符串递归利用反射使用<code>get</code>,<code>set</code>来获取值和设置值.</p>
+<h3 id="Map-Wrapper"><a href="#Map-Wrapper" class="headerlink" title="Map Wrapper"></a>Map Wrapper</h3><p>逻辑与<code>BeanWrapper</code>基本一致</p>
+<h3 id="Collection-Wrapper"><a href="#Collection-Wrapper" class="headerlink" title="Collection Wrapper"></a>Collection Wrapper</h3><p>这个类非常简单，因为它的绝大多数操作都会直接抛出异常</p>
+<p>可是当我们使用<code>tags[0]</code>时是可以取值的，这是为什么?</p>
+<p>因为在我们使用<code>tags[0]</code>时走的是<code>MapWrapper</code>和<code>BeanWrapper</code>共同父类<code>BaseWrapper</code>的逻辑而不是<code>ColleactionWrapper</code></p>
+<h3 id="自定义-Wrapper"><a href="#自定义-Wrapper" class="headerlink" title="自定义 Wrapper"></a>自定义 Wrapper</h3><ul>
+<li>确定自定义类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CustomObject</span>&#123;</span><br><span class="line">  <span class="keyword">public</span> String name;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="title function_">CustomObject</span><span class="params">(String name)</span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>定义CustomObjectWrapper</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里代码很多但是最主要的就是一个get,一个set</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CustomObjectWrapper</span> <span class="keyword">implements</span> <span class="title class_">ObjectWrapper</span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> CustomObject object;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="title function_">CustomObjectWrapper</span><span class="params">(CustomObject object)</span>&#123;</span><br><span class="line">    <span class="built_in">this</span>.object = object;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> Object <span class="title function_">get</span><span class="params">(PropertyTokenizer prop)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;get&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(prop.getName().equals(<span class="string">&quot;name&quot;</span>))&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.object.name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">set</span><span class="params">(PropertyTokenizer prop, Object value)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;set&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span>(prop.getName().equals(<span class="string">&quot;name&quot;</span>))&#123;</span><br><span class="line">      <span class="built_in">this</span>.object.name = (String) value;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> String <span class="title function_">findProperty</span><span class="params">(String name, <span class="type">boolean</span> useCamelCaseMapping)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;findProperty&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> String[] getGetterNames() &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;getGetterNames&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>[<span class="number">0</span>];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> String[] getSetterNames() &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;getSetterNames&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>[<span class="number">0</span>];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> Class&lt;?&gt; getSetterType(String name) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;getSetterType&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> Class&lt;?&gt; getGetterType(String name) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;getGetterType&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">hasSetter</span><span class="params">(String name)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;hasSetter&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">hasGetter</span><span class="params">(String name)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;hasGetter&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> MetaObject <span class="title function_">instantiatePropertyValue</span><span class="params">(String name, PropertyTokenizer prop, ObjectFactory objectFactory)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;instantiatePropertyValue&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isCollection</span><span class="params">()</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;isCollection&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(Object element)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;element&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> &lt;E&gt; <span class="keyword">void</span> <span class="title function_">addAll</span><span class="params">(List&lt;E&gt; element)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;addAll&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>定义CustomObjectWrapperFactory</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CustomObjectWrapperFactory</span> <span class="keyword">implements</span> <span class="title class_">ObjectWrapperFactory</span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">hasWrapperFor</span><span class="params">(Object object)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> object <span class="keyword">instanceof</span> CustomObject;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> ObjectWrapper <span class="title function_">getWrapperFor</span><span class="params">(MetaObject metaObject, Object object)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">CustomObjectWrapper</span>((CustomObject)object);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>测试代码</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="type">CustomObject</span> <span class="variable">customObject</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CustomObject</span>(<span class="string">&quot;名字&quot;</span>);</span><br><span class="line">  <span class="type">CustomObjectWrapperFactory</span> <span class="variable">customObjectWrapperFactory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CustomObjectWrapperFactory</span>();</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// ObjectFactory和DefaultReflectorFactory使用默认的</span></span><br><span class="line">  <span class="type">ObjectFactory</span> <span class="variable">DEFAULT_OBJECT_FACTORY</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DefaultObjectFactory</span>();</span><br><span class="line">  <span class="type">DefaultReflectorFactory</span> <span class="variable">defaultReflectorFactory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DefaultReflectorFactory</span>();</span><br><span class="line">  </span><br><span class="line">  <span class="type">MetaObject</span> <span class="variable">metaObject</span> <span class="operator">=</span> MetaObject.forObject(customObject,DEFAULT_OBJECT_FACTORY,customObjectWrapperFactory,defaultReflectorFactory);</span><br><span class="line">  <span class="type">Object</span> <span class="variable">name</span> <span class="operator">=</span> metaObject.getValue(<span class="string">&quot;name&quot;</span>);</span><br><span class="line">  System.out.println(name);</span><br><span class="line"></span><br><span class="line">  metaObject.setValue(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;名称1&quot;</span>);</span><br><span class="line">  name = metaObject.getValue(<span class="string">&quot;name&quot;</span>);</span><br><span class="line">  System.out.println(name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/07/02/mybatis/mysql_meta_object_analyse/" data-id="clin7xb59002iccon9nbu1kzr" data-title="Mybatis MetaObject分析" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/metaobject/" rel="tag">metaobject</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-orange/how_to_parse_dynamic_sql" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/06/15/orange/how_to_parse_dynamic_sql/" class="article-date">
+  <time class="dt-published" datetime="2022-06-15T13:09:28.000Z" itemprop="datePublished">2022-06-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/orange/">orange</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/06/15/orange/how_to_parse_dynamic_sql/">Orange是如何解析动态SQL的</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://github.com/freakchick/orange">orange</a>是一个动态sql引擎，类似mybatis的功能，解析带标签的动态sql，生成?占位符的sql和?对应的参数列表</p>
+<h2 id="解析过程"><a href="#解析过程" class="headerlink" title="解析过程"></a>解析过程</h2><p><img src="/assets/images/orange/orange%E8%A7%A3%E6%9E%90%E5%8A%A8%E6%80%81sql%E8%BF%87%E7%A8%8B.drawio.png" alt="orange解析动态sql过程.drawio.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/06/15/orange/how_to_parse_dynamic_sql/" data-id="clin7xb5c002qccon8u9ghobq" data-title="Orange是如何解析动态SQL的" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/orange/" rel="tag">orange</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-dbapi/how_to_execute_dynamic_sql" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/06/09/dbapi/how_to_execute_dynamic_sql/" class="article-date">
+  <time class="dt-published" datetime="2022-06-09T11:19:45.000Z" itemprop="datePublished">2022-06-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/dbapi/">dbapi</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/06/09/dbapi/how_to_execute_dynamic_sql/">dbapi是如何执行动态SQL的</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://gitee.com/freakchicken/db-api">dbapi</a>可以解析类似<code>MyBatis</code>形式的SQL语句</p>
+<p>整个执行过程分为两部分:</p>
+<ul>
+<li>1.解析SQL字符串</li>
+<li>2.执行SQL</li>
+</ul>
+<p>本文将着重介绍它是如何执行SQL的</p>
+<p>对标<code>db-api</code>版本:<code>dfc0dac12d67e892e3ceb0b89dad773b2ab14642</code></p>
+<h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>db-api使用<a target="_blank" rel="noopener" href="https://gitee.com/freakchicken/orange">orange</a>解析字符串,将形如</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">select * from user</span><br><span class="line"><span class="tag">&lt;<span class="name">where</span>&gt;</span></span><br><span class="line">  name in </span><br><span class="line">  <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">&#x27;list&#x27;</span> <span class="attr">open</span>=<span class="string">&#x27;(&#x27;</span> <span class="attr">separator</span>=<span class="string">&#x27;,&#x27;</span> <span class="attr">close</span>=<span class="string">&#x27;)&#x27;</span>&gt;</span></span><br><span class="line">    #&#123;item.name&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">where</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>的SQL语句解析为<code>SqlMeta</code>对象,其中<code>SqlMeta.sql</code>属性为解析后的SQL字符串,<code>SqlMeta.jdbcParamValues</code>属性为解析后的参数列表</p>
+<h2 id="执行"><a href="#执行" class="headerlink" title="执行"></a>执行</h2><p>通过分析找到真正执行的类<code>com.gitee.freakchicken.dbapi.basic.servlet.APIServlet</code>,这个类是一个<code>HttpServlet</code></p>
+<p>无论是<code>get</code>请求还是<code>post</code>请求,都会调用<code>com.gitee.freakchicken.dbapi.basic.servlet.APIServlet#process</code>方法</p>
+<p>process方法分为以下几步:</p>
+<ul>
+<li>1.根据path获取API定义</li>
+<li>2.获取相关数据库配置</li>
+<li>3.从请求中获取参数</li>
+<li>4.缓存</li>
+<li>5.获取链接</li>
+<li>6.执行sql</li>
+<li>7.执行数据转换</li>
+</ul>
+<p><strong>以上各步,一旦出现异常就会发送提醒</strong></p>
+<p>这里最主要的就是第六步</p>
+<h3 id="executeSql执行sql"><a href="#executeSql执行sql" class="headerlink" title="executeSql执行sql"></a>executeSql执行sql</h3><p><code>com.gitee.freakchicken.dbapi.basic.servlet.APIServlet#executeSql</code>无非是根据配置设置连接是否自动提交事务，如果不是自动提交的事务，则按照执行结果提交或返回事务</p>
+<p>这里最主要的是调用<code>com.gitee.freakchicken.dbapi.basic.util.JdbcUtil#executeSql</code></p>
+<p>而在<code>JdbcUtil#executeSql</code>里主要使用<code>PreparedStatement</code>执行sql</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/06/09/dbapi/how_to_execute_dynamic_sql/" data-id="clin7xb4f000mccon551f20r6" data-title="dbapi是如何执行动态SQL的" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-mybatis/mybatis-mapper-invoke" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/06/05/mybatis/mybatis-mapper-invoke/" class="article-date">
+  <time class="dt-published" datetime="2022-06-04T16:01:16.000Z" itemprop="datePublished">2022-06-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/06/05/mybatis/mybatis-mapper-invoke/">MyBatis Mapper调用链</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><img src="/assets/images/mybatis/mybatis-study/mapper%E8%B0%83%E7%94%A8%E9%93%BE.drawio.png" alt="mapper调用链.drawio.png"></p>
+<p><a href="/assets/drawio/mybatis/mybatis-study/mapper%E8%B0%83%E7%94%A8%E9%93%BE.drawio">drawio文件下载</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/06/05/mybatis/mybatis-mapper-invoke/" data-id="clin7xb57002bccon77fohrl0" data-title="MyBatis Mapper调用链" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-mybatis/mybatis-sql-xml-parse" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/06/04/mybatis/mybatis-sql-xml-parse/" class="article-date">
+  <time class="dt-published" datetime="2022-06-04T07:03:43.000Z" itemprop="datePublished">2022-06-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/06/04/mybatis/mybatis-sql-xml-parse/">MyBatis SQL XML解析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>本文仅关注MyBatis SQL XML解析(select&#x2F;update&#x2F;insert&#x2F;delete),不关注MyBatis的其他功能,如果想了解MyBatis的其他功能,可以参考<a target="_blank" rel="noopener" href="https://www.mybatis.org/mybatis-3/zh/index.html">MyBatis官网</a></p>
+<h2 id="解析过程"><a href="#解析过程" class="headerlink" title="解析过程"></a>解析过程</h2><p><img src="/assets/images/mybatis/mybatis-study/MyBatis_Mapper_sql_Xml%E8%A7%A3%E6%9E%90.drawio.png" alt="MyBatis_Mapper_sql_Xml解析"></p>
+<p><a href="/assets/drawio/mybatis/mybatis-study/MyBatis_Mapper_sql_Xml%E8%A7%A3%E6%9E%90.drawio">drawio文件下载</a></p>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><ul>
+<li>1.克隆MyBatis源码</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/fuzi1996/mybatis-3.git</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用<code>3.5.7_code_read</code>分支</strong></p>
+<h2 id="测试代码介绍"><a href="#测试代码介绍" class="headerlink" title="测试代码介绍"></a>测试代码介绍</h2><p>测试代码位置<code>org.apache.ibatis.builder.XmlMapperBuilderTest#selfTest</code>该单元测试主要测试<code>mapper</code>中的<code>select</code>、<code>update</code>、<code>insert</code>、<code>delete</code>语句的解析<br>对应<code>xml</code>文件地址:<code>src\test\java\org\apache\ibatis\builder\SelfTestMapper.xml</code>,可以看到这里面只有一个<code>select</code>语句</p>
+<h2 id="解析过程-1"><a href="#解析过程-1" class="headerlink" title="解析过程"></a>解析过程</h2><h3 id="1-构建XMLMapperBuilder"><a href="#1-构建XMLMapperBuilder" class="headerlink" title="1.构建XMLMapperBuilder"></a>1.构建XMLMapperBuilder</h3><p>构建<code>XMLMapperBuilder</code>需要构建<code>MyBatis</code>的全局配置对象<code>Configuration</code>,这里直接new一个<code>Configuration</code>即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Configuration</span> <span class="variable">configuration</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Configuration</span>();</span><br><span class="line"><span class="type">String</span> <span class="variable">resource</span> <span class="operator">=</span> <span class="string">&quot;org/apache/ibatis/builder/SelfTestMapper.xml&quot;</span>;</span><br><span class="line"><span class="comment">// configuration.getSqlFragments()是mybatis中已缓存的sql片段</span></span><br><span class="line"><span class="keyword">try</span> (<span class="type">InputStream</span> <span class="variable">inputStream</span> <span class="operator">=</span> Resources.getResourceAsStream(resource)) &#123;</span><br><span class="line">  <span class="type">XMLMapperBuilder</span> <span class="variable">builder</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">XMLMapperBuilder</span>(inputStream, configuration, resource, configuration.getSqlFragments());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-XMLMapperBuilder解析-parse"><a href="#2-XMLMapperBuilder解析-parse" class="headerlink" title="2.XMLMapperBuilder解析(parse)"></a>2.XMLMapperBuilder解析(parse)</h3><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">                                            --&gt; XMLIncludeTransformer</span><br><span class="line">XMLMapperBuilder --&gt; XMLStatementBuilder --| </span><br><span class="line">                                            --&gt; LanguageDriver --&gt; XMLScriptBuilder</span><br></pre></td></tr></table></figure>
+
+<p>经过该调用链将<code>xml</code>字符串转为<code>SqlNode</code>对象,并缓存到<code>Configuration</code>中</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/06/04/mybatis/mybatis-sql-xml-parse/" data-id="clin7xb57002ccconbi37cyrn" data-title="MyBatis SQL XML解析" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-onlyoffice/onlyoffice-install" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/05/21/onlyoffice/onlyoffice-install/" class="article-date">
+  <time class="dt-published" datetime="2022-05-21T12:13:17.000Z" itemprop="datePublished">2022-05-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/OnlyOffice/">OnlyOffice</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/05/21/onlyoffice/onlyoffice-install/">OnlyOffice的安装</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>OnlyOffice的安装分为使用OnlyOffice官方安装包和自行从源码编译安装两种</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="使用官方二进制包安装"><a href="#使用官方二进制包安装" class="headerlink" title="使用官方二进制包安装"></a>使用官方二进制包安装</h3><p><strong>使用官方二进制包安装一切都使用默认配置,例如<code>postgresql</code>和<code>rabbitmq</code>的连接地址等</strong></p>
+<p><strong>文档展示的是在Ubuntu上安装OnlyOffice</strong></p>
+<p><a target="_blank" rel="noopener" href="https://helpcenter.onlyoffice.com/installation/docs-community-install-ubuntu.aspx">官方文档</a></p>
+<ul>
+<li>1.系统要求</li>
+</ul>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CPU dual core 2 GHz or better</span><br><span class="line">RAM 2 GB or more</span><br><span class="line">HDD at least 40 GB of free space</span><br><span class="line">Additional requirements at least 4 GB of swap</span><br><span class="line">OS 64-bit Debian, Ubuntu or other compatible distribution with kernel version 3.13 or later</span><br><span class="line">Additional requirements</span><br><span class="line">  PostgreSQL: version 12.9 or later</span><br><span class="line">  NGINX: version 1.3.13 or later</span><br><span class="line">  libstdc++6: version 4.8.4 or later</span><br><span class="line">  RabbitMQ</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>2.安装依赖</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install postgresql</span><br><span class="line">sudo apt-get install rabbitmq-server</span><br><span class="line">sudo apt-get install nginx-extras</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>3.数据库初始化</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo -i -u postgres psql -c <span class="string">&quot;CREATE DATABASE onlyoffice;&quot;</span></span><br><span class="line">sudo -i -u postgres psql -c <span class="string">&quot;CREATE USER onlyoffice WITH password &#x27;onlyoffice&#x27;;&quot;</span></span><br><span class="line">sudo -i -u postgres psql -c <span class="string">&quot;GRANT ALL privileges ON DATABASE onlyoffice TO onlyoffice;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>初始化数据库,数据库初始化文件在<code>/server/schema/postgresql/createdb.sql</code></p>
+<ul>
+<li>4.安装<code>OnlyOffice</code></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Add GPG key:</span></span><br><span class="line"><span class="built_in">mkdir</span> -p ~/.gnupg</span><br><span class="line"><span class="built_in">chmod</span> 700 ~/.gnupg</span><br><span class="line">gpg --no-default-keyring --keyring gnupg-ring:/tmp/onlyoffice.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys CB2DE8E5</span><br><span class="line"><span class="built_in">chmod</span> 644 /tmp/onlyoffice.gpg</span><br><span class="line">sudo <span class="built_in">chown</span> root:root /tmp/onlyoffice.gpg</span><br><span class="line">sudo <span class="built_in">mv</span> /tmp/onlyoffice.gpg /etc/apt/trusted.gpg.d/</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add ONLYOFFICE Docs repository:</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;deb https://download.onlyoffice.com/repo/debian squeeze main&quot;</span> | sudo <span class="built_in">tee</span> /etc/apt/sources.list.d/onlyoffice.list</span><br><span class="line"></span><br><span class="line"><span class="comment"># install</span></span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install ttf-mscorefonts-installer</span><br><span class="line"><span class="comment"># 在安装onlyoffice-documentserver时会要求输入数据库密码</span></span><br><span class="line">sudo apt-get install onlyoffice-documentserver</span><br></pre></td></tr></table></figure>
+
+<p><strong>由于这里都在使用默认的配置,所以安装后OnlyOffice应该就在后台正常运行,访问本机80端口就可以看到OnlyOffice</strong></p>
+<ul>
+<li>5.管理</li>
+</ul>
+<p><code>OnlyOffice</code>使用<code>supervisorctl</code>作为进程管理</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看supervisorctl管理的进程状态,以ds:开头的都是OnlyOffice的后台进程</span></span><br><span class="line">sudo supervisorctl status</span><br></pre></td></tr></table></figure>
+
+<p>可以通过<code>supervisorctl</code>来开启或关闭<code>OnlyOffice</code>的后台进程</p>
+<p><strong>安装后,OnlyOffice就会自动在后台运行</strong></p>
+<h3 id="自行编译安装"><a href="#自行编译安装" class="headerlink" title="自行编译安装"></a>自行编译安装</h3><p>关于编译的部分,在<a href="/2022/05/20/onlyoffice/compile-onlyoffice">从源码编译OnlyOffice</a>这里不再赘述</p>
+<p><code>OnlyOffice</code>编译后,会在<code>/build_tools/out</code>下看到最终编译产物</p>
+<p>以下是启动步骤:</p>
+<ul>
+<li><p>1.安装好必要的软件</p>
+</li>
+<li><p>2.安装依赖</p>
+<p><strong>具体配置省略,与使用官方二进制包安装一致</strong></p>
+<ul>
+<li>postgresql<ul>
+<li>初始数据库</li>
+</ul>
+</li>
+<li>rabbitmq-server</li>
+</ul>
+</li>
+<li><p>3.启动</p>
+<ul>
+<li>启动<code>FileConverter</code></li>
+</ul>
+<p>参考脚本:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">cd</span> /build_tools/out/linux_64/onlyoffice/documentserver/server/FileConverter</span><br><span class="line"><span class="comment"># NODE_ENV指定当前环境为development-linux,这样就会读取`development-linux.json`作为`default.json`的补充</span></span><br><span class="line"><span class="comment"># NODE_CONFIG指定运行时的一些具体的配置数据,比如这里就指定了rabbitmq与postgresql的数据,需要自行修改</span></span><br><span class="line">LD_LIBRARY_PATH=<span class="variable">$PWD</span>/bin NODE_ENV=development-linux NODE_CONFIG_DIR=<span class="variable">$PWD</span>/../Common/config  NODE_CONFIG=<span class="string">&#x27;&#123;&quot;rabbitmq&quot;: &#123;&quot;url&quot;: &quot;amqp://guest:guest@192.168.0.2:5672&quot;&#125;,&quot;services&quot;: &#123;&quot;CoAuthoring&quot;: &#123;&quot;sql&quot;: &#123;&quot;type&quot;: &quot;postgres&quot;,&quot;dbHost&quot;: &quot;192.168.0.2&quot;,&quot;dbPort&quot;: 5432,&quot;dbName&quot;: &quot;onlyoffice&quot;,&quot;dbUser&quot;: &quot;onlyoffice&quot;,&quot;dbPass&quot;: &quot;onlyoffice&quot;&#125;,&quot;redis&quot;: &#123;&quot;host&quot;: &quot;192.168.0.2&quot;&#125;&#125;&#125;&#125;&#x27;</span> <span class="built_in">nohup</span> ./converter &gt; nohup.out 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动<code>DocService</code></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">cd</span> /build_tools/out/linux_64/onlyoffice/documentserver/server/DocService</span><br><span class="line"><span class="comment"># NODE_ENV指定当前环境为development-linux,这样就会读取`development-linux.json`作为`default.json`的补充</span></span><br><span class="line"><span class="comment"># NODE_CONFIG指定运行时的一些具体的配置数据,比如这里就指定了rabbitmq与postgresql的数据,需要自行修改</span></span><br><span class="line">LD_LIBRARY_PATH=<span class="variable">$PWD</span>/bin NODE_ENV=development-linux NODE_CONFIG_DIR=<span class="variable">$PWD</span>/../Common/config NODE_CONFIG=<span class="string">&#x27;&#123;&quot;rabbitmq&quot;: &#123;&quot;url&quot;: &quot;amqp://guest:guest@192.168.0.2:5672&quot;&#125;,&quot;services&quot;: &#123;&quot;CoAuthoring&quot;: &#123;&quot;sql&quot;: &#123;&quot;type&quot;: &quot;postgres&quot;,&quot;dbHost&quot;: &quot;192.168.0.2&quot;,&quot;dbPort&quot;: 5432,&quot;dbName&quot;: &quot;onlyoffice&quot;,&quot;dbUser&quot;: &quot;onlyoffice&quot;,&quot;dbPass&quot;: &quot;onlyoffice&quot;&#125;,&quot;redis&quot;: &#123;&quot;host&quot;: &quot;192.168.0.2&quot;&#125;&#125;&#125;&#125;&#x27;</span> <span class="built_in">nohup</span> ./docservice &gt; nohup.out 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动示例</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">cd</span> /build_tools/out/linux_64/onlyoffice/documentserver-example</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果files文件夹不存在,就创建一个</span></span><br><span class="line"><span class="keyword">if</span> [ ! -d <span class="string">&quot;files&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">mkdir</span> files</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定DocService的地址,这里需要修改ip地址</span></span><br><span class="line">NODE_CONFIG=<span class="string">&#x27;&#123;&quot;server&quot;:&#123;&quot;siteUrl&quot;:&quot;http://192.168.234.128:8000/&quot;&#125;&#125;&#x27;</span> <span class="built_in">nohup</span> ./example &gt; nohup.out 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>以上启动完成后,访问<code>http://你的ip:3000</code>就可以看到示例页面了</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/05/21/onlyoffice/onlyoffice-install/" data-id="clin7xb5c002pccon7vpw4bov" data-title="OnlyOffice的安装" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OnlyOffice/" rel="tag">OnlyOffice</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-onlyoffice/compile-onlyoffice" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/05/20/onlyoffice/compile-onlyoffice/" class="article-date">
+  <time class="dt-published" datetime="2022-05-20T11:47:01.000Z" itemprop="datePublished">2022-05-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/OnlyOffice/">OnlyOffice</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/05/20/onlyoffice/compile-onlyoffice/">从源码编译OnlyOffice</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">系统: Ubuntu 14.04</span><br><span class="line">网络: 必须科学上网</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么要求科学上网?</strong><br>OnlyOffice源码存放在github上,且编译时会从google服务器下载v8相关资源,所以必须科学上网</p>
+<h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><ul>
+<li><p>锚定<code>build_tools</code>git版本:<code>be06b3c2c8df1559d2198d3c7e186a9d5913799f</code></p>
+</li>
+<li><p><code>/build_tools</code>路径指的是OnlyOffice编译工具仓库clone后的本地地址</p>
+</li>
+<li><p><code>OnlyOffice</code>连接数限制在build_tools同级目录<code>/server/Common/sources/contants.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 改为9999就可以无限连接数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">LICENSE_CONNECTIONS</span> = <span class="number">20</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="Linux下源码编译步骤"><a href="#Linux下源码编译步骤" class="headerlink" title="Linux下源码编译步骤"></a>Linux下源码编译步骤</h2><ul>
+<li>1.build_tools工具下载</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/ONLYOFFICE/build_tools.git</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>2.相关资源预下载</p>
+<ul>
+<li><p><code>node</code>环境准备</p>
+<p>这里不再介绍如何安装<code>node</code>,但有以下几点需要注意:</p>
+<ul>
+<li><p><code>node</code>版本必须大于<code>10.20</code></p>
+</li>
+<li><p>如果想使用国内的<code>npm</code>镜像,例如淘宝的<code>npm</code>镜像,我在尝试的时候发现一些包不能正确安装,因此最好是科学上网,不使用镜像</p>
+</li>
+<li><p>每一次编译的时候,<code>build_tools</code>都会尝试全局安装<code>grunt-cli</code>和<code>pkg</code>这两个包,因此可以提前安装好,然后修改<code>build_tools</code>源码,避免每次都安装</p>
+<ul>
+<li><code>npm</code>安装<code>grunt-cli</code>和<code>pkg</code></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install -g grunt-cli</span><br><span class="line">npm install -g pkg</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改<code>\build_tools\tools\linux\deps.py</code>中源码,注释掉以下两行</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># base.cmd(&quot;sudo&quot;, [&quot;npm&quot;, &quot;install&quot;, &quot;-g&quot;, &quot;grunt-cli&quot;])</span></span><br><span class="line"><span class="comment"># base.cmd(&quot;sudo&quot;, [&quot;npm&quot;, &quot;install&quot;, &quot;-g&quot;, &quot;pkg&quot;])</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><code>java</code>环境准备</p>
+<p>这里不再介绍具体的<code>java</code>安装,但须注意以下几点:</p>
+<ul>
+<li><p><code>java</code>版本仅支持<code>11</code>,<code>1.8</code></p>
+</li>
+<li><p>编译的时候每次都会尝试全局安装<code>open-jdk</code>,如果<code>java</code>环境已经配置好,可以修改<code>\build_tools\tools\linux\deps.py</code>中源码,注释掉以下几行</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># java_error = base.cmd(&quot;sudo&quot;, [&quot;apt-get&quot;, &quot;-y&quot;, &quot;install&quot;, &quot;openjdk-11-jdk&quot;], True)</span></span><br><span class="line"><span class="comment"># if (0 != java_error):</span></span><br><span class="line"><span class="comment">#   java_error = base.cmd(&quot;sudo&quot;, [&quot;apt-get&quot;, &quot;-y&quot;, &quot;install&quot;, &quot;openjdk-8-jdk&quot;], True)</span></span><br><span class="line"><span class="comment"># if (0 != java_error):</span></span><br><span class="line"><span class="comment">#   base.cmd(&quot;sudo&quot;, [&quot;apt-get&quot;, &quot;-y&quot;, &quot;install&quot;, &quot;software-properties-common&quot;])</span></span><br><span class="line"><span class="comment">#   base.cmd(&quot;sudo&quot;, [&quot;add-apt-repository&quot;, &quot;-y&quot;, &quot;ppa:openjdk-r/ppa&quot;])</span></span><br><span class="line"><span class="comment">#   base.cmd(&quot;sudo&quot;, [&quot;apt-get&quot;, &quot;update&quot;])</span></span><br><span class="line"><span class="comment">#   base.cmd(&quot;sudo&quot;, [&quot;apt-get&quot;, &quot;-y&quot;, &quot;install&quot;, &quot;openjdk-8-jdk&quot;])</span></span><br><span class="line"><span class="comment">#   base.cmd(&quot;sudo&quot;, [&quot;update-alternatives&quot;, &quot;--config&quot;, &quot;java&quot;])</span></span><br><span class="line"><span class="comment">#   base.cmd(&quot;sudo&quot;, [&quot;update-alternatives&quot;, &quot;--config&quot;, &quot;javac&quot;])</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>qt</code>环境准备</p>
+<p><code>qt</code>版本:<code>5.9.9</code></p>
+<ul>
+<li>下载<br>下载镜像:<a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/qt/archive/qt/5.9/5.9.9/">https://mirrors.tuna.tsinghua.edu.cn/qt/archive/qt/5.9/5.9.9/</a></li>
+</ul>
+<p>具体下载地址:<a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/qt/archive/qt/5.9/5.9.9/single/qt-everywhere-opensource-src-5.9.9.tar.xz">https://mirrors.tuna.tsinghua.edu.cn/qt/archive/qt/5.9/5.9.9/single/qt-everywhere-opensource-src-5.9.9.tar.xz</a></p>
+<ul>
+<li><p>重命名<br>下载后将文件名改为<code>qt_source_5.9.9.tar.xz</code>并放置在<code>/build_tools/tools/linux</code>文件夹下</p>
+</li>
+<li><p>解压<br>解压<code>/build_tools/tools/linux/qt_source_5.9.9.tar.xz</code>到<code>/build_tools/tools/linux/qt-everywhere-opensource-src-5.9.9</code>文件加下</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>为什么需要资源预下载</strong><br>如果不预下载一些资源,会在编译时自动下载.但是编译时下载的资源很慢,碰上网络波动,极易造成编译失败</p>
+</li>
+<li><p>3.编译</p>
+</li>
+</ul>
+<p>进入<code>/build_tools/tools/linux</code>目录下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./automate.py server</span><br></pre></td></tr></table></figure>
+
+<p>编译完成后,可以在<code>/build_tools/out</code>下看到最终编译产物</p>
+<p>初始编译通过后,如果不需要更新<code>OnlyOffice</code>的代码,需要修改<code>/build_tools/tools/linux/automate.py</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">build_tools_params = [<span class="string">&quot;--branch&quot;</span>, branch, </span><br><span class="line">                      <span class="string">&quot;--module&quot;</span>, modules, </span><br><span class="line">                      <span class="comment"># 这里需要把1改为0,这样后面就不会更新仓库</span></span><br><span class="line">                      <span class="string">&quot;--update&quot;</span>, <span class="string">&quot;0&quot;</span>,</span><br><span class="line">                      <span class="string">&quot;--qt-dir&quot;</span>, os.getcwd() + <span class="string">&quot;/qt_build/Qt-5.9.9&quot;</span>] + params</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>4.编译字体与主题</li>
+</ul>
+<p>第3步,编译产物<code>/build_tools/out</code>下没有字体与主题资源,所以还需要生成字体与主题</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">cd</span> /build_tools/out/linux_64/onlyoffice/documentserver</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果fonts文件夹不存在</span></span><br><span class="line"><span class="keyword">if</span> [ ! -d <span class="string">&quot;fonts&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">mkdir</span> fonts</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment"># 在/build_tools/out/linux_64/onlyoffice/documentserver/fonts下生成字体</span></span><br><span class="line">LD_LIBRARY_PATH=<span class="variable">$&#123;PWD&#125;</span>/server/FileConverter/bin server/tools/allfontsgen \</span><br><span class="line">  --input=<span class="string">&quot;<span class="variable">$&#123;PWD&#125;</span>/core-fonts&quot;</span> \</span><br><span class="line">  --allfonts-web=<span class="string">&quot;<span class="variable">$&#123;PWD&#125;</span>/sdkjs/common/AllFonts.js&quot;</span> \</span><br><span class="line">  --allfonts=<span class="string">&quot;<span class="variable">$&#123;PWD&#125;</span>/server/FileConverter/bin/AllFonts.js&quot;</span> \</span><br><span class="line">  --images=<span class="string">&quot;<span class="variable">$&#123;PWD&#125;</span>/sdkjs/common/Images&quot;</span> \</span><br><span class="line">  --selection=<span class="string">&quot;<span class="variable">$&#123;PWD&#125;</span>/server/FileConverter/bin/font_selection.bin&quot;</span> \</span><br><span class="line">  --output-web=<span class="string">&#x27;fonts&#x27;</span> \</span><br><span class="line">  --use-system=<span class="string">&quot;true&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成主题</span></span><br><span class="line"><span class="built_in">cd</span> /build_tools/out/linux_64/onlyoffice/documentserver</span><br><span class="line">LD_LIBRARY_PATH=<span class="variable">$&#123;PWD&#125;</span>/server/FileConverter/bin server/tools/allthemesgen \</span><br><span class="line">  --converter-dir=<span class="string">&quot;<span class="variable">$&#123;PWD&#125;</span>/server/FileConverter/bin&quot;</span>\</span><br><span class="line">  --src=<span class="string">&quot;<span class="variable">$&#123;PWD&#125;</span>/sdkjs/slide/themes&quot;</span>\</span><br><span class="line">  --output=<span class="string">&quot;<span class="variable">$&#123;PWD&#125;</span>/sdkjs/common/Images&quot;</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2022/05/20/onlyoffice/compile-onlyoffice/" data-id="clin7xb5a002lccongf608ht6" data-title="从源码编译OnlyOffice" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OnlyOffice/" rel="tag">OnlyOffice</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/HarmonyOS/">HarmonyOS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OnlyOffice/">OnlyOffice</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug-fix/">bug-fix</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug%E4%BF%AE%E5%A4%8D/">bug修复</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/cmake/">cmake</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dbapi/">dbapi</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/design-pattern/">design-pattern</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/frp/">frp</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jdbc/">jdbc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jeecg/">jeecg</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/npm/">npm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/orange/">orange</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-boot/">spring-boot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-form-making/">vue-form-making</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue2/">vue2</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/wsl/">wsl</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" rel="tag">Bean条件注入</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Connection/" rel="tag">Connection</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DatabaseMetaData/" rel="tag">DatabaseMetaData</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HarmonyOS/" rel="tag">HarmonyOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-LifeCycle/" rel="tag">Maven LifeCycle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-Plugin/" rel="tag">Maven Plugin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OnlyOffice/" rel="tag">OnlyOffice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ResultSet/" rel="tag">ResultSet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statement/" rel="tag">Statement</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" rel="tag">Vue 依赖收集</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-reactivity/" rel="tag">Vue2 reactivity</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bat/" rel="tag">bat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug-fix/" rel="tag">bug-fix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug%E4%BF%AE%E5%A4%8D/" rel="tag">bug修复</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cmake/" rel="tag">cmake</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/" rel="tag">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/favicon/" rel="tag">favicon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/frp/" rel="tag">frp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hci/" rel="tag">hci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jest-Test/" rel="tag">jest Test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/metaobject/" rel="tag">metaobject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="tag">mybatis执行器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm-scripts/" rel="tag">npm scripts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/online-form/" rel="tag">online-form</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/orange/" rel="tag">orange</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server-programming/" rel="tag">server-programming</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-form-making/" rel="tag">vue-form-making</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl1/" rel="tag">wsl1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl2/" rel="tag">wsl2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" rel="tag">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" rel="tag">启动流程分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" rel="tag">源码阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="tag">环境搭建</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" rel="tag">自动装配原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%93%9D%E7%89%99/" rel="tag">蓝牙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" rel="tag">表单设计器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" rel="tag">验证码校验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" rel="tag">验证码生成</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" style="font-size: 10px;">Bean条件注入</a> <a href="/tags/Connection/" style="font-size: 10px;">Connection</a> <a href="/tags/DatabaseMetaData/" style="font-size: 10px;">DatabaseMetaData</a> <a href="/tags/HarmonyOS/" style="font-size: 10px;">HarmonyOS</a> <a href="/tags/Maven/" style="font-size: 16px;">Maven</a> <a href="/tags/Maven-LifeCycle/" style="font-size: 10px;">Maven LifeCycle</a> <a href="/tags/Maven-Plugin/" style="font-size: 10px;">Maven Plugin</a> <a href="/tags/OnlyOffice/" style="font-size: 12px;">OnlyOffice</a> <a href="/tags/ResultSet/" style="font-size: 10px;">ResultSet</a> <a href="/tags/Statement/" style="font-size: 10px;">Statement</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" style="font-size: 10px;">Vue 依赖收集</a> <a href="/tags/Vue2-reactivity/" style="font-size: 10px;">Vue2 reactivity</a> <a href="/tags/bat/" style="font-size: 10px;">bat</a> <a href="/tags/bug-fix/" style="font-size: 10px;">bug-fix</a> <a href="/tags/bug%E4%BF%AE%E5%A4%8D/" style="font-size: 10px;">bug修复</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/cmake/" style="font-size: 10px;">cmake</a> <a href="/tags/dbapi/" style="font-size: 14px;">dbapi</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/element-ui/" style="font-size: 10px;">element-ui</a> <a href="/tags/favicon/" style="font-size: 10px;">favicon</a> <a href="/tags/frp/" style="font-size: 10px;">frp</a> <a href="/tags/hci/" style="font-size: 10px;">hci</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jdbc/" style="font-size: 20px;">jdbc</a> <a href="/tags/jeecg/" style="font-size: 14px;">jeecg</a> <a href="/tags/jest-Test/" style="font-size: 10px;">jest Test</a> <a href="/tags/metaobject/" style="font-size: 10px;">metaobject</a> <a href="/tags/mybatis/" style="font-size: 18px;">mybatis</a> <a href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" style="font-size: 10px;">mybatis执行器</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/npm-scripts/" style="font-size: 10px;">npm scripts</a> <a href="/tags/online-form/" style="font-size: 10px;">online-form</a> <a href="/tags/orange/" style="font-size: 10px;">orange</a> <a href="/tags/server-programming/" style="font-size: 10px;">server-programming</a> <a href="/tags/spring-boot/" style="font-size: 16px;">spring-boot</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue-form-making/" style="font-size: 10px;">vue-form-making</a> <a href="/tags/vue2/" style="font-size: 10px;">vue2</a> <a href="/tags/wsl1/" style="font-size: 10px;">wsl1</a> <a href="/tags/wsl2/" style="font-size: 12px;">wsl2</a> <a href="/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 12px;">事务</a> <a href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" style="font-size: 10px;">内网穿透</a> <a href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" style="font-size: 10px;">启动流程分析</a> <a href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" style="font-size: 10px;">源码阅读</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" style="font-size: 10px;">环境搭建</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" style="font-size: 10px;">自动装配原理</a> <a href="/tags/%E8%93%9D%E7%89%99/" style="font-size: 10px;">蓝牙</a> <a href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" style="font-size: 10px;">表单设计器</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" style="font-size: 10px;">验证码校验</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" style="font-size: 10px;">验证码生成</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">十二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">九月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/08/">八月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/12/18/element-ui/el-form-item-with-if/">ElFormItem使用v-if导致校验异常问题</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/11/dbapi/command_line_too_large_in_bat/">BAT命令行过长处理</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/16/harmony/collect_hci_log/">HarmonyOS手机蓝牙日志</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/02/mybatis/mysql_meta_object_analyse/">Mybatis MetaObject分析</a>
+          </li>
+        
+          <li>
+            <a href="/2022/06/15/orange/how_to_parse_dynamic_sql/">Orange是如何解析动态SQL的</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 fuzi<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

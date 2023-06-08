@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>技术琐话</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="技术琐话">
+<meta property="og:url" content="https://fuzi1996.github.io/page/4/index.html">
+<meta property="og:site_name" content="技术琐话">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="fuzi">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="技术琐话" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">技术琐话</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://fuzi1996.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-mybatis/mybatis-executor-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/11/21/mybatis/mybatis-executor-study/" class="article-date">
+  <time class="dt-published" datetime="2021-11-21T05:39:58.000Z" itemprop="datePublished">2021-11-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/11/21/mybatis/mybatis-executor-study/">mybatis执行器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>MyBatis就是针对JDBC做了一层封装，关于JDBC执行流程,详见:<a href="/2021/10/01/jdbc/jdbc-study#JDBC%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B">JDBC执行流程</a></p>
+<p>主要涉及四部分:</p>
+<ul>
+<li>动态代理 MapperProxy</li>
+<li>Sql会话 SqlSession</li>
+<li>mybatis执行器 Executor</li>
+<li>JDBC处理器 StatementHandler</li>
+</ul>
+<p>MyBatis执行流程:</p>
+<p><a href="/assets/drawio/mybatis/mybatis-study/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8.drawio"><img src="/assets/images/mybatis/mybatis-study/mybatis%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.drawio.png" alt="MyBatis执行流程"></a></p>
+<h2 id="MyBatis执行器"><a href="#MyBatis执行器" class="headerlink" title="MyBatis执行器"></a>MyBatis执行器</h2><p><a href="/assets/drawio/mybatis/mybatis-study/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8.drawio"><img src="/assets/images/mybatis/mybatis-study/sqlsession%E4%B8%8Eexcutor.drawio.png" alt="sqlsession与excutor"></a></p>
+<h2 id="BaseExecutor"><a href="#BaseExecutor" class="headerlink" title="BaseExecutor"></a>BaseExecutor</h2><ul>
+<li><p>公共功能:</p>
+<ul>
+<li>一级缓存</li>
+<li>获取连接</li>
+</ul>
+</li>
+<li><p>方法:</p>
+<ul>
+<li>query -&gt; doQuery(接口)</li>
+<li>update -&gt; doUpdate(接口)<br><code>BaseExecutor</code>中<code>query</code>,<code>update</code>是具体方法，可以进行一级缓存操作，然后调用具体实现类的<code>doQuery</code>与<code>doUpdate</code>方法查询</li>
+</ul>
+</li>
+</ul>
+<h3 id="SimpleExecutor"><a href="#SimpleExecutor" class="headerlink" title="SimpleExecutor"></a>SimpleExecutor</h3><p><code>doQuery</code>&#x2F;<code>doUpdate</code>:<br>  使用<code>SimpleExecutor</code>,无论执行的SQL是否一样每次都会进行预编译,每次都创建一个新的<code>PrepareStatement</code></p>
+<h3 id="ReuseExecutor"><a href="#ReuseExecutor" class="headerlink" title="ReuseExecutor"></a>ReuseExecutor</h3><p><code>doQuery</code>&#x2F;<code>doUpdate</code>:<br>  使用<code>ReuseExecutor</code>,多次执行,若执行的SQL一样则会预编译一次</p>
+<p><code>ReuseExecutor</code>内部维护了一个HashMap(<code>statementMap</code>,以执行的sql为key,以<code>Statement</code>为value),如果执行的sql相同,则会命中<code>statementMap</code>中的数据,不会构建新的<code>PrepareStatement</code>,进而减少编译</p>
+<h3 id="BatchExecutor"><a href="#BatchExecutor" class="headerlink" title="BatchExecutor"></a>BatchExecutor</h3><p><code>doUpdate</code>:<br>  <code>BatchExecutor</code>只针对非查询语句(<code>doUpdate</code>)才有编译优化,若执行的sql与前一条执行的sql一致且与前一条对应的<code>MapperStatement</code>一致,才会开启编译优化<br>否则执行几次就会编译几次,创建新的<code>PrepareStatement</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/11/21/mybatis/mybatis-executor-study/" data-id="clin7xb550027ccon9b2680yi" data-title="mybatis执行器" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="tag">mybatis执行器</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-server-programming-guide/procedure" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/10/23/server-programming-guide/procedure/" class="article-date">
+  <time class="dt-published" datetime="2021-10-23T03:05:05.000Z" itemprop="datePublished">2021-10-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/c/">c++</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/10/23/server-programming-guide/procedure/">编译</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ source.cpp  <span class="comment"># a.out</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>以上的编译可以分为以下四步</strong></p>
+<h3 id="预处理-Pre-Procession"><a href="#预处理-Pre-Procession" class="headerlink" title="预处理(Pre-Procession)"></a>预处理(Pre-Procession)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -E 选项指示编译器仅对输入文件进行预处理</span></span><br><span class="line">g++ -E source.cpp -o source.i</span><br><span class="line"><span class="comment"># or </span></span><br><span class="line">cpp source.cpp target.cpp</span><br></pre></td></tr></table></figure>
+
+<h3 id="纯编译-Compiling"><a href="#纯编译-Compiling" class="headerlink" title="纯编译(Compiling)"></a>纯编译(Compiling)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -S 选项告诉编译器产生汇编语言后停止编译</span></span><br><span class="line"><span class="comment"># g++产生汇编文件的缺省名是.s</span></span><br><span class="line">g++ -S source.cpp -o preprocessed.s</span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">cpp source.cpp preprocessed.cpp</span><br><span class="line">/usr/lib/gcc/x86_64-linux-gnu/9/cc1plus preprocessed.cpp</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>c++filt 这个工具来帮助我们还原混淆符号对应的函数签名</p>
+</blockquote>
+<h3 id="汇编-Assembling"><a href="#汇编-Assembling" class="headerlink" title="汇编(Assembling)"></a>汇编(Assembling)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -c 选项告诉编译器仅把源代码转成机器语言的目标代码</span></span><br><span class="line">g++ -c source.cpp -0 preprocessed.o</span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">as preprocessed.s -o preprocessed.o</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>file 查看文件类型<br>readelf 查看elf文件信息<br>nm 展示文件中符号</p>
+</blockquote>
+<h3 id="链接-Linking"><a href="#链接-Linking" class="headerlink" title="链接(Linking)"></a>链接(Linking)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">g++ preprocessed.o</span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">ld -static preprocessed.o \</span><br><span class="line">    /usr/lib/x86_64-linux-gnu/crt1.o \</span><br><span class="line">    /usr/lib/x86_64-linux-gnu/crti.o \</span><br><span class="line">    /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginT.o \</span><br><span class="line">    -L/usr/lib/gcc/x86_64-linux-gnu/9 \</span><br><span class="line">    -L/usr/lib/x86_64-linux-gnu \</span><br><span class="line">    -L/lib/x86_64-linux-gnu \</span><br><span class="line">    -L/lib \</span><br><span class="line">    -L/usr/lib \</span><br><span class="line">    -lstdc++ \</span><br><span class="line">    -lm \</span><br><span class="line">    --start-group \</span><br><span class="line">    -lgcc \</span><br><span class="line">    -lgcc_eh \</span><br><span class="line">    -lc \</span><br><span class="line">    --end-group \</span><br><span class="line">    /usr/lib/gcc/x86_64-linux-gnu/9/crtend.o \</span><br><span class="line">    /usr/lib/x86_64-linux-gnu/crtn.o</span><br></pre></td></tr></table></figure>
+
+<h2 id="g-重要参数"><a href="#g-重要参数" class="headerlink" title="g++重要参数"></a>g++重要参数</h2><ol>
+<li>-g</li>
+</ol>
+<p>编译带调试信息的可执行文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -g test.cpp -o <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>-O[n]</li>
+</ol>
+<p>代码优化,可选参数</p>
+<ul>
+<li>-O  不做优化</li>
+<li>-O1 默认优化</li>
+<li>-O2 除O1外,进一步优化</li>
+<li>-O3 更进一步的优化</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -O2 test.cpp</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>-l&#x2F;L</li>
+</ol>
+<ul>
+<li>-l紧跟着就是库名,<code>/lib</code>,<code>/usr/lib</code>,<code>/usr/local/lib</code>里直接-l库名就能链接</li>
+<li>-L紧跟着就是库所在目录</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g++ -lglong test.cpp</span><br><span class="line">g++ -L/home/temp/mytestlibfolder -lmytest  test.cpp</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>-I<br>指定头文件搜索路径,<code>/usr/include</code>可以不需要指定</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -I/myinclude test.cpp</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>-Wall<br>打印警告信息</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -Wall test.cpp</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>-w<br>关闭警告信息</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -w test.cpp</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li>-std&#x3D;[n]<br>指定c++标准</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -std=c++11 test.cpp</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li>-D<br>定义宏</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -DDEBUG test.cpp</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建和使用链接库"><a href="#创建和使用链接库" class="headerlink" title="创建和使用链接库"></a>创建和使用链接库</h2><p>假设我们有这么一个程序,它的作用是用来交换数字,目录结构如下:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- include</span><br><span class="line">  - swap.h</span><br><span class="line">- main.cpp</span><br><span class="line">- src</span><br><span class="line">  - swap.cpp</span><br></pre></td></tr></table></figure>
+
+<h3 id="静态库"><a href="#静态库" class="headerlink" title="静态库"></a>静态库</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生成:</span></span><br><span class="line"><span class="comment"># 进入src目录下</span></span><br><span class="line"><span class="built_in">cd</span> src</span><br><span class="line"><span class="comment"># 汇编生成swap.o文件</span></span><br><span class="line">g++ swap.cpp -c -I../include</span><br><span class="line"><span class="comment"># 生成静态链接库</span></span><br><span class="line">ar rs libswap.a swap.o</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用:</span></span><br><span class="line"><span class="comment"># 回到上级目录</span></span><br><span class="line"><span class="built_in">cd</span> ..</span><br><span class="line"><span class="comment"># 链接,生成可执行文件</span></span><br><span class="line">g++ main.cpp -Iinclude -Lsrc -lswap -o staticmain</span><br></pre></td></tr></table></figure>
+
+<h3 id="动态库"><a href="#动态库" class="headerlink" title="动态库"></a>动态库</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生成:</span></span><br><span class="line"><span class="comment"># 进入src目录下</span></span><br><span class="line"><span class="built_in">cd</span> src</span><br><span class="line"><span class="comment"># 汇编生成swap.o文件</span></span><br><span class="line">g++ swap.cpp -I../include -fPIC -shared -o libswap.so</span><br><span class="line"><span class="comment"># 上面命令等价于</span></span><br><span class="line"><span class="comment"># g++ swap.cpp -I../include -c -fPIC</span></span><br><span class="line"><span class="comment"># g++ -shared -o libswap.so swap.o</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用:</span></span><br><span class="line"><span class="comment"># 回到上级目录</span></span><br><span class="line"><span class="built_in">cd</span> ..</span><br><span class="line"><span class="comment"># 链接,生成可执行文件</span></span><br><span class="line">g++ main.cpp -Iinclude -Lsrc -lswap -o sharemain</span><br></pre></td></tr></table></figure>
+
+<p>运行动态库的程序时,指定库路径</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># sharemain.so在src目录下</span></span><br><span class="line">LD_LIBRARY_PATH=src ./sharemain</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://liuhaohua.com/server-programming-guide/basics/procedure/">编译过程概览</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/10/23/server-programming-guide/procedure/" data-id="clin7xb5e002ucconfdzd88k8" data-title="编译" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/server-programming/" rel="tag">server-programming</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-design-pattern/design-pattern-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/10/13/design-pattern/design-pattern-study/" class="article-date">
+  <time class="dt-published" datetime="2021-10-13T14:35:43.000Z" itemprop="datePublished">2021-10-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/design-pattern/">design-pattern</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/10/13/design-pattern/design-pattern-study/">设计模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="门面模式-Facade-Pattern"><a href="#门面模式-Facade-Pattern" class="headerlink" title="门面模式(Facade Pattern)"></a>门面模式(Facade Pattern)</h2><ul>
+<li><p>简介:<br>门面模式为封装的对象定义了一个<strong>新</strong>的接口，所有针对封装对象的操作都通过门面接口去实现</p>
+</li>
+<li><p>示例:</p>
+<ul>
+<li>MyBatis中SqlSession与Executor<br>SqlSession是门面接口，Executor是被封装的对象，所有访问执行器Excutor的操作都需要通过SqlSession定义的新接口去执行</li>
+</ul>
+</li>
+</ul>
+<h2 id="模板模式-Template-Pattern"><a href="#模板模式-Template-Pattern" class="headerlink" title="模板模式(Template Pattern)"></a>模板模式(Template Pattern)</h2><ul>
+<li><p>简介:<br>一个抽象类公开定义了执行它的方法的方式&#x2F;模板。它的子类可以按需要重写方法实现，但调用将以抽象类中定义的方式进行</p>
+</li>
+<li><p>示例:</p>
+<ul>
+<li><p>面向接口编程就是典型的模板模式</p>
+</li>
+<li><p>MyBatis提供了3种不同的Executor，分别为SimpleExecutor、ResueExecutor、BatchExecutor，这些Executor都继承至BaseExecutor，BaseExecutor中定义的方法的执行流程及通用的处理逻辑，具体的方法由子类来实现，是典型的模板方法模式的应用</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="享元模式-Flyweight-Pattern"><a href="#享元模式-Flyweight-Pattern" class="headerlink" title="享元模式(Flyweight Pattern)"></a>享元模式(Flyweight Pattern)</h2><ul>
+<li><p>简介:<br>主要用于减少创建对象的数量，以减少内存占用和提高性能</p>
+</li>
+<li><p>示例:</p>
+<ul>
+<li>Mybatis的Configration缓存了MappedStatement对象,当使用时直接从缓存中取出</li>
+</ul>
+</li>
+</ul>
+<h2 id="装饰器模式-Decorater-Pattern"><a href="#装饰器模式-Decorater-Pattern" class="headerlink" title="装饰器模式(Decorater Pattern)"></a>装饰器模式(Decorater Pattern)</h2><ul>
+<li><p>简介:<br>创建了一个装饰类，用来包装原有的类，并在保持类方法签名完整性的前提下，提供了额外的功能<br>允许向一个现有的对象添加新的功能，同时又不改变其结构</p>
+</li>
+<li><p>示例:</p>
+<ul>
+<li>Mybatis中创建了CachingExecutor作为装饰类,包装了SimpleExecutor,ReuseExecutor和BatchExecutor,在保持方法签名不变的前提下,提供了缓存功能</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/10/13/design-pattern/design-pattern-study/" data-id="clin7xb4h000scconbo7pb05c" data-title="设计模式" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/" rel="tag">design-pattern</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-db/transaction" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/10/01/db/transaction/" class="article-date">
+  <time class="dt-published" datetime="2021-10-01T15:44:01.000Z" itemprop="datePublished">2021-10-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/10/01/db/transaction/">数据库事务</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="显式事务与隐式事务"><a href="#显式事务与隐式事务" class="headerlink" title="显式事务与隐式事务"></a>显式事务与隐式事务</h2><ul>
+<li>对于单条SQL语句，数据库系统自动将其作为一个事务执行，这种事务被称为隐式事务</li>
+<li>手动把多条SQL语句作为一个事务执行，使用<code>BEGIN</code>开启一个事务，使用<code>COMMIT</code>提交一个事务，这种事务被称为显式事务</li>
+</ul>
+<h2 id="事务的四个特性"><a href="#事务的四个特性" class="headerlink" title="事务的四个特性"></a>事务的四个特性</h2><h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><p>将所有SQL作为原子工作单元执行，要么全部执行，要么全部不执行</p>
+<h3 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h3><p>事务完成后,数据状态的改变是一致的，结果是完整的</p>
+<h3 id="隔离性"><a href="#隔离性" class="headerlink" title="隔离性"></a>隔离性</h3><p>事务与事务试图操纵同样数据时，他们之间是互相隔离的<br>如果有多个事务并发执行，每个事务作出的修改必须与其他事务隔离</p>
+<h3 id="持久性"><a href="#持久性" class="headerlink" title="持久性"></a>持久性</h3><p>事务提交后，数据结果会永久保存，也即完成数据持久化，即使断电数据也已经保存</p>
+<h2 id="隔离级别与数据读取问题"><a href="#隔离级别与数据读取问题" class="headerlink" title="隔离级别与数据读取问题"></a>隔离级别与数据读取问题</h2><h3 id="脏读-Read-Uncommitted"><a href="#脏读-Read-Uncommitted" class="headerlink" title="脏读(Read Uncommitted)"></a>脏读(Read Uncommitted)</h3><p>在这种隔离级别下，一个事务会读到另一个事务更新后但未提交的数据，如果另一个事务回滚，那么当前事务读到的数据就是脏数据</p>
+<p>例如:<br>A事务修改了一条数据，但是未提交修改，此时A事务对数据的修改对其他事务是可见的，B事务中能够读取A事务未提交的修改。一旦A事务回滚，B事务中读取的就是不正确的数据</p>
+<h3 id="不可重复读-Read-Committed"><a href="#不可重复读-Read-Committed" class="headerlink" title="不可重复读(Read Committed)"></a>不可重复读(Read Committed)</h3><p>一个事务先后采用相同的策略读取数据，发现两次读取的数据不一致</p>
+<p>详细解释:在一个事务内，多次读同一数据，在这个事务还没有结束时，如果另一个事务恰好修改了这个数据，那么，在第一个事务中，两次读取的数据就可能不一致</p>
+<p>例如:</p>
+<ol>
+<li>A事务中读取一行数据</li>
+<li>B事务中修改了该行数据</li>
+<li>A事务中再次读取该行数据将得到不同的结果</li>
+</ol>
+<h3 id="幻读-Repeatable-Read"><a href="#幻读-Repeatable-Read" class="headerlink" title="幻读(Repeatable Read)"></a>幻读(Repeatable Read)</h3><p>一个事务按照相同的条件查询数据，却发现其他事务插入了满足其查询条件的数据</p>
+<p>详细解释:在一个事务中，第一次查询某条记录，发现没有，但是，当试图更新这条不存在的记录时，竟然能成功，并且，再次读取同一条记录，它就神奇地出现了</p>
+<p>例如:</p>
+<ol>
+<li>A事务中通过WHERE条件读取若干行</li>
+<li>B事务中插入了符合条件的若干条数据</li>
+<li>A事务中通过相同的条件再次读取数据时将会读取到B事务中插入的数据。</li>
+</ol>
+<p>此外隔离级别还有<code>Serializable</code>，最严格的隔离级别，但效率最低</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/1177760294764384/1179611198786848">事务</a></li>
+<li>MyBatis 3源码深度解析／江荣波</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/10/01/db/transaction/" data-id="clin7xb4b000gccon7e3le72c" data-title="数据库事务" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-jdbc/jdbc-study" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/10/01/jdbc/jdbc-study/" class="article-date">
+  <time class="dt-published" datetime="2021-10-01T02:21:51.000Z" itemprop="datePublished">2021-10-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jdbc/">jdbc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/10/01/jdbc/jdbc-study/">JDBC 学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="JDBC是什么"><a href="#JDBC是什么" class="headerlink" title="JDBC是什么"></a>JDBC是什么</h2><p>数据库有很多，如果想通过JAVA访问数据库，那么需要通过JDBC接口，借用厂商提供的数据库JDBC驱动来访问数据库</p>
+<p>JDBC驱动其实就是实现了JAVA接口的一组jar包</p>
+<h2 id="JDBC执行流程"><a href="#JDBC执行流程" class="headerlink" title="JDBC执行流程"></a>JDBC执行流程</h2><img class="kroki" src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXMtYXNjaWkiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBjb250ZW50U3R5bGVUeXBlPSJ0ZXh0L2NzcyIgaGVpZ2h0PSIyMTdweCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSIgc3R5bGU9IndpZHRoOjI2MnB4O2hlaWdodDoyMTdweDtiYWNrZ3JvdW5kOiNGRkZGRkY7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyNjIgMjE3IiB3aWR0aD0iMjYycHgiIHpvb21BbmRQYW49Im1hZ25pZnkiPjxkZWZzLz48Zz48cGF0aCBkPSJNMTA0LjUsMTUuNDE4IEwxMDQuNSwyMy45ODQ0IEw4NC41LDI3Ljk4NDQgTDEwNC41LDMxLjk4NDQgTDEwNC41LDQwLjU1MDggQTAsMCAwIDAgMCAxMDQuNSw0MC41NTA4IEwxOTcuNSw0MC41NTA4IEEwLDAgMCAwIDAgMTk3LjUsNDAuNTUwOCBMMTk3LjUsMjUuNDE4IEwxODcuNSwxNS40MTggTDEwNC41LDE1LjQxOCBBMCwwIDAgMCAwIDEwNC41LDE1LjQxOCAiIGZpbGw9IiNGRUZGREQiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MC41OyIvPjxwYXRoIGQ9Ik0xODcuNSwxNS40MTggTDE4Ny41LDI1LjQxOCBMMTk3LjUsMjUuNDE4IEwxODcuNSwxNS40MTggIiBmaWxsPSIjRkVGRkREIiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiLz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSI3MiIgeD0iMTEwLjUiIHk9IjMyLjQ4NDkiPkNvbm5lY3Rpb248L3RleHQ+PHJlY3QgZmlsbD0iI0YxRjFGMSIgaGVpZ2h0PSIzMy45Njg4IiByeD0iMTIuNSIgcnk9IjEyLjUiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MC41OyIgd2lkdGg9IjY4IiB4PSIxNi41IiB5PSIxMSIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjQ4IiB4PSIyNi41IiB5PSIzMi4xMzg3Ij4mIzMzNzE5OyYjMjQ0NzE7JiMzNjgzMDsmIzI1NTA5OzwvdGV4dD48cGF0aCBkPSJNMTEwLDY5LjM4NjcgTDExMCw3Ny45NTMxIEw5MCw4MS45NTMxIEwxMTAsODUuOTUzMSBMMTEwLDk0LjUxOTUgQTAsMCAwIDAgMCAxMTAsOTQuNTE5NSBMMjUwLDk0LjUxOTUgQTAsMCAwIDAgMCAyNTAsOTQuNTE5NSBMMjUwLDc5LjM4NjcgTDI0MCw2OS4zODY3IEwxMTAsNjkuMzg2NyBBMCwwIDAgMCAwIDExMCw2OS4zODY3ICIgZmlsbD0iI0ZFRkZERCIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDowLjU7Ii8+PHBhdGggZD0iTTI0MCw2OS4zODY3IEwyNDAsNzkuMzg2NyBMMjUwLDc5LjM4NjcgTDI0MCw2OS4zODY3ICIgZmlsbD0iI0ZFRkZERCIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDowLjU7Ii8+PHRleHQgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMiIGxlbmd0aEFkanVzdD0ic3BhY2luZyIgdGV4dExlbmd0aD0iMTE5IiB4PSIxMTYiIHk9Ijg2LjQ1MzYiPlByZXBhcmVTdGF0ZW1lbnQ8L3RleHQ+PHJlY3QgZmlsbD0iI0YxRjFGMSIgaGVpZ2h0PSIzMy45Njg4IiByeD0iMTIuNSIgcnk9IjEyLjUiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MC41OyIgd2lkdGg9Ijc5IiB4PSIxMSIgeT0iNjQuOTY4OCIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjU5IiB4PSIyMSIgeT0iODYuMTA3NCI+JiMzOTA0NDsmIzMyNTM0OyYjMzU3OTM7U1FMPC90ZXh0PjxyZWN0IGZpbGw9IiNGMUYxRjEiIGhlaWdodD0iMzMuOTY4OCIgcng9IjEyLjUiIHJ5PSIxMi41IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiIHdpZHRoPSI2OCIgeD0iMTYuNSIgeT0iMTE4LjkzNzUiLz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSI0OCIgeD0iMjYuNSIgeT0iMTQwLjA3NjIiPiYjMzU3NzQ7JiMzMjYyMjsmIzIxNDQyOyYjMjU5Njg7PC90ZXh0PjxwYXRoIGQ9Ik0xMDQsMTc3LjMyNDIgTDEwNCwxODUuODkwNiBMODQsMTg5Ljg5MDYgTDEwNCwxOTMuODkwNiBMMTA0LDIwMi40NTcgQTAsMCAwIDAgMCAxMDQsMjAyLjQ1NyBMMTg2LDIwMi40NTcgQTAsMCAwIDAgMCAxODYsMjAyLjQ1NyBMMTg2LDE4Ny4zMjQyIEwxNzYsMTc3LjMyNDIgTDEwNCwxNzcuMzI0MiBBMCwwIDAgMCAwIDEwNCwxNzcuMzI0MiAiIGZpbGw9IiNGRUZGREQiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MC41OyIvPjxwYXRoIGQ9Ik0xNzYsMTc3LjMyNDIgTDE3NiwxODcuMzI0MiBMMTg2LDE4Ny4zMjQyIEwxNzYsMTc3LjMyNDIgIiBmaWxsPSIjRkVGRkREIiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiLz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSI2MSIgeD0iMTEwIiB5PSIxOTQuMzkxMSI+UmVzdWx0U2V0PC90ZXh0PjxyZWN0IGZpbGw9IiNGMUYxRjEiIGhlaWdodD0iMzMuOTY4OCIgcng9IjEyLjUiIHJ5PSIxMi41IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiIHdpZHRoPSI2NyIgeD0iMTciIHk9IjE3Mi45MDYzIi8+PHRleHQgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGxlbmd0aEFkanVzdD0ic3BhY2luZyIgdGV4dExlbmd0aD0iNDciIHg9IjI3IiB5PSIxOTQuMDQ0OSI+JiMyNTE5MTsmIzM0ODkyO1NRTDwvdGV4dD48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSI1MC41IiB4Mj0iNTAuNSIgeTE9IjQ0Ljk2ODgiIHkyPSI2NC45Njg4Ii8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSI0Ni41LDU0Ljk2ODgsNTAuNSw2NC45Njg4LDU0LjUsNTQuOTY4OCw1MC41LDU4Ljk2ODgiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjUwLjUiIHgyPSI1MC41IiB5MT0iOTguOTM3NSIgeTI9IjExOC45Mzc1Ii8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSI0Ni41LDEwOC45Mzc1LDUwLjUsMTE4LjkzNzUsNTQuNSwxMDguOTM3NSw1MC41LDExMi45Mzc1IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSI1MC41IiB4Mj0iNTAuNSIgeTE9IjE1Mi45MDYzIiB5Mj0iMTcyLjkwNjMiLz48cG9seWdvbiBmaWxsPSIjMTgxODE4IiBwb2ludHM9IjQ2LjUsMTYyLjkwNjMsNTAuNSwxNzIuOTA2Myw1NC41LDE2Mi45MDYzLDUwLjUsMTY2LjkwNjMiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIvPjwhLS1TUkM9W2l0aEhqX3RmbGthbHppenhyaFZLY1lpbGxvSExlSVdwRlFFNElxNzFFSnlsQnBNdjkzQ19ab2lyQnFLMTlDVGJ6TjlIb19DenFyd2lkbldTdzhFY0ZnMGVqSTJuQTNNdTlCNGFESlNyaG1IOXJ1anItdnhsTlZVcWwtZFByMHRNTjVSRkVmVV9NRFkzUUs5R1FkNWZKYWJtQWY5TTAwMDBdLS0+PC9nPjwvc3ZnPg=='>
+
+<h2 id="JDBC-API简介"><a href="#JDBC-API简介" class="headerlink" title="JDBC API简介"></a>JDBC API简介</h2><h3 id="建立数据源连接"><a href="#建立数据源连接" class="headerlink" title="建立数据源连接"></a>建立数据源连接</h3><ul>
+<li>DriverManager 完全由JDBC API实现的驱动管理类</li>
+<li>DataSource 更灵活,由JDBC驱动程序提供<ul>
+<li>ConnectionPoolDataSource 支持缓存和复用Connection对象，这样能够在很大程度上提升应用性能和伸缩性。</li>
+<li>XADataSource 该实例返回的Connection对象能够支持分布式事务。</li>
+</ul>
+</li>
+</ul>
+<h3 id="执行SQL语句"><a href="#执行SQL语句" class="headerlink" title="执行SQL语句"></a>执行SQL语句</h3><p>调用ResultSet对象的getMetaData()方法获取结果集元数据信息。该方法返回一个ResultSetMetaData对象，我们可以通过ResultSetMetaData对象获取结果集中所有的字段名称、字段数量、字段数据类型等信息</p>
+<h3 id="java-sql包"><a href="#java-sql包" class="headerlink" title="java.sql包"></a>java.sql包</h3><p><img src="/assets/images/jdbc/jdbc-study/java.sql%E6%A0%B8%E5%BF%83%E7%B1%BB%E5%85%B3%E7%B3%BB.png" alt="java.sql核心类关系,来自MyBatis 3源码深度解析／江荣波"></p>
+<h4 id="Wrapper"><a href="#Wrapper" class="headerlink" title="Wrapper"></a>Wrapper</h4><p>许多JDBC驱动程序提供超越传统JDBC的扩展，为了符合JDBC API规范，驱动厂商可能会在原始类型的基础上进行包装，Wrapper接口为使用JDBC的应用程序提供访问原始类型的功能，从而使用JDBC驱动中一些非标准的特性</p>
+<ul>
+<li>unwrap()方法用于返回未经过包装的JDBC驱动原始类型实例，我们可以通过该实例调用JDBC驱动中提供的非标准的方法</li>
+<li>isWrapperFor()方法用于判断当前实例是否是JDBC驱动中某一类型的包装类型</li>
+</ul>
+<p>例如:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">Statement</span> <span class="variable">statement</span> <span class="operator">=</span> connection.createStatement();</span><br><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forname(<span class="string">&quot;oracle.jdbc.OracleStatement&quot;</span>);</span><br><span class="line"><span class="keyword">if</span>(statement.isWrapperFor(clazz))&#123;</span><br><span class="line">  <span class="type">OracleStatement</span> <span class="variable">oracleStatement</span> <span class="operator">=</span> (OracleStatement)stmt.unwrap(clazz);</span><br><span class="line">  <span class="comment">// do otherthing</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="javax-sql包"><a href="#javax-sql包" class="headerlink" title="javax.sql包"></a>javax.sql包</h3><ul>
+<li>DataSource接口<br>无需像DriverManager似的硬编码</li>
+<li>PooledConnection接口<br>连接复用</li>
+<li>XADataSource、XAResource和XAConnection接口<br>分布式事务支持</li>
+<li>RowSet接口<br>RowSet就相当于数据库表数据在应用程序内存中的映射</li>
+</ul>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><h3 id="通过JDBC访问MySql"><a href="#通过JDBC访问MySql" class="headerlink" title="通过JDBC访问MySql"></a>通过JDBC访问MySql</h3><p><strong>环境声明:</strong></p>
+<ul>
+<li>mysql数据库地址:10.88.88.2:3306</li>
+<li>mysql版本(<code>select version()</code>):8.0.26</li>
+</ul>
+<h4 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h4><p>1.新建一个空的maven工程，pom中引入最新的<code>mysql-connector-java</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.0.26<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- scope为runtime,避免编写时与java自带jdbc接口混淆 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>2.数据库初始化</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建数据库learjdbc:</span></span><br><span class="line"><span class="keyword">DROP</span> DATABASE IF <span class="keyword">EXISTS</span> learnjdbc;</span><br><span class="line"><span class="keyword">CREATE</span> DATABASE learnjdbc;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 创建登录用户learn/口令learnpassword</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> IF <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> learn@<span class="string">&#x27;%&#x27;</span> IDENTIFIED <span class="keyword">BY</span> <span class="string">&#x27;learnpassword&#x27;</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> PRIVILEGES <span class="keyword">ON</span> learnjdbc.<span class="operator">*</span> <span class="keyword">TO</span> learn@<span class="string">&#x27;%&#x27;</span> <span class="keyword">WITH</span> <span class="keyword">GRANT</span> OPTION;</span><br><span class="line">FLUSH PRIVILEGES;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 创建表students:</span></span><br><span class="line">USE learnjdbc;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> students (</span><br><span class="line">  id <span class="type">BIGINT</span> AUTO_INCREMENT <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  gender TINYINT(<span class="number">1</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  grade <span class="type">INT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  score <span class="type">INT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY(id)</span><br><span class="line">) Engine<span class="operator">=</span>INNODB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>UTF8;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入初始数据:</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小明&#x27;</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">88</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小红&#x27;</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">95</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小军&#x27;</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">93</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小白&#x27;</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">100</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小牛&#x27;</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">96</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小兵&#x27;</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">99</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小强&#x27;</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">86</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小乔&#x27;</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">79</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小青&#x27;</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">85</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小王&#x27;</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">90</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小林&#x27;</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">91</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (name, gender, grade, score) <span class="keyword">VALUES</span> (<span class="string">&#x27;小贝&#x27;</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">77</span>);</span><br></pre></td></tr></table></figure>
+
+<p>3.测试连接</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">JDBC_URL</span> <span class="operator">=</span> <span class="string">&quot;jdbc:mysql://10.88.88.2:3306/learnjdbc?useSSL=false&amp;characterEncoding=utf8&amp;allowPublicKeyRetrieval=true&quot;</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">JDBC_USER</span> <span class="operator">=</span> <span class="string">&quot;learn&quot;</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">JDBC_PASSWORD</span> <span class="operator">=</span> <span class="string">&quot;learnpassword&quot;</span>;</span><br><span class="line"><span class="type">Connection</span> <span class="variable">connection</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);</span><br><span class="line">&#125; <span class="keyword">catch</span> (SQLException throwables) &#123;</span><br><span class="line">    throwables.printStackTrace();</span><br><span class="line">&#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="literal">null</span> != connection)&#123;</span><br><span class="line">        connection.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>4.问题解决</p>
+<ul>
+<li>Public Key Retrieval is not allowed</li>
+</ul>
+<p>连接后面添加<code>allowPublicKeyRetrieval=true</code><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u013360850/article/details/80373604">MySQL 8.0 Public Key Retrieval is not allowed 错误的解决方法</a></p>
+<ul>
+<li>Access denied for user ‘learn‘@’172.17.0.1’ (using password: YES)</li>
+</ul>
+<p>密码错了,仔细检查java代码中的密码</p>
+<h4 id="JDBC查询"><a href="#JDBC查询" class="headerlink" title="JDBC查询"></a>JDBC查询</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ResultSet</span> <span class="variable">resultSet</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">try</span> (<span class="type">Connection</span> <span class="variable">connection</span> <span class="operator">=</span> DriverManager.getConnection(JDBCConstant.JDBC_URL,JDBCConstant.JDBC_USER,JDBCConstant.JDBC_PASSWORD);</span><br><span class="line">      <span class="type">PreparedStatement</span> <span class="variable">preparedStatement</span> <span class="operator">=</span> connection.prepareStatement(<span class="string">&quot;SELECT id, grade, name, gender FROM students WHERE gender=?&quot;</span>))&#123;</span><br><span class="line">    preparedStatement.setObject(<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line">    resultSet = preparedStatement.executeQuery();</span><br><span class="line">    <span class="keyword">while</span> (resultSet.next())&#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">id</span> <span class="operator">=</span> resultSet.getLong(<span class="number">1</span>); <span class="comment">// 注意：索引从1开始</span></span><br><span class="line">        <span class="type">long</span> <span class="variable">grade</span> <span class="operator">=</span> resultSet.getLong(<span class="number">2</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> resultSet.getString(<span class="number">3</span>);</span><br><span class="line">        <span class="type">int</span> <span class="variable">gender</span> <span class="operator">=</span> resultSet.getInt(<span class="number">4</span>);</span><br><span class="line">        System.out.println(String.format(<span class="string">&quot;id:%s grade:%s name:%s gender:%s&quot;</span>,id,grade,name,gender));</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">catch</span> (SQLException throwables) &#123;</span><br><span class="line">    throwables.printStackTrace();</span><br><span class="line">&#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="literal">null</span> != resultSet)&#123;</span><br><span class="line">        resultSet.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用<code>PreparedStatement</code>,这样它会自动帮我们进行’转义’功能,防止SQL注入</p>
+<h4 id="JDBC更新"><a href="#JDBC更新" class="headerlink" title="JDBC更新"></a>JDBC更新</h4><h5 id="JDBC插入"><a href="#JDBC插入" class="headerlink" title="JDBC插入"></a>JDBC插入</h5><ul>
+<li>插入时附带主键id</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (<span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> DriverManager.getConnection(JDBCConstant.JDBC_URL, JDBCConstant.JDBC_USER, JDBCConstant.JDBC_PASSWORD);</span><br><span class="line">  <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> conn.prepareStatement(<span class="string">&quot;INSERT INTO students (id, grade, name, gender, score) VALUES (?,?,?,?,?)&quot;</span>))&#123;</span><br><span class="line">  <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">  ps.setObject(index++, <span class="number">999</span>); <span class="comment">// 注意：索引从1开始</span></span><br><span class="line">  ps.setObject(index++, <span class="number">1</span>); <span class="comment">// grade</span></span><br><span class="line">  ps.setObject(index++, <span class="string">&quot;Bob&quot;</span>); <span class="comment">// name</span></span><br><span class="line">  ps.setObject(index++, <span class="number">0</span>); <span class="comment">// gender</span></span><br><span class="line">  ps.setObject(index++, <span class="number">100</span>); <span class="comment">// score</span></span><br><span class="line">  <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> ps.executeUpdate(); <span class="comment">// 1</span></span><br><span class="line">  System.out.println(String.format(<span class="string">&quot;flag:%s&quot;</span>,n));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用数据库自动生成id</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (<span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> DriverManager.getConnection(JDBCConstant.JDBC_URL, JDBCConstant.JDBC_USER, JDBCConstant.JDBC_PASSWORD);</span><br><span class="line">    <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> conn.prepareStatement(<span class="string">&quot;INSERT INTO students (grade, name, gender, score) VALUES (?,?,?,?)&quot;</span>, Statement.RETURN_GENERATED_KEYS))&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    ps.setObject(index++, <span class="number">2</span>); <span class="comment">// grade</span></span><br><span class="line">    ps.setObject(index++, <span class="string">&quot;Bob2&quot;</span>); <span class="comment">// name</span></span><br><span class="line">    ps.setObject(index++, <span class="number">0</span>); <span class="comment">// gender</span></span><br><span class="line">    ps.setObject(index++, <span class="number">90</span>); <span class="comment">// score</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> ps.executeUpdate(); <span class="comment">// 1</span></span><br><span class="line">    System.out.println(String.format(<span class="string">&quot;flag:%s&quot;</span>,n));</span><br><span class="line">    <span class="comment">// 通过`getGeneratedKeys`获取自动生成的id</span></span><br><span class="line">    <span class="keyword">try</span> (<span class="type">ResultSet</span> <span class="variable">resultSet</span> <span class="operator">=</span> ps.getGeneratedKeys()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (resultSet.next())&#123;</span><br><span class="line">            <span class="type">long</span> <span class="variable">id</span> <span class="operator">=</span> resultSet.getLong(<span class="number">1</span>);</span><br><span class="line">            System.out.println(String.format(<span class="string">&quot;id:%s&quot;</span>,id));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="JDBC更新-1"><a href="#JDBC更新-1" class="headerlink" title="JDBC更新"></a>JDBC更新</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (<span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> DriverManager.getConnection(JDBCConstant.JDBC_URL, JDBCConstant.JDBC_USER, JDBCConstant.JDBC_PASSWORD);</span><br><span class="line"><span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> conn.prepareStatement(<span class="string">&quot;UPDATE students SET name=? WHERE id=?&quot;</span>))&#123;</span><br><span class="line">  <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">  ps.setObject(index++, <span class="string">&quot;Bob&quot;</span>); <span class="comment">// 注意：索引从1开始</span></span><br><span class="line">  ps.setObject(index++, <span class="number">999</span>);</span><br><span class="line">  <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> ps.executeUpdate(); <span class="comment">// 返回更新的行数</span></span><br><span class="line">  System.out.println(String.format(<span class="string">&quot;更新的行数:%s&quot;</span>,n));</span><br><span class="line">&#125; <span class="keyword">catch</span> (SQLException throwables) &#123;</span><br><span class="line">    throwables.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="JDBC删除"><a href="#JDBC删除" class="headerlink" title="JDBC删除"></a>JDBC删除</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (<span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> DriverManager.getConnection(JDBCConstant.JDBC_URL, JDBCConstant.JDBC_USER, JDBCConstant.JDBC_PASSWORD);</span><br><span class="line"><span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> conn.prepareStatement(<span class="string">&quot;DELETE FROM students WHERE id=?&quot;</span>))&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    ps.setObject(index++, <span class="number">999</span>); <span class="comment">// 注意：索引从1开始</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> ps.executeUpdate(); <span class="comment">// 删除的行数</span></span><br><span class="line">    System.out.println(String.format(<span class="string">&quot;删除的行数:%s&quot;</span>,n));</span><br><span class="line">&#125; <span class="keyword">catch</span> (SQLException throwables) &#123;</span><br><span class="line">    throwables.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="JDBC事务"><a href="#JDBC事务" class="headerlink" title="JDBC事务"></a>JDBC事务</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="type">Connection</span> <span class="variable">connection</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    connection = DriverManager.getConnection(JDBCConstant.JDBC_URL,JDBCConstant.JDBC_USER,JDBCConstant.JDBC_PASSWORD);</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">autoCommit</span> <span class="operator">=</span> connection.getAutoCommit();</span><br><span class="line">    System.out.println(String.format(<span class="string">&quot;autoCommit:%s&quot;</span>,autoCommit));</span><br><span class="line">    connection.setAutoCommit(<span class="literal">false</span>);</span><br><span class="line">    ps = connection.prepareStatement(<span class="string">&quot;UPDATE students SET name=? WHERE id=?&quot;</span>);</span><br><span class="line">    <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    ps.setObject(index++, <span class="string">&quot;Bob&quot;</span>); <span class="comment">// 注意：索引从1开始</span></span><br><span class="line">    ps.setObject(index++, <span class="number">999</span>);</span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> ps.executeUpdate(); <span class="comment">// 返回更新的行数</span></span><br><span class="line">    System.out.println(String.format(<span class="string">&quot;更新的行数:%s&quot;</span>,n));</span><br><span class="line">    ps.close();</span><br><span class="line">    ps = connection.prepareStatement(<span class="string">&quot;UPDATE students SET name=? WHERE id=?&quot;</span>);</span><br><span class="line">    index = <span class="number">1</span>;</span><br><span class="line">    ps.setObject(index++, <span class="string">&quot;Bob999&quot;</span>); <span class="comment">// 注意：索引从1开始</span></span><br><span class="line">    ps.setObject(index++, <span class="number">999</span>);</span><br><span class="line">    n = ps.executeUpdate(); <span class="comment">// 返回更新的行数</span></span><br><span class="line">    System.out.println(String.format(<span class="string">&quot;更新的行数:%s&quot;</span>,n));</span><br><span class="line">    connection.commit();</span><br><span class="line">    connection.setAutoCommit(<span class="literal">true</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (SQLException throwables) &#123;</span><br><span class="line">    connection.rollback();</span><br><span class="line">    throwables.printStackTrace();</span><br><span class="line">&#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="literal">null</span> != connection)&#123;</span><br><span class="line">        connection.close();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(<span class="literal">null</span> != ps)&#123;</span><br><span class="line">        ps.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="JDBC-Batch"><a href="#JDBC-Batch" class="headerlink" title="JDBC Batch"></a>JDBC Batch</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (<span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> conn.prepareStatement(<span class="string">&quot;INSERT INTO students (name, gender, grade, score) VALUES (?, ?, ?, ?)&quot;</span>)) &#123;</span><br><span class="line">    <span class="comment">// 对同一个PreparedStatement反复设置参数并调用addBatch():</span></span><br><span class="line">    <span class="keyword">for</span> (Student s : students) &#123;</span><br><span class="line">        ps.setString(<span class="number">1</span>, s.name);</span><br><span class="line">        ps.setBoolean(<span class="number">2</span>, s.gender);</span><br><span class="line">        ps.setInt(<span class="number">3</span>, s.grade);</span><br><span class="line">        ps.setInt(<span class="number">4</span>, s.score);</span><br><span class="line">        ps.addBatch(); <span class="comment">// 添加到batch</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 执行batch:</span></span><br><span class="line">    <span class="type">int</span>[] ns = ps.executeBatch();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> n : ns) &#123;</span><br><span class="line">        System.out.println(n + <span class="string">&quot; inserted.&quot;</span>); <span class="comment">// batch中每个SQL执行的结果数量</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="JDBC-连接池"><a href="#JDBC-连接池" class="headerlink" title="JDBC 连接池"></a>JDBC 连接池</h4><p>这里使用<a target="_blank" rel="noopener" href="https://github.com/brettwooldridge/HikariCP#artifacts">HikariCP</a></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.zaxxer<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>HikariCP<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.0.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ResultSet</span> <span class="variable">resultSet</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="type">DataSource</span> <span class="variable">dataSource</span> <span class="operator">=</span> JDBCConstant.getDataSource();</span><br><span class="line"><span class="keyword">try</span> (<span class="type">Connection</span> <span class="variable">connection</span> <span class="operator">=</span> dataSource.getConnection();</span><br><span class="line">      <span class="type">PreparedStatement</span> <span class="variable">preparedStatement</span> <span class="operator">=</span> connection.prepareStatement(<span class="string">&quot;SELECT id, grade, name, gender FROM students WHERE gender=?&quot;</span>))&#123;</span><br><span class="line">    preparedStatement.setObject(<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line">    resultSet = preparedStatement.executeQuery();</span><br><span class="line">    <span class="keyword">while</span> (resultSet.next())&#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">id</span> <span class="operator">=</span> resultSet.getLong(<span class="number">1</span>); <span class="comment">// 注意：索引从1开始</span></span><br><span class="line">        <span class="type">long</span> <span class="variable">grade</span> <span class="operator">=</span> resultSet.getLong(<span class="number">2</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> resultSet.getString(<span class="number">3</span>);</span><br><span class="line">        <span class="type">int</span> <span class="variable">gender</span> <span class="operator">=</span> resultSet.getInt(<span class="number">4</span>);</span><br><span class="line">        System.out.println(String.format(<span class="string">&quot;id:%s grade:%s name:%s gender:%s&quot;</span>,id,grade,name,gender));</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">catch</span> (SQLException throwables) &#123;</span><br><span class="line">    throwables.printStackTrace();</span><br><span class="line">&#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="literal">null</span> != resultSet)&#123;</span><br><span class="line">        resultSet.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>1.<a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/1252599548343744/1255943820274272">JDBC编程</a><br>2.<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Tp4y1X7FM">MyBatis源码解析大合集</a><br>3.MyBatis 3源码深度解析／江荣波</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/10/01/jdbc/jdbc-study/" data-id="clin7xb4t001bccon9m2kbc7h" data-title="JDBC 学习" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-vue/add_jest_test" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/25/vue/add_jest_test/" class="article-date">
+  <time class="dt-published" datetime="2021-09-25T01:23:19.000Z" itemprop="datePublished">2021-09-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/vue2/">vue2</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/09/25/vue/add_jest_test/">为VUE2工程添加JEST单元测试</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>现有一vue2工程(vue初始化工程,仅有<code>HelloWorld.vue</code>)，需要给它添加jest单元测试</p>
+<h2 id="添加unit-jest"><a href="#添加unit-jest" class="headerlink" title="添加unit-jest"></a>添加unit-jest</h2><p>使用命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vue add unit-jest</span><br></pre></td></tr></table></figure>
+
+<p>给已有的工程添加单元测试</p>
+<p><strong>测试</strong></p>
+<p>可以观察到命令执行完成后</p>
+<ol>
+<li>会在<code>src/tests/unit</code>产生一个<code>example.spec.js</code>的文件,这个是测试<code>HelloWorld.vue</code>这个单VUE组件的</li>
+<li><code>package.json</code>的<code>devDependencies</code>中会添加涉及vue jest的依赖，<code>scripts</code>中会添加一个新的<code>test:unit</code>的命令</li>
+</ol>
+<p>使用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run <span class="built_in">test</span>:unit</span><br></pre></td></tr></table></figure>
+
+<p>就可以单测<code>HelloWorld.vue</code>，这个组件</p>
+<h2 id="部分特殊处理"><a href="#部分特殊处理" class="headerlink" title="部分特殊处理"></a>部分特殊处理</h2><h3 id="针对webpack路径别名的配置"><a href="#针对webpack路径别名的配置" class="headerlink" title="针对webpack路径别名的配置"></a>针对webpack路径别名的配置</h3><p>经过我的实测，<code>jest</code>单测是支持<code>@</code>路径别名的(得益于<code>node_modules\@vue\cli-service\lib\config\base.js</code>)<br>但是针对其他的别名，<code>jest</code>就不怎么支持了，需要我们自行配置。例如:</p>
+<p><code>vue.config.js</code>中配置了如下别名:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&quot;path&quot;</span>);</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">resolve</span>(<span class="params">dir</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> path.<span class="title function_">join</span>(__dirname, dir);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">  <span class="attr">chainWebpack</span>: <span class="function"><span class="params">config</span> =&gt;</span> &#123;</span><br><span class="line">    config.<span class="property">resolve</span>.<span class="property">alias</span></span><br><span class="line">      .<span class="title function_">set</span>(<span class="string">&quot;assets&quot;</span>, <span class="title function_">resolve</span>(<span class="string">&quot;src/assets&quot;</span>))</span><br><span class="line">      .<span class="title function_">set</span>(<span class="string">&quot;components&quot;</span>, <span class="title function_">resolve</span>(<span class="string">&quot;src/components&quot;</span>))</span><br><span class="line">      .<span class="title function_">set</span>(<span class="string">&quot;public&quot;</span>, <span class="title function_">resolve</span>(<span class="string">&quot;public&quot;</span>));</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么在<code>jest.config.js</code>中需要配置<code>moduleNameMapper</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">  <span class="attr">moduleNameMapper</span>: &#123;</span><br><span class="line">    <span class="string">&quot;^assets(.*)$&quot;</span>: <span class="string">&quot;&lt;rootDir&gt;/src/assets$1&quot;</span>,</span><br><span class="line">    <span class="string">&quot;^components(.*)$&quot;</span>: <span class="string">&quot;&lt;rootDir&gt;/src/components$1&quot;</span>,</span><br><span class="line">    <span class="string">&quot;^public(.*)$&quot;</span>: <span class="string">&quot;&lt;rootDir&gt;/public$1&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="针对引入的样式文件与css模块"><a href="#针对引入的样式文件与css模块" class="headerlink" title="针对引入的样式文件与css模块"></a>针对引入的样式文件与css模块</h3><p>根据vue-test-utils官网<a target="_blank" rel="noopener" href="https://vue-test-utils.vuejs.org/guides/#detecting-styles">介绍</a>，当运行在jsdom上时，只能探测到内联样式</p>
+<p>我们有以下组件:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;msg&quot;</span> <span class="attr">style</span>=<span class="string">&quot;color:green;&quot;</span>&gt;</span></span><br><span class="line">    &#123;&#123;msg&#125;&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> <span class="string">&#x27;@/src/css/style-msg.css&#x27;</span></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="language-javascript">  <span class="attr">name</span>: <span class="string">&#x27;StyleMsg&#x27;</span>,</span></span><br><span class="line"><span class="language-javascript">  <span class="attr">props</span>: &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">msg</span>:&#123;</span></span><br><span class="line"><span class="language-javascript">      <span class="attr">type</span>:<span class="title class_">String</span>,</span></span><br><span class="line"><span class="language-javascript">      <span class="attr">default</span>:<span class="string">&#x27;&#x27;</span></span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript">  &#125;</span></span><br><span class="line"><span class="language-javascript">&#125;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>当单元测试的组件中有引入的css样式时，可以这么做<a target="_blank" rel="noopener" href="https://jestjs.io/docs/webpack#mocking-css-modules">忽略样式配置</a></p>
+<p>这么做是模拟了css的处理，本质还是没有引入样式</p>
+<p>参考:</p>
+<p><a target="_blank" rel="noopener" href="https://jestjs.io/zh-Hans/docs/webpack">使用 webpack</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/25/vue/add_jest_test/" data-id="clin7xb5j0038ccon7doy0e6u" data-title="为VUE2工程添加JEST单元测试" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jest-Test/" rel="tag">jest Test</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue2/" rel="tag">vue2</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-jeecg/online-form-dev/about_form_table" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/11/jeecg/online-form-dev/about_form_table/" class="article-date">
+  <time class="dt-published" datetime="2021-09-11T12:28:02.000Z" itemprop="datePublished">2021-09-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jeecg/">jeecg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/09/11/jeecg/online-form-dev/about_form_table/">jeecg 2.4.6 Online表单开发 数据库配置+crud</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="表单保存"><a href="#表单保存" class="headerlink" title="表单保存"></a>表单保存</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/editAll</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>PUT</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> <span class="string">&quot;head&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;id&quot;</span>: <span class="string">&quot;3d028152d85948a8b021aa8f13088dcd&quot;</span>,</span><br><span class="line">  <span class="string">&quot;tableName&quot;</span>: <span class="string">&quot;flcm_product&quot;</span>,</span><br><span class="line">  <span class="string">&quot;tableType&quot;</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="string">&quot;tableVersion&quot;</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="string">&quot;tableTxt&quot;</span>: <span class="string">&quot;基金产品&quot;</span>,</span><br><span class="line">  <span class="string">&quot;isCheckbox&quot;</span>: <span class="string">&quot;Y&quot;</span>,</span><br><span class="line">  <span class="string">&quot;isDbSynch&quot;</span>: <span class="string">&quot;N&quot;</span>,</span><br><span class="line">  <span class="string">&quot;isPage&quot;</span>: <span class="string">&quot;Y&quot;</span>,</span><br><span class="line">  <span class="string">&quot;isTree&quot;</span>: <span class="string">&quot;N&quot;</span>,</span><br><span class="line">  <span class="string">&quot;idSequence&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;idType&quot;</span>: <span class="string">&quot;UUID&quot;</span>,</span><br><span class="line">  <span class="string">&quot;queryMode&quot;</span>: <span class="string">&quot;single&quot;</span>,</span><br><span class="line">  <span class="string">&quot;relationType&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;subTableStr&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;tabOrderNum&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;treeParentIdField&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;treeIdField&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;treeFieldname&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;formCategory&quot;</span>: <span class="string">&quot;bdfl_include&quot;</span>,</span><br><span class="line">  <span class="string">&quot;formTemplate&quot;</span>: <span class="string">&quot;1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;themeTemplate&quot;</span>: <span class="string">&quot;normal&quot;</span>,</span><br><span class="line">  <span class="string">&quot;formTemplateMobile&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;extConfigJson&quot;</span>: <span class="string">&quot;&#123;\&quot;reportPrintShow\&quot;:0,\&quot;reportPrintUrl\&quot;:\&quot;\&quot;,\&quot;joinQuery\&quot;:0,\&quot;modelFullscreen\&quot;:0,\&quot;modalMinWidth\&quot;:\&quot;\&quot;&#125;&quot;</span>,</span><br><span class="line">  <span class="string">&quot;updateBy&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;updateTime&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;createBy&quot;</span>: <span class="string">&quot;admin&quot;</span>,</span><br><span class="line">  <span class="string">&quot;createTime&quot;</span>: <span class="string">&quot;2021-09-11 20:04:12&quot;</span>,</span><br><span class="line">  <span class="string">&quot;copyType&quot;</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">&quot;copyVersion&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;physicId&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;hascopy&quot;</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">&quot;scroll&quot;</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="string">&quot;taskId&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;isDesForm&quot;</span>: <span class="string">&quot;N&quot;</span>,</span><br><span class="line">  <span class="string">&quot;desFormCode&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line"> &#125;,</span><br><span class="line"> <span class="string">&quot;fields&quot;</span>: [</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="string">&quot;id&quot;</span>: <span class="string">&quot;eed836ca2e974802caa1d6b98e3f4333&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbFieldName&quot;</span>: <span class="string">&quot;id&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbFieldTxt&quot;</span>: <span class="string">&quot;主键&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryDictField&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryDictText&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryDefVal&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryDictTable&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryConfigFlag&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;mainTable&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;mainField&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldHref&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dictField&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dictText&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldMustInput&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dictTable&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldLength&quot;</span>: <span class="string">&quot;120&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldDefaultValue&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldExtendJson&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;converter&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;isShowForm&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;isShowList&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;sortFlag&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;isReadOnly&quot;</span>: <span class="string">&quot;1&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldShowType&quot;</span>: <span class="string">&quot;text&quot;</span>,</span><br><span class="line">   <span class="string">&quot;isQuery&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryMode&quot;</span>: <span class="string">&quot;single&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbLength&quot;</span>: <span class="string">&quot;36&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbPointLength&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbDefaultVal&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;orderNum&quot;</span>: <span class="number">1</span>,</span><br><span class="line">   <span class="string">&quot;dbType&quot;</span>: <span class="string">&quot;string&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbIsKey&quot;</span>: <span class="string">&quot;1&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbIsNull&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;order_num&quot;</span>: <span class="number">0</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 其他字段舍弃</span></span><br><span class="line"> ],</span><br><span class="line"> <span class="string">&quot;indexs&quot;</span>: [</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="string">&quot;id&quot;</span>: <span class="string">&quot;c92fd1cd8c8f1aaa264ee628e8b73f97&quot;</span>,</span><br><span class="line">   <span class="string">&quot;indexName&quot;</span>: <span class="string">&quot;uk_code&quot;</span>,</span><br><span class="line">   <span class="string">&quot;indexField&quot;</span>: <span class="string">&quot;code&quot;</span>,</span><br><span class="line">   <span class="string">&quot;indexType&quot;</span>: <span class="string">&quot;unique&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line"> ],</span><br><span class="line"> <span class="string">&quot;deleteFieldIds&quot;</span>: [],</span><br><span class="line"> <span class="string">&quot;deleteIndexIds&quot;</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#b(org.jeecg.modules.online.cgform.model.a)</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据库同步"><a href="#数据库同步" class="headerlink" title="数据库同步"></a>数据库同步</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/doDbSynch/3d028152d85948a8b021aa8f13088dcd/normal</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code,<code>normal</code>是同步方式</p>
+<p><code>normal</code>:普通同步,<code>force</code>:强制同步,这两个同步方式的唯一区别是是否产生<code>drop</code>语句</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>POST</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<p>无</p>
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#h</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据增加"><a href="#数据增加" class="headerlink" title="数据增加"></a>数据增加</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/form/3d028152d85948a8b021aa8f13088dcd?tabletype=1</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>POST</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;name&quot;</span>:<span class="string">&quot;产品名称TEST#1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;code&quot;</span>:<span class="string">&quot;产品代码TEST#1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;duration&quot;</span>:<span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#a(java.lang.String, com.alibaba.fastjson.JSONObject, javax.servlet.http.HttpServletRequest)</span><br></pre></td></tr></table></figure>
+
+<p>这里其实就是根据配置生成<code>insert</code>语句</p>
+<h2 id="数据删除"><a href="#数据删除" class="headerlink" title="数据删除"></a>数据删除</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/form/3d028152d85948a8b021aa8f13088dcd/1436700316685357058</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code,<code>1436700316685357058</code>是数据id</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>DELETE</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<p>无</p>
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#f</span><br></pre></td></tr></table></figure>
+
+<p>这里其实就是根据配置生成<code>delete</code>语句&#x2F;或逻辑删除</p>
+<h2 id="数据修改"><a href="#数据修改" class="headerlink" title="数据修改"></a>数据修改</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/form/3d028152d85948a8b021aa8f13088dcd?tabletype=1</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>PUT</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;duration&quot;</span>:<span class="number">123</span>,</span><br><span class="line">  <span class="string">&quot;code&quot;</span>:<span class="string">&quot;code&quot;</span>,</span><br><span class="line">  <span class="string">&quot;name&quot;</span>:<span class="string">&quot;name&quot;</span>,</span><br><span class="line">  <span class="string">&quot;id&quot;</span>:<span class="string">&quot;1437763464737640449&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#a(java.lang.String, com.alibaba.fastjson.JSONObject)</span><br></pre></td></tr></table></figure>
+
+<p>这里其实就是根据配置生成<code>update</code>语句</p>
+<h2 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/form/3d028152d85948a8b021aa8f13088dcd?tabletype=1</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>PUT</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_t=<span class="number">1631624511</span>&amp;column=id&amp;order=desc&amp;pageNo=<span class="number">1</span>&amp;pageSize=<span class="number">10</span>&amp;superQueryMatchType=and</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#a(java.lang.String, javax.servlet.http.HttpServletRequest)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/11/jeecg/online-form-dev/about_form_table/" data-id="clin7xb5l003dccon3kymennk" data-title="jeecg 2.4.6 Online表单开发 数据库配置+crud" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/online-form/" rel="tag">online-form</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-form-making/analyse_form_making" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/11/form-making/analyse_form_making/" class="article-date">
+  <time class="dt-published" datetime="2021-09-11T00:54:11.000Z" itemprop="datePublished">2021-09-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/vue-form-making/">vue-form-making</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/09/11/form-making/analyse_form_making/">开源项目vue-form-making分析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://github.com/GavinZhuLei/vue-form-making">vue-form-making</a>是基于 vue2 和 element-ui 实现的可视化表单设计器。<br>其分为开源版本与收费版本。本文仅分析他的开源版本。分析版本为:<code>1.2.10</code></p>
+<p><img src="/assets/images/vue-form-making/%E7%95%8C%E9%9D%A2%E9%A2%84%E8%A7%88.png" alt="界面预览"></p>
+<h2 id="界面结构"><a href="#界面结构" class="headerlink" title="界面结构"></a>界面结构</h2><p><a href="/assets/drawio/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E7%95%8C%E9%9D%A2%E7%BB%93%E6%9E%84.drawio"><img src="/assets/images/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E7%95%8C%E9%9D%A2%E7%BB%93%E6%9E%84.drawio.png" alt="表单设计器界面结构.drawio.png"></a></p>
+<h2 id="名称与文件路径关系"><a href="#名称与文件路径关系" class="headerlink" title="名称与文件路径关系"></a>名称与文件路径关系</h2><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>对应文件路径</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Container</td>
+<td>&#x2F;src&#x2F;components&#x2F;Container.vue</td>
+</tr>
+<tr>
+<td>WidgetConfig</td>
+<td>&#x2F;src&#x2F;components&#x2F;WidgetConfig.vue</td>
+</tr>
+<tr>
+<td>FormConfig</td>
+<td>&#x2F;src&#x2F;components&#x2F;FormConfig.vue</td>
+</tr>
+<tr>
+<td>WidgetForm</td>
+<td>&#x2F;src&#x2F;components&#x2F;WidgetForm.vue</td>
+</tr>
+<tr>
+<td>WidgetFormItem</td>
+<td>&#x2F;src&#x2F;components&#x2F;WidgetFormItem.vue</td>
+</tr>
+<tr>
+<td>GenerateForm</td>
+<td>&#x2F;src&#x2F;components&#x2F;GenerateForm.vue</td>
+</tr>
+<tr>
+<td>GenerateFormItem</td>
+<td>&#x2F;src&#x2F;components&#x2F;GenerateFormItem.vue</td>
+</tr>
+</tbody></table>
+<h2 id="各文件功能分析"><a href="#各文件功能分析" class="headerlink" title="各文件功能分析"></a>各文件功能分析</h2><p><a href="/assets/drawio/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E5%90%84%E6%96%87%E4%BB%B6%E5%8A%9F%E8%83%BD.drawio"><img src="/assets/images/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E5%90%84%E6%96%87%E4%BB%B6%E5%8A%9F%E8%83%BD.drawio.png" alt="表单设计器各文件功能.drawio.png"></a></p>
+<h2 id="渲染时各文件功能"><a href="#渲染时各文件功能" class="headerlink" title="渲染时各文件功能"></a>渲染时各文件功能</h2><ol>
+<li>即时预览时</li>
+</ol>
+<p><a href="/assets/drawio/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E5%8D%B3%E6%97%B6%E9%A2%84%E8%A7%88%E6%97%B6%E5%90%84%E6%96%87%E4%BB%B6%E5%8A%9F%E8%83%BD.drawio"><img src="/assets/images/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E5%8D%B3%E6%97%B6%E9%A2%84%E8%A7%88%E6%97%B6%E5%90%84%E6%96%87%E4%BB%B6%E5%8A%9F%E8%83%BD.drawio.png" alt="表单设计器即时预览时各文件功能.drawio.png"></a></p>
+<p><code>WidgetFormItem</code>为即时预览时组件最终渲染器。</p>
+<ol start="2">
+<li>渲染时</li>
+</ol>
+<p><a href="/assets/drawio/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E7%95%8C%E9%9D%A2%E6%B8%B2%E6%9F%93%E6%97%B6%E5%90%84%E6%96%87%E4%BB%B6%E5%8A%9F%E8%83%BD.drawio"><img src="/assets/images/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E7%95%8C%E9%9D%A2%E6%B8%B2%E6%9F%93%E6%97%B6%E5%90%84%E6%96%87%E4%BB%B6%E5%8A%9F%E8%83%BD.drawio.png" alt="表单设计器界面渲染时各文件功能.drawio.png"></a></p>
+<p><code>GenerateFormItem</code>为渲染时组件最终渲染器。</p>
+<h2 id="渲染后数据改变流程"><a href="#渲染后数据改变流程" class="headerlink" title="渲染后数据改变流程"></a>渲染后数据改变流程</h2><h3 id="内部组件"><a href="#内部组件" class="headerlink" title="内部组件"></a>内部组件</h3><p><a href="/assets/drawio/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E7%95%8C%E9%9D%A2%E6%B8%B2%E6%9F%93%E6%97%B6%E6%95%B0%E6%8D%AE%E6%94%B9%E5%8F%98%E6%B5%81%E7%A8%8B.drawio"><img src="/assets/images/vue-form-making/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8%E7%95%8C%E9%9D%A2%E6%B8%B2%E6%9F%93%E6%97%B6%E6%95%B0%E6%8D%AE%E6%94%B9%E5%8F%98%E6%B5%81%E7%A8%8B.drawio.png" alt="表单设计器界面渲染时数据改变流程.drawio.png"></a></p>
+<ol>
+<li><code>GenerateFormItem</code>中组件的数据<code>dataModel</code>发生改变,通过<code>update:models</code>修改上层组件的<code>models</code>数据,通过<code>input-change</code>事件触发<code>GenerateForm</code>的<code>onInputChange</code>方法</li>
+<li><code>GenerateForm</code>的<code>onInputChange</code>方法中通过<code>on-change</code>方法对外暴露组件数据改变事件</li>
+</ol>
+<h3 id="外部组件"><a href="#外部组件" class="headerlink" title="外部组件"></a>外部组件</h3><p>引入<code>GenerateForm</code>使用<code>value</code> props 传入外部数据,<code>GenerateForm</code>与<code>GenerateFormItem</code>中通过<code>props</code>一层层向下传递，每一层通过<code>watch</code>监听数据</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/11/form-making/analyse_form_making/" data-id="clin7xb4l000zccon0odve118" data-title="开源项目vue-form-making分析" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue-form-making/" rel="tag">vue-form-making</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" rel="tag">表单设计器</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-how_to_send_args_to_npm_scripts" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/10/how_to_send_args_to_npm_scripts/" class="article-date">
+  <time class="dt-published" datetime="2021-09-10T14:13:02.000Z" itemprop="datePublished">2021-09-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/npm/">npm</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/09/10/how_to_send_args_to_npm_scripts/">怎样给npm scripts发送命令行参数</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>当我使用<code>hexo</code>创建一片新的文章时,需要使用命令,比如本篇文章就需要使用命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page --path /_posts/how_to_send_args_to_npm_scripts how_to_send_args_to_npm_scripts</span><br></pre></td></tr></table></figure>
+
+<p>但我不想每次创建一篇新文章时都要敲这么长一串命令,而且命令中文章的标题<code>how_to_send_args_to_npm_scripts</code>是重复的<br>那么该怎么做呢？</p>
+<h2 id="将命令放入package-json中"><a href="#将命令放入package-json中" class="headerlink" title="将命令放入package.json中"></a>将命令放入<code>package.json</code>中</h2><p><code>package.json</code>中<code>scripts</code>下面可以放置该命令</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="comment">// 其他配置项忽略</span></span><br><span class="line">  <span class="string">&quot;scripts&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">//其他命令忽略</span></span><br><span class="line">    <span class="string">&quot;new&quot;</span>:<span class="string">&quot;hexo new page --path /_posts/how_to_send_args_to_npm_scripts how_to_send_args_to_npm_scripts&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 其他配置项忽略</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是我每次生成的文章标题都是不一样的，这该如何处理？</p>
+<h2 id="使scripts中命令动态化"><a href="#使scripts中命令动态化" class="headerlink" title="使scripts中命令动态化"></a>使<code>scripts</code>中命令动态化</h2><p>我希望当我使用<code>npm run new</code>这个命令时,能供传入新创建的文章标题以及文件名,这就要使用命令行参数解析功能,可以将<code>scripts</code>中命令改为</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="comment">// 其他配置项忽略</span></span><br><span class="line">  <span class="string">&quot;scripts&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">//其他命令忽略</span></span><br><span class="line">    <span class="comment">//$npm_config_path $npm_config_title只在bash终端下有效</span></span><br><span class="line">    <span class="comment">//windows用户需要使用 %npm_config_path% %npm_config_title%</span></span><br><span class="line">    <span class="string">&quot;new&quot;</span>:<span class="string">&quot;hexo new page --path /_posts/$npm_config_path $npm_config_title&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 其他配置项忽略</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样我只需使用<code>npm run new --path=how_to_send_args_to_npm_scritps --title=怎样向NPMScripts脚本发送参数</code>就可以生成一篇名为<code>how_to_send_args_to_npm_scritps.md</code>标题叫<code>怎样向NPMScripts脚本发送参数</code>的文章</p>
+<h2 id="进一步精简命令"><a href="#进一步精简命令" class="headerlink" title="进一步精简命令"></a>进一步精简命令</h2><p>可以新建以下脚本<code>./scripts/newPage.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> exec = <span class="built_in">require</span>(<span class="string">&#x27;child_process&#x27;</span>).<span class="property">exec</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> args = process.<span class="property">argv</span>.<span class="title function_">slice</span>(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;传入参数&#x27;</span>,args)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(args.<span class="property">length</span> != <span class="number">2</span>)&#123;</span><br><span class="line">  <span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> cmdStr = <span class="string">`hexo new page --path /_posts/<span class="subst">$&#123;args[<span class="number">0</span>]&#125;</span> &quot;<span class="subst">$&#123;args[<span class="number">1</span>]&#125;</span>&quot;`</span></span><br><span class="line"><span class="title function_">exec</span>(cmdStr, <span class="keyword">function</span>(<span class="params">err,stdout,stderr</span>)&#123;</span><br><span class="line">  <span class="keyword">if</span>(err) &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(stderr);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(stdout);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>将<code>scripts</code>中<code>new</code>对应的脚本改为</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="comment">// 其他配置项忽略</span></span><br><span class="line">  <span class="string">&quot;scripts&quot;</span>: &#123;</span><br><span class="line">    <span class="comment">//其他命令忽略</span></span><br><span class="line">    <span class="string">&quot;new&quot;</span>:<span class="string">&quot;node ./scripts/newPage.js&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 其他配置项忽略</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>npm run new how_to_send_args_to_npm_scritps 怎样向NPMScripts脚本发送参数</code>就可以生成一篇名为<code>how_to_send_args_to_npm_scritps.md</code>标题叫<code>怎样向NPMScripts脚本发送参数</code>的文章</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2016/10/npm_scripts.html">npm scripts 使用指南</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/10/how_to_send_args_to_npm_scripts/" data-id="clin7xb420004ccon8mssdg2h" data-title="怎样给npm scripts发送命令行参数" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/npm-scripts/" rel="tag">npm scripts</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-jeecg/how-jeecg-check-checkcode" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/05/jeecg/how-jeecg-check-checkcode/" class="article-date">
+  <time class="dt-published" datetime="2021-09-05T12:24:00.000Z" itemprop="datePublished">2021-09-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jeecg/">jeecg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/09/05/jeecg/how-jeecg-check-checkcode/">jeecg 2.4.6 如何校验验证码</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>这里主要分析jeecg 2.4.6如何校验登录</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><h3 id="生成验证码"><a href="#生成验证码" class="headerlink" title="生成验证码"></a>生成验证码</h3><p>前端缓存发送生成验证码请求时时间戳currdatetime</p>
+<h3 id="后端缓存"><a href="#后端缓存" class="headerlink" title="后端缓存"></a>后端缓存</h3><p>后端将验证码小写后+时间戳 md5后作为key,小写验证码作为value存redis,缓存时长60秒</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//org.jeecg.modules.system.controller.LoginController#randomImage</span></span><br><span class="line"><span class="comment">//生成随机验证码</span></span><br><span class="line"><span class="type">String</span> <span class="variable">code</span> <span class="operator">=</span> RandomUtil.randomString(BASE_CHECK_CODES,<span class="number">4</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">lowerCaseCode</span> <span class="operator">=</span> code.toLowerCase();</span><br><span class="line"><span class="comment">//验证码小写后+时间戳 md5后作为key</span></span><br><span class="line"><span class="type">String</span> <span class="variable">realKey</span> <span class="operator">=</span> MD5Util.MD5Encode(lowerCaseCode+key, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line"><span class="comment">//缓存redis</span></span><br><span class="line">redisUtil.set(realKey, lowerCaseCode, <span class="number">60</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="登录校验"><a href="#登录校验" class="headerlink" title="登录校验"></a>登录校验</h3><p>登录地址:</p>
+<p><a target="_blank" rel="noopener" href="http://localhost:8080/jeecg-boot/sys/login">http://localhost:8080/jeecg-boot/sys/login</a></p>
+<p>请求参数:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;username&quot;</span>:<span class="string">&quot;admin&quot;</span>,</span><br><span class="line">  <span class="string">&quot;password&quot;</span>:<span class="string">&quot;123456&quot;</span>,</span><br><span class="line">  <span class="comment">// 输入的验证码</span></span><br><span class="line">  <span class="string">&quot;captcha&quot;</span>:<span class="string">&quot;UKwW&quot;</span>,</span><br><span class="line">  <span class="comment">// 缓存时间戳</span></span><br><span class="line">  <span class="string">&quot;checkKey&quot;</span>:<span class="number">1630844796721</span>,</span><br><span class="line">  <span class="string">&quot;remember_me&quot;</span>:<span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输入的验证码+时间戳 md5后作为key,从redis里面获取验证码,验证码不为空且输入的验证码与redis里面获取的验证码一致，即为验证通过</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//org.jeecg.modules.system.controller.LoginController#login</span></span><br><span class="line"><span class="comment">//获取输入的验证码</span></span><br><span class="line"><span class="type">String</span> <span class="variable">captcha</span> <span class="operator">=</span> sysLoginModel.getCaptcha();</span><br><span class="line"><span class="keyword">if</span>(captcha==<span class="literal">null</span>)&#123;</span><br><span class="line">    result.error500(<span class="string">&quot;验证码无效&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">String</span> <span class="variable">lowerCaseCaptcha</span> <span class="operator">=</span> captcha.toLowerCase();</span><br><span class="line"><span class="comment">//输入的验证码+时间戳 md5后作为key</span></span><br><span class="line"><span class="type">String</span> <span class="variable">realKey</span> <span class="operator">=</span> MD5Util.MD5Encode(lowerCaseCaptcha+sysLoginModel.getCheckKey(), <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line"><span class="comment">//获取redis里面缓存的验证码</span></span><br><span class="line"><span class="type">Object</span> <span class="variable">checkCode</span> <span class="operator">=</span> redisUtil.get(realKey);</span><br><span class="line"><span class="comment">//当进入登录页时，有一定几率出现验证码错误 #1714</span></span><br><span class="line"><span class="keyword">if</span>(checkCode==<span class="literal">null</span> || !checkCode.toString().equals(lowerCaseCaptcha)) &#123;</span><br><span class="line">  result.error500(<span class="string">&quot;验证码错误&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/05/jeecg/how-jeecg-check-checkcode/" data-id="clin7xb4z001qccongbzo7ipt" data-title="jeecg 2.4.6 如何校验验证码" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" rel="tag">验证码校验</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/">下一页 &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/HarmonyOS/">HarmonyOS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OnlyOffice/">OnlyOffice</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug-fix/">bug-fix</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug%E4%BF%AE%E5%A4%8D/">bug修复</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/cmake/">cmake</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dbapi/">dbapi</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/design-pattern/">design-pattern</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/frp/">frp</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jdbc/">jdbc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jeecg/">jeecg</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/npm/">npm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/orange/">orange</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-boot/">spring-boot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-form-making/">vue-form-making</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue2/">vue2</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/wsl/">wsl</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" rel="tag">Bean条件注入</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Connection/" rel="tag">Connection</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DatabaseMetaData/" rel="tag">DatabaseMetaData</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HarmonyOS/" rel="tag">HarmonyOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-LifeCycle/" rel="tag">Maven LifeCycle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-Plugin/" rel="tag">Maven Plugin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OnlyOffice/" rel="tag">OnlyOffice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ResultSet/" rel="tag">ResultSet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statement/" rel="tag">Statement</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" rel="tag">Vue 依赖收集</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-reactivity/" rel="tag">Vue2 reactivity</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bat/" rel="tag">bat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug-fix/" rel="tag">bug-fix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug%E4%BF%AE%E5%A4%8D/" rel="tag">bug修复</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cmake/" rel="tag">cmake</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/" rel="tag">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/favicon/" rel="tag">favicon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/frp/" rel="tag">frp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hci/" rel="tag">hci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jest-Test/" rel="tag">jest Test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/metaobject/" rel="tag">metaobject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="tag">mybatis执行器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm-scripts/" rel="tag">npm scripts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/online-form/" rel="tag">online-form</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/orange/" rel="tag">orange</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server-programming/" rel="tag">server-programming</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-form-making/" rel="tag">vue-form-making</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl1/" rel="tag">wsl1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl2/" rel="tag">wsl2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" rel="tag">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" rel="tag">启动流程分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" rel="tag">源码阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="tag">环境搭建</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" rel="tag">自动装配原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%93%9D%E7%89%99/" rel="tag">蓝牙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" rel="tag">表单设计器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" rel="tag">验证码校验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" rel="tag">验证码生成</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" style="font-size: 10px;">Bean条件注入</a> <a href="/tags/Connection/" style="font-size: 10px;">Connection</a> <a href="/tags/DatabaseMetaData/" style="font-size: 10px;">DatabaseMetaData</a> <a href="/tags/HarmonyOS/" style="font-size: 10px;">HarmonyOS</a> <a href="/tags/Maven/" style="font-size: 16px;">Maven</a> <a href="/tags/Maven-LifeCycle/" style="font-size: 10px;">Maven LifeCycle</a> <a href="/tags/Maven-Plugin/" style="font-size: 10px;">Maven Plugin</a> <a href="/tags/OnlyOffice/" style="font-size: 12px;">OnlyOffice</a> <a href="/tags/ResultSet/" style="font-size: 10px;">ResultSet</a> <a href="/tags/Statement/" style="font-size: 10px;">Statement</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" style="font-size: 10px;">Vue 依赖收集</a> <a href="/tags/Vue2-reactivity/" style="font-size: 10px;">Vue2 reactivity</a> <a href="/tags/bat/" style="font-size: 10px;">bat</a> <a href="/tags/bug-fix/" style="font-size: 10px;">bug-fix</a> <a href="/tags/bug%E4%BF%AE%E5%A4%8D/" style="font-size: 10px;">bug修复</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/cmake/" style="font-size: 10px;">cmake</a> <a href="/tags/dbapi/" style="font-size: 14px;">dbapi</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/element-ui/" style="font-size: 10px;">element-ui</a> <a href="/tags/favicon/" style="font-size: 10px;">favicon</a> <a href="/tags/frp/" style="font-size: 10px;">frp</a> <a href="/tags/hci/" style="font-size: 10px;">hci</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jdbc/" style="font-size: 20px;">jdbc</a> <a href="/tags/jeecg/" style="font-size: 14px;">jeecg</a> <a href="/tags/jest-Test/" style="font-size: 10px;">jest Test</a> <a href="/tags/metaobject/" style="font-size: 10px;">metaobject</a> <a href="/tags/mybatis/" style="font-size: 18px;">mybatis</a> <a href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" style="font-size: 10px;">mybatis执行器</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/npm-scripts/" style="font-size: 10px;">npm scripts</a> <a href="/tags/online-form/" style="font-size: 10px;">online-form</a> <a href="/tags/orange/" style="font-size: 10px;">orange</a> <a href="/tags/server-programming/" style="font-size: 10px;">server-programming</a> <a href="/tags/spring-boot/" style="font-size: 16px;">spring-boot</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue-form-making/" style="font-size: 10px;">vue-form-making</a> <a href="/tags/vue2/" style="font-size: 10px;">vue2</a> <a href="/tags/wsl1/" style="font-size: 10px;">wsl1</a> <a href="/tags/wsl2/" style="font-size: 12px;">wsl2</a> <a href="/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 12px;">事务</a> <a href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" style="font-size: 10px;">内网穿透</a> <a href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" style="font-size: 10px;">启动流程分析</a> <a href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" style="font-size: 10px;">源码阅读</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" style="font-size: 10px;">环境搭建</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" style="font-size: 10px;">自动装配原理</a> <a href="/tags/%E8%93%9D%E7%89%99/" style="font-size: 10px;">蓝牙</a> <a href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" style="font-size: 10px;">表单设计器</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" style="font-size: 10px;">验证码校验</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" style="font-size: 10px;">验证码生成</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">十二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">九月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/08/">八月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/12/18/element-ui/el-form-item-with-if/">ElFormItem使用v-if导致校验异常问题</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/11/dbapi/command_line_too_large_in_bat/">BAT命令行过长处理</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/16/harmony/collect_hci_log/">HarmonyOS手机蓝牙日志</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/02/mybatis/mysql_meta_object_analyse/">Mybatis MetaObject分析</a>
+          </li>
+        
+          <li>
+            <a href="/2022/06/15/orange/how_to_parse_dynamic_sql/">Orange是如何解析动态SQL的</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 fuzi<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

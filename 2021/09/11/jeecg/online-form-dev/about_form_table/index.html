@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>jeecg 2.4.6 Online表单开发 数据库配置+crud | 技术琐话</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="表单保存 请求URL:  1http:&#x2F;&#x2F;localhost:8080&#x2F;jeecg-boot&#x2F;online&#x2F;cgform&#x2F;api&#x2F;editAll   请求方法:  PUT  请求参数:  1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jeecg 2.4.6 Online表单开发 数据库配置+crud">
+<meta property="og:url" content="https://fuzi1996.github.io/2021/09/11/jeecg/online-form-dev/about_form_table/index.html">
+<meta property="og:site_name" content="技术琐话">
+<meta property="og:description" content="表单保存 请求URL:  1http:&#x2F;&#x2F;localhost:8080&#x2F;jeecg-boot&#x2F;online&#x2F;cgform&#x2F;api&#x2F;editAll   请求方法:  PUT  请求参数:  1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-09-11T12:28:02.000Z">
+<meta property="article:modified_time" content="2023-06-08T14:12:33.681Z">
+<meta property="article:author" content="fuzi">
+<meta property="article:tag" content="jeecg">
+<meta property="article:tag" content="online-form">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="技术琐话" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">技术琐话</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://fuzi1996.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-jeecg/online-form-dev/about_form_table" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/09/11/jeecg/online-form-dev/about_form_table/" class="article-date">
+  <time class="dt-published" datetime="2021-09-11T12:28:02.000Z" itemprop="datePublished">2021-09-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jeecg/">jeecg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      jeecg 2.4.6 Online表单开发 数据库配置+crud
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="表单保存"><a href="#表单保存" class="headerlink" title="表单保存"></a>表单保存</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/editAll</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>PUT</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> <span class="string">&quot;head&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;id&quot;</span>: <span class="string">&quot;3d028152d85948a8b021aa8f13088dcd&quot;</span>,</span><br><span class="line">  <span class="string">&quot;tableName&quot;</span>: <span class="string">&quot;flcm_product&quot;</span>,</span><br><span class="line">  <span class="string">&quot;tableType&quot;</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="string">&quot;tableVersion&quot;</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="string">&quot;tableTxt&quot;</span>: <span class="string">&quot;基金产品&quot;</span>,</span><br><span class="line">  <span class="string">&quot;isCheckbox&quot;</span>: <span class="string">&quot;Y&quot;</span>,</span><br><span class="line">  <span class="string">&quot;isDbSynch&quot;</span>: <span class="string">&quot;N&quot;</span>,</span><br><span class="line">  <span class="string">&quot;isPage&quot;</span>: <span class="string">&quot;Y&quot;</span>,</span><br><span class="line">  <span class="string">&quot;isTree&quot;</span>: <span class="string">&quot;N&quot;</span>,</span><br><span class="line">  <span class="string">&quot;idSequence&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;idType&quot;</span>: <span class="string">&quot;UUID&quot;</span>,</span><br><span class="line">  <span class="string">&quot;queryMode&quot;</span>: <span class="string">&quot;single&quot;</span>,</span><br><span class="line">  <span class="string">&quot;relationType&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;subTableStr&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;tabOrderNum&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;treeParentIdField&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;treeIdField&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;treeFieldname&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;formCategory&quot;</span>: <span class="string">&quot;bdfl_include&quot;</span>,</span><br><span class="line">  <span class="string">&quot;formTemplate&quot;</span>: <span class="string">&quot;1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;themeTemplate&quot;</span>: <span class="string">&quot;normal&quot;</span>,</span><br><span class="line">  <span class="string">&quot;formTemplateMobile&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;extConfigJson&quot;</span>: <span class="string">&quot;&#123;\&quot;reportPrintShow\&quot;:0,\&quot;reportPrintUrl\&quot;:\&quot;\&quot;,\&quot;joinQuery\&quot;:0,\&quot;modelFullscreen\&quot;:0,\&quot;modalMinWidth\&quot;:\&quot;\&quot;&#125;&quot;</span>,</span><br><span class="line">  <span class="string">&quot;updateBy&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;updateTime&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;createBy&quot;</span>: <span class="string">&quot;admin&quot;</span>,</span><br><span class="line">  <span class="string">&quot;createTime&quot;</span>: <span class="string">&quot;2021-09-11 20:04:12&quot;</span>,</span><br><span class="line">  <span class="string">&quot;copyType&quot;</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">&quot;copyVersion&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;physicId&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;hascopy&quot;</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">&quot;scroll&quot;</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="string">&quot;taskId&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">  <span class="string">&quot;isDesForm&quot;</span>: <span class="string">&quot;N&quot;</span>,</span><br><span class="line">  <span class="string">&quot;desFormCode&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line"> &#125;,</span><br><span class="line"> <span class="string">&quot;fields&quot;</span>: [</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="string">&quot;id&quot;</span>: <span class="string">&quot;eed836ca2e974802caa1d6b98e3f4333&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbFieldName&quot;</span>: <span class="string">&quot;id&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbFieldTxt&quot;</span>: <span class="string">&quot;主键&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryDictField&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryDictText&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryDefVal&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryDictTable&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryConfigFlag&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;mainTable&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;mainField&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldHref&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dictField&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dictText&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldMustInput&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dictTable&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldLength&quot;</span>: <span class="string">&quot;120&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldDefaultValue&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldExtendJson&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;converter&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;isShowForm&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;isShowList&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;sortFlag&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;isReadOnly&quot;</span>: <span class="string">&quot;1&quot;</span>,</span><br><span class="line">   <span class="string">&quot;fieldShowType&quot;</span>: <span class="string">&quot;text&quot;</span>,</span><br><span class="line">   <span class="string">&quot;isQuery&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;queryMode&quot;</span>: <span class="string">&quot;single&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbLength&quot;</span>: <span class="string">&quot;36&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbPointLength&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbDefaultVal&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">   <span class="string">&quot;orderNum&quot;</span>: <span class="number">1</span>,</span><br><span class="line">   <span class="string">&quot;dbType&quot;</span>: <span class="string">&quot;string&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbIsKey&quot;</span>: <span class="string">&quot;1&quot;</span>,</span><br><span class="line">   <span class="string">&quot;dbIsNull&quot;</span>: <span class="string">&quot;0&quot;</span>,</span><br><span class="line">   <span class="string">&quot;order_num&quot;</span>: <span class="number">0</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 其他字段舍弃</span></span><br><span class="line"> ],</span><br><span class="line"> <span class="string">&quot;indexs&quot;</span>: [</span><br><span class="line">  &#123;</span><br><span class="line">   <span class="string">&quot;id&quot;</span>: <span class="string">&quot;c92fd1cd8c8f1aaa264ee628e8b73f97&quot;</span>,</span><br><span class="line">   <span class="string">&quot;indexName&quot;</span>: <span class="string">&quot;uk_code&quot;</span>,</span><br><span class="line">   <span class="string">&quot;indexField&quot;</span>: <span class="string">&quot;code&quot;</span>,</span><br><span class="line">   <span class="string">&quot;indexType&quot;</span>: <span class="string">&quot;unique&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line"> ],</span><br><span class="line"> <span class="string">&quot;deleteFieldIds&quot;</span>: [],</span><br><span class="line"> <span class="string">&quot;deleteIndexIds&quot;</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#b(org.jeecg.modules.online.cgform.model.a)</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据库同步"><a href="#数据库同步" class="headerlink" title="数据库同步"></a>数据库同步</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/doDbSynch/3d028152d85948a8b021aa8f13088dcd/normal</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code,<code>normal</code>是同步方式</p>
+<p><code>normal</code>:普通同步,<code>force</code>:强制同步,这两个同步方式的唯一区别是是否产生<code>drop</code>语句</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>POST</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<p>无</p>
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#h</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据增加"><a href="#数据增加" class="headerlink" title="数据增加"></a>数据增加</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/form/3d028152d85948a8b021aa8f13088dcd?tabletype=1</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>POST</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;name&quot;</span>:<span class="string">&quot;产品名称TEST#1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;code&quot;</span>:<span class="string">&quot;产品代码TEST#1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;duration&quot;</span>:<span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#a(java.lang.String, com.alibaba.fastjson.JSONObject, javax.servlet.http.HttpServletRequest)</span><br></pre></td></tr></table></figure>
+
+<p>这里其实就是根据配置生成<code>insert</code>语句</p>
+<h2 id="数据删除"><a href="#数据删除" class="headerlink" title="数据删除"></a>数据删除</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/form/3d028152d85948a8b021aa8f13088dcd/1436700316685357058</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code,<code>1436700316685357058</code>是数据id</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>DELETE</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<p>无</p>
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#f</span><br></pre></td></tr></table></figure>
+
+<p>这里其实就是根据配置生成<code>delete</code>语句&#x2F;或逻辑删除</p>
+<h2 id="数据修改"><a href="#数据修改" class="headerlink" title="数据修改"></a>数据修改</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/form/3d028152d85948a8b021aa8f13088dcd?tabletype=1</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>PUT</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;duration&quot;</span>:<span class="number">123</span>,</span><br><span class="line">  <span class="string">&quot;code&quot;</span>:<span class="string">&quot;code&quot;</span>,</span><br><span class="line">  <span class="string">&quot;name&quot;</span>:<span class="string">&quot;name&quot;</span>,</span><br><span class="line">  <span class="string">&quot;id&quot;</span>:<span class="string">&quot;1437763464737640449&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#a(java.lang.String, com.alibaba.fastjson.JSONObject)</span><br></pre></td></tr></table></figure>
+
+<p>这里其实就是根据配置生成<code>update</code>语句</p>
+<h2 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h2><ul>
+<li>请求URL:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">http</span>:<span class="comment">//localhost:8080/jeecg-boot/online/cgform/api/form/3d028152d85948a8b021aa8f13088dcd?tabletype=1</span></span><br></pre></td></tr></table></figure>
+
+<p>其中,<code>3d028152d85948a8b021aa8f13088dcd</code>是表单code</p>
+<ul>
+<li>请求方法:</li>
+</ul>
+<p>PUT</p>
+<ul>
+<li>请求参数:</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_t=<span class="number">1631624511</span>&amp;column=id&amp;order=desc&amp;pageNo=<span class="number">1</span>&amp;pageSize=<span class="number">10</span>&amp;superQueryMatchType=and</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>后台处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 这里应该是对实现类做了混淆</span><br><span class="line">org.jeecg.modules.online.cgform.c.a#a(java.lang.String, javax.servlet.http.HttpServletRequest)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://fuzi1996.github.io/2021/09/11/jeecg/online-form-dev/about_form_table/" data-id="clin7xb5l003dccon3kymennk" data-title="jeecg 2.4.6 Online表单开发 数据库配置+crud" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/online-form/" rel="tag">online-form</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2021/09/25/vue/add_jest_test/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          为VUE2工程添加JEST单元测试
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/09/11/form-making/analyse_form_making/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">开源项目vue-form-making分析</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/HarmonyOS/">HarmonyOS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OnlyOffice/">OnlyOffice</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug-fix/">bug-fix</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bug%E4%BF%AE%E5%A4%8D/">bug修复</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/cmake/">cmake</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/dbapi/">dbapi</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/design-pattern/">design-pattern</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/frp/">frp</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jdbc/">jdbc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jeecg/">jeecg</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/npm/">npm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/orange/">orange</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring-boot/">spring-boot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-form-making/">vue-form-making</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue2/">vue2</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/wsl/">wsl</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" rel="tag">Bean条件注入</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Connection/" rel="tag">Connection</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DatabaseMetaData/" rel="tag">DatabaseMetaData</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HarmonyOS/" rel="tag">HarmonyOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/" rel="tag">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-LifeCycle/" rel="tag">Maven LifeCycle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven-Plugin/" rel="tag">Maven Plugin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OnlyOffice/" rel="tag">OnlyOffice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ResultSet/" rel="tag">ResultSet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statement/" rel="tag">Statement</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" rel="tag">Vue 依赖收集</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-reactivity/" rel="tag">Vue2 reactivity</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bat/" rel="tag">bat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug-fix/" rel="tag">bug-fix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bug%E4%BF%AE%E5%A4%8D/" rel="tag">bug修复</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cmake/" rel="tag">cmake</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dbapi/" rel="tag">dbapi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/" rel="tag">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/element-ui/" rel="tag">element-ui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/favicon/" rel="tag">favicon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/frp/" rel="tag">frp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hci/" rel="tag">hci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jdbc/" rel="tag">jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jeecg/" rel="tag">jeecg</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jest-Test/" rel="tag">jest Test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/metaobject/" rel="tag">metaobject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/" rel="tag">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="tag">mybatis执行器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm-scripts/" rel="tag">npm scripts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/online-form/" rel="tag">online-form</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/orange/" rel="tag">orange</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/server-programming/" rel="tag">server-programming</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/" rel="tag">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-form-making/" rel="tag">vue-form-making</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl1/" rel="tag">wsl1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wsl2/" rel="tag">wsl2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" rel="tag">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" rel="tag">启动流程分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" rel="tag">源码阅读</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="tag">环境搭建</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" rel="tag">自动装配原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%93%9D%E7%89%99/" rel="tag">蓝牙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" rel="tag">表单设计器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" rel="tag">验证码校验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" rel="tag">验证码生成</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean%E6%9D%A1%E4%BB%B6%E6%B3%A8%E5%85%A5/" style="font-size: 10px;">Bean条件注入</a> <a href="/tags/Connection/" style="font-size: 10px;">Connection</a> <a href="/tags/DatabaseMetaData/" style="font-size: 10px;">DatabaseMetaData</a> <a href="/tags/HarmonyOS/" style="font-size: 10px;">HarmonyOS</a> <a href="/tags/Maven/" style="font-size: 16px;">Maven</a> <a href="/tags/Maven-LifeCycle/" style="font-size: 10px;">Maven LifeCycle</a> <a href="/tags/Maven-Plugin/" style="font-size: 10px;">Maven Plugin</a> <a href="/tags/OnlyOffice/" style="font-size: 12px;">OnlyOffice</a> <a href="/tags/ResultSet/" style="font-size: 10px;">ResultSet</a> <a href="/tags/Statement/" style="font-size: 10px;">Statement</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Vue-%E4%BE%9D%E8%B5%96%E6%94%B6%E9%9B%86/" style="font-size: 10px;">Vue 依赖收集</a> <a href="/tags/Vue2-reactivity/" style="font-size: 10px;">Vue2 reactivity</a> <a href="/tags/bat/" style="font-size: 10px;">bat</a> <a href="/tags/bug-fix/" style="font-size: 10px;">bug-fix</a> <a href="/tags/bug%E4%BF%AE%E5%A4%8D/" style="font-size: 10px;">bug修复</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/cmake/" style="font-size: 10px;">cmake</a> <a href="/tags/dbapi/" style="font-size: 14px;">dbapi</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/element-ui/" style="font-size: 10px;">element-ui</a> <a href="/tags/favicon/" style="font-size: 10px;">favicon</a> <a href="/tags/frp/" style="font-size: 10px;">frp</a> <a href="/tags/hci/" style="font-size: 10px;">hci</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jdbc/" style="font-size: 20px;">jdbc</a> <a href="/tags/jeecg/" style="font-size: 14px;">jeecg</a> <a href="/tags/jest-Test/" style="font-size: 10px;">jest Test</a> <a href="/tags/metaobject/" style="font-size: 10px;">metaobject</a> <a href="/tags/mybatis/" style="font-size: 18px;">mybatis</a> <a href="/tags/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" style="font-size: 10px;">mybatis执行器</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/npm-scripts/" style="font-size: 10px;">npm scripts</a> <a href="/tags/online-form/" style="font-size: 10px;">online-form</a> <a href="/tags/orange/" style="font-size: 10px;">orange</a> <a href="/tags/server-programming/" style="font-size: 10px;">server-programming</a> <a href="/tags/spring-boot/" style="font-size: 16px;">spring-boot</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue-form-making/" style="font-size: 10px;">vue-form-making</a> <a href="/tags/vue2/" style="font-size: 10px;">vue2</a> <a href="/tags/wsl1/" style="font-size: 10px;">wsl1</a> <a href="/tags/wsl2/" style="font-size: 12px;">wsl2</a> <a href="/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 12px;">事务</a> <a href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" style="font-size: 10px;">内网穿透</a> <a href="/tags/%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" style="font-size: 10px;">启动流程分析</a> <a href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" style="font-size: 10px;">源码阅读</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" style="font-size: 10px;">环境搭建</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86/" style="font-size: 10px;">自动装配原理</a> <a href="/tags/%E8%93%9D%E7%89%99/" style="font-size: 10px;">蓝牙</a> <a href="/tags/%E8%A1%A8%E5%8D%95%E8%AE%BE%E8%AE%A1%E5%99%A8/" style="font-size: 10px;">表单设计器</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C/" style="font-size: 10px;">验证码校验</a> <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81%E7%94%9F%E6%88%90/" style="font-size: 10px;">验证码生成</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">十二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">九月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/08/">八月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/12/18/element-ui/el-form-item-with-if/">ElFormItem使用v-if导致校验异常问题</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/11/dbapi/command_line_too_large_in_bat/">BAT命令行过长处理</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/16/harmony/collect_hci_log/">HarmonyOS手机蓝牙日志</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/02/mybatis/mysql_meta_object_analyse/">Mybatis MetaObject分析</a>
+          </li>
+        
+          <li>
+            <a href="/2022/06/15/orange/how_to_parse_dynamic_sql/">Orange是如何解析动态SQL的</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 fuzi<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
